@@ -2,11 +2,16 @@ import { NgModule, NO_ERRORS_SCHEMA } from "@angular/core";
 import { NativeScriptModule } from "nativescript-angular/nativescript.module";
 import { NativeScriptHttpModule } from "nativescript-angular/http";
 import { AppRoutingModule } from "./app.routing";
+import { TNSFontIconModule } from "nativescript-ngx-fonticon";
+import { NativeScriptFormsModule } from "nativescript-angular/forms";
+import { ReactiveFormsModule } from "@angular/forms";
 
 import { AppComponent } from "./app.component";
 import { HomeComponent } from "./home/home.component";
+import { SetupComponent } from "./setup/setup.component";
 
 import { CompanyService } from "./services/company.service";
+import { CouchbaseService } from "./services/couchbase.service";
 import { ProcessHTTPMsgService } from "./services/process-httpmsg.service";
 import { BaseURL } from "./shared/baseurl";
 
@@ -17,16 +22,23 @@ import { BaseURL } from "./shared/baseurl";
     imports: [
         NativeScriptModule,
         AppRoutingModule,
-        NativeScriptHttpModule
+        NativeScriptHttpModule,
+        NativeScriptFormsModule,
+        ReactiveFormsModule,
+        TNSFontIconModule.forRoot({
+            "fa": "./fonts/font-awesome.min.css"
+        })
     ],
     declarations: [
         AppComponent,
-        HomeComponent
+        HomeComponent,
+        SetupComponent
     ],
     providers: [
         {provide: 'BaseURL', useValue: BaseURL},
         ProcessHTTPMsgService,
-        CompanyService
+        CompanyService,
+        CouchbaseService
     ],
     schemas: [
         NO_ERRORS_SCHEMA

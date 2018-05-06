@@ -1,6 +1,10 @@
 import { Component, OnInit, Inject } from "@angular/core";
 import { CompanyVO } from "../shared/companyVO";
 import { CompanyService } from "../services/company.service";
+import { getString, setString } from "application-settings";
+import { CouchbaseService } from "../services/couchbase.service";
+import { RouterExtensions } from "nativescript-angular/router";
+import { TNSFontIconService } from "nativescript-ngx-fonticon";
 
 @Component({
     selector: "app-home",
@@ -11,16 +15,26 @@ import { CompanyService } from "../services/company.service";
 export class HomeComponent implements OnInit {
 
     companies: CompanyVO[];
-    errMess: string;
+    company: CompanyVO;
+    message: string;
+    actionBarStyle: string = "background-color: #333333; color: #FFFFFF;";
 
     constructor(
-        private companyService: CompanyService
+        private companyService: CompanyService,
+        private couchbaseService: CouchbaseService,
+        private fonticon: TNSFontIconService,
+        private routerExtensions: RouterExtensions
     ) {}
 
     ngOnInit() {
-        this.companyService.getCompanies()
-            .subscribe(companies => this.companies = companies,
-            errmess => this.errMess = <any>errmess);
+        if (getString("Company", "") === "") {
+            this.message = "No Company in App Config!";
+            console.log("Go to Setup!");
+            this.routerExtensions.navigate(["/setup"]);
+        }
+        
     }
+
+
 
 }
