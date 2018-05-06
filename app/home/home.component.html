@@ -1,0 +1,21 @@
+<ActionBar title="Home" class="action-bar"></ActionBar>
+<StackLayout class="page">
+    <ListView [items]="companies" class="list-group" *ngIf="companies">
+        <ng-template let-company="item">
+            <StackLayout orientation="horizontal" class="list-group-item">
+                <Image row="0" col="0" rowSpan="2" height="110" width="110" [src]="company.logo" class="thumb p-4"></Image>
+                <GridLayout class="list-group-item" rows="auto auto auto auto auto auto auto" columns="*">
+                    <label row="0" col="0" [text]="company.company" class="list-group-item-heading" textWrap="true"></label>
+                    <Label row="1" col="0" [text]="company.description" class="list-group-item-text" textWrap="true"></Label>
+                    <Label row="2" col="0" [text]="company.website" class="list-group-item-text"></Label>
+                    <Label row="3" col="0" [text]="company.email" class="list-group-item-text"></Label>
+                    <Label row="4" col="0" [text]="company.phone" class="list-group-item-text"></Label>
+                    <Label row="5" col="0" [text]="company.street" class="list-group-item-text"></Label>
+                    <Label row="6" col="0" [text]="company.city + ' ' + company.state + ', ' + company.zip" class="list-group-item-text"></Label>
+                </GridLayout>
+            </StackLayout>
+        </ng-template>
+    </ListView>
+    <ActivityIndicator busy="true" *ngIf="!(companies || errMess)" width="50" height="50" class="activity-indicator"></ActivityIndicator>
+    <Label *ngIf="errMess" [text]="'Error: ' + errMess"></Label>
+</StackLayout>
