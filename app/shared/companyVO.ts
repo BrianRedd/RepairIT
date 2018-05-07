@@ -1,9 +1,8 @@
 export interface CompanyVO {
     id: string,
-    company: string,
+    name: string,
     logo: string,
-    primary: string,
-    secondary: string,
+    colors: Array<string>,
     email: string,
     website: string,
     phone: string,
