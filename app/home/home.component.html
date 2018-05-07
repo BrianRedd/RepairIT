@@ -1,5 +1,10 @@
-<ActionBar title="Home" class="action-bar" [style]="actionBarStyle"></ActionBar>
+<ActionBar class="action-bar" [style]="actionBarStyle">
+    <Label [text]="('fa-home' | fonticon) + ' RepairIT Home'" class="h2 fa" [style]="actionBarTextStyle"></Label>
+</ActionBar>
 <StackLayout class="page">
+    <StackLayout orientation="horizontal" horizontalAlignment="center" *ngIf="message">
+        <Label [text]="message"></Label>
+    </StackLayout>
     <Button class="btn" text="Reset Data" (tap)="reset()"></Button>
     <StackLayout *ngIf="company">
         <Image verticalAlignment="top" row="0" col="0" rowSpan="2" height="110" width="110" [src]="company.logo" class="thumb p-4"></Image>

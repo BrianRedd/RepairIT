@@ -1,0 +1,21 @@
+<ActionBar class="action-bar" [style]="actionBarStyle">
+    <Label [text]="('fa-user' | fonticon) + ' New User'" class="h2 fa" [style]="actionBarTextStyle"></Label>
+</ActionBar>
+<StackLayout class="page m-15">
+    <StackLayout orientation="horizontal" horizontalAlignment="center" *ngIf="message">
+        <Label [text]="message"></Label>
+    </StackLayout>
+    <GridLayout class="m-5" rows="auto auto auto auto auto auto" columns="*, *" [formGroup]="newuserForm">
+        <Label class="h3 m-15" row="0" col="0" colSpan="2" text="Please enter First and Last Name; an Associate ID will be generated for you, but can be edited as necessary." textWrap="true"></Label>
+        <Label class="h3 m-15" row="1" col="0" text="First Name"></Label>
+        <TextField class="input input-border" row="1" col="1" formControlName="firstname" id="firstname" hint="First Name" [text]="" (textChange)="onFirstNameChange($event)"></TextField>
+        <Label class="h3 m-15" row="2" col="0" text="Last Name"></Label>
+        <TextField class="input input-border" row="2" col="1" formControlName="lastname" id="lastname" hint="Last Name" [text]="" (textChange)="onLastNameChange($event)"></TextField>
+        <Label class="h3 m-15" row="3" col="0" text="Password (optional)"></Label>
+        <TextField class="input input-border" row="3" col="1" formControlName="associatepw" id="associatepw" hint="Password" [text]="" secure="true"></TextField>
+        <Label class="h3 m-15" row="4" col="0" text="Associate ID"></Label>
+        <TextField class="input input-border" row="4" col="1" formControlName="associateid" id="associateid" hint="Associate ID" [text]="" (textChange)="onIdChange($event)"></TextField>
+        <Button class="btn btn-primary btn-active m-15" row="5" col="1" text="Submit" (tap)="submit()" [isEnabled]="newuserForm.valid"></Button>
+    </GridLayout>
+    <Button class="btn" text="Reset Data" (tap)="reset()"></Button>
+</StackLayout>

@@ -1,7 +1,7 @@
-import { Component, OnInit, Inject } from "@angular/core";
+import { Component, Inject } from "@angular/core";
 import { CompanyVO } from "../shared/companyVO";
 import { CompanyService } from "../services/company.service";
-import { getString, setString } from "application-settings";
+import { getString, setString, setNumber } from "application-settings";
 import { CouchbaseService } from "../services/couchbase.service";
 import { RouterExtensions } from "nativescript-angular/router";
 import { TNSFontIconService } from "nativescript-ngx-fonticon";
@@ -16,13 +16,13 @@ import { confirm } from "ui/dialogs";
     templateUrl: "./setup.component.html",
     styleUrls: ['./setup.component.css']
 })
-export class SetupComponent implements OnInit {
+export class SetupComponent {
 
     companies: CompanyVO[];
     company: CompanyVO;
     message: string;
     setupForm: FormGroup;
-    actionBarStyle: string = "background-color: #333333;";
+    actionBarStyle: string = "background-color: #006A5C;";
     actionBarTextStyle: string = "color: #FFFFFF";
 
     constructor(
@@ -54,6 +54,11 @@ export class SetupComponent implements OnInit {
     ngOnInit() {
     }
 
+    onCompanyIDBlur(args) {
+        let textField = <TextField>args.object;
+        this.setupForm.patchValue({"companyid": textField.text.toUpperCase()});
+    };
+
     submit() {
         this.message = "";
         this.companyService.getCompanies()
@@ -64,7 +69,7 @@ export class SetupComponent implements OnInit {
     }
 
     confirm() {
-        console.log("Entered: " + this.setupForm.get("companyid").value + ":" + this.setupForm.get("companypw").value);
+        //console.log("Entered: " + this.setupForm.get("companyid").value + ":" + this.setupForm.get("companypw").value);
         for (let i: number = 0; i < this.companies.length; i++ ) {
             if (this.setupForm.get("companyid").value !== this.companies[i].id ||
                 this.setupForm.get("companypw").value !== this.companies[i].password ) {
@@ -85,9 +90,6 @@ export class SetupComponent implements OnInit {
                         const toast = new Toasty(this.message, "short", "center");
                         toast.show();
                     } else {
-                        this.message = "RepairIT App Configured for " + this.company.name;
-                        const toast = new Toasty(this.message, "long", "center");
-                        toast.show();
                         setString("Company", this.company.name);
                         setString("CompanyID", this.company.id);
                         setString("CompanyPW", this.company.password);
@@ -101,9 +103,19 @@ export class SetupComponent implements OnInit {
                         setString("CompanyState", this.company.state);
                         setString("CompanyZip", this.company.zip);
                         this.couchbaseService.updateDocument("colors", {"colors": this.company.colors});
+                        //console.log("***COLORS", this.couchbaseService.getDocument("colors"));
                         this.couchbaseService.updateDocument("issues", {"issues": this.company.issues});
+                        //console.log("***ISSUES", this.couchbaseService.getDocument("issues"));
                         this.couchbaseService.updateDocument("locations", {"locations": this.company.locations});
-                        console.log(JSON.stringify(this.company));
+                        //console.log("***LOCATIONS", this.couchbaseService.getDocument("locations"));
+                        setNumber("numusers", 0);
+                        setString("users", "");
+
+                        this.message = "RepairIT App Configured for " + this.company.name;
+                        const toast = new Toasty(this.message, "long", "center");
+                        toast.show();
+                        
+                        this.routerExtensions.navigate(["/newuser"]);
                     }
                 });
                 escape;
@@ -115,8 +127,6 @@ export class SetupComponent implements OnInit {
         this.message = "Contact Us Coming Soon!";
         const toast = new Toasty(this.message, "short", "center");
         toast.show();
-        
-        this.routerExtensions.navigate(["/home"]);
     }
 
 }

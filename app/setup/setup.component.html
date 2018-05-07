@@ -9,9 +9,9 @@
         <Label class="h3 m-15" row="0" col="0" colSpan="2" text="Please enter Company ID and Password, as provided by the RepairIT implementation team." textWrap="true"></Label>
         <Label class="h4 m-15" row="1" col="0" colSpan="2" text="If you do not have a Company ID and Password, please contact us by clicking button at bottom of page." textWrap="true"></Label>
         <Label class="h3 m-15" row="2" col="0" text="Company ID"></Label>
-        <TextField class="input input-border" row="2" col="1" formControlName="companyid" id="companyid" hint="Company ID" [text]=""></TextField>
+        <TextField class="input input-border" row="2" col="1" formControlName="companyid" id="companyid" hint="Company ID" [text]="" (blur)="onCompanyIDBlur($event)"></TextField>
         <Label class="h3 m-15" row="3" col="0" text="Company Password"></Label>
-        <TextField class="input input-border" row="3" col="1" formControlName="companypw" id="companypw" hint="Company Password" [text]=""></TextField>
+        <TextField class="input input-border" row="3" col="1" formControlName="companypw" id="companypw" hint="Company Password" [text]="" secure="true"></TextField>
         <Button class="btn btn-active m-15" row="4" col="0" text="Contact Us" (tap)="contact()"></Button>
         <Button class="btn btn-primary btn-active m-15" row="4" col="1" text="Submit" (tap)="submit()" [isEnabled]="setupForm.valid"></Button>
     </GridLayout>

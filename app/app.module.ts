@@ -9,6 +9,7 @@ import { ReactiveFormsModule } from "@angular/forms";
 import { AppComponent } from "./app.component";
 import { HomeComponent } from "./home/home.component";
 import { SetupComponent } from "./setup/setup.component";
+import { NewuserComponent } from "./newuser/newuser.component";
 
 import { CompanyService } from "./services/company.service";
 import { CouchbaseService } from "./services/couchbase.service";
@@ -32,7 +33,8 @@ import { BaseURL } from "./shared/baseurl";
     declarations: [
         AppComponent,
         HomeComponent,
-        SetupComponent
+        SetupComponent,
+        NewuserComponent
     ],
     providers: [
         {provide: 'BaseURL', useValue: BaseURL},

@@ -5,6 +5,7 @@ import { getString, setString, clear } from "application-settings";
 import { CouchbaseService } from "../services/couchbase.service";
 import { RouterExtensions } from "nativescript-angular/router";
 import { TNSFontIconService } from "nativescript-ngx-fonticon";
+import { Toasty } from "nativescript-toasty";
 
 @Component({
     selector: "app-home",
@@ -16,7 +17,8 @@ export class HomeComponent implements OnInit {
 
     company: any; 
     message: string;
-    actionBarStyle: string = "background-color: #333333; color: #FFFFFF;";
+    actionBarStyle: string = "background-color: #006A5C;";
+    actionBarTextStyle: string = "color: #FFFFFF";
 
     constructor(
         private companyService: CompanyService,
@@ -28,8 +30,9 @@ export class HomeComponent implements OnInit {
 
     ngOnInit() {
         if (getString("Company", "") === "") {
-            this.message = "No Company in App Config!";
-            console.log("Go to Setup!");
+            /*this.message = "RepairIT is not yet set up.";
+            const toast = new Toasty(this.message, "long", "center");
+            toast.show();*/
             this.routerExtensions.navigate(["/setup"]);
         } else {
             this.company = new Array<CompanyVO>();
@@ -48,8 +51,18 @@ export class HomeComponent implements OnInit {
             this.company.colors = this.couchbaseService.getDocument("colors").colors;
             this.company.issues = this.couchbaseService.getDocument("issues").issues;
             this.company.locations = this.couchbaseService.getDocument("locations").locations;
-            console.log("THIS.COUCHBASE.GET > issues:\n", this.couchbaseService.getDocument("issues"));
-            console.log("THIS.COMPANY.ISSUES:\n", this.company.issues);
+            this.actionBarStyle = "background-color: " + this.company.colors[0].hex + ";";
+            this.userLoggedIn();
+        }
+    }
+
+    userLoggedIn() {
+        if (getString("currentuser") === "") {
+
+        } else {
+            this.message = getString("currentusername") + " signed in";
+            let toast = new Toasty(this.message, "short", "middle");
+            toast.show();
         }
     }
 
@@ -60,7 +73,5 @@ export class HomeComponent implements OnInit {
         this.couchbaseService.deleteDocument("locations");
         this.routerExtensions.navigate(["/setup"]);
     }
-
-
 
 }
