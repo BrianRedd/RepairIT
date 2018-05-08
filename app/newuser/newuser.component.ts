@@ -1,6 +1,5 @@
 import { Component, Inject, OnInit } from "@angular/core";
 import { getString, setString, getNumber, setNumber, clear } from "application-settings";
-import { UserVO } from "../shared/userVO";
 import { CouchbaseService } from "../services/couchbase.service";
 import { RouterExtensions } from "nativescript-angular/router";
 import { TNSFontIconService } from "nativescript-ngx-fonticon";
@@ -15,7 +14,7 @@ import { confirm } from "ui/dialogs";
     templateUrl: "./newuser.component.html",
     styleUrls: ['./newuser.component.css']
 })
-export class NewuserComponent {
+export class NewuserComponent implements OnInit {
 
     message: string;
     newuserForm: FormGroup;
@@ -32,18 +31,17 @@ export class NewuserComponent {
         private fonticon: TNSFontIconService,
         private routerExtensions: RouterExtensions
     ) {
+        let colors = this.couchbaseService.getDocument("colors").colors;
+        //console.log("colors", JSON.stringify(colors));
+        if (colors[0].hex) {
+            this.actionBarStyle = "background-color: " + colors[0].hex + ";";
+        }
         this.users = getString("users", "");
         this.numusers = getNumber("numusers");
         if (this.numusers === 0) {
             this.message = "No existing associates defined"
         } else {
             this.message = "Existing associates: " + this.users;
-        }
-
-        let colors = this.couchbaseService.getDocument("colors").colors;
-        //console.log("colors", JSON.stringify(colors));
-        if (colors[0].hex) {
-            this.actionBarStyle = "background-color: " + colors[0].hex + ";";
         }
         this.newuserForm = this.formBuilder.group({
             firstname: ["", Validators.required],
@@ -97,9 +95,9 @@ export class NewuserComponent {
             let username_x: string = "username_" + num_x;
             let username: string = this.newuserForm.get("firstname").value + " " + this.newuserForm.get("lastname").value;
             setString(userid_x, this.newuserForm.get("associateid").value);
-            setString("currentuserid", this.newuserForm.get("associateid").value);
             setString(userpw_x, this.newuserForm.get("associatepw").value);
             setString(username_x, username);
+            setString("currentuserid", this.newuserForm.get("associateid").value);
             setString("currentusername", username);
             this.message = username + "  added as Associate";
             let toast = new Toasty(this.message, "short", "center");

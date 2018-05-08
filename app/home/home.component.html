@@ -1,39 +1,21 @@
 <ActionBar class="action-bar" [style]="actionBarStyle">
     <Label [text]="('fa-home' | fonticon) + ' RepairIT Home'" class="h2 fa" [style]="actionBarTextStyle"></Label>
 </ActionBar>
-<StackLayout class="page">
-    <StackLayout orientation="horizontal" horizontalAlignment="center" *ngIf="message">
-        <Label [text]="message"></Label>
-    </StackLayout>
-    <Button class="btn" text="Reset Data" (tap)="reset()"></Button>
-    <StackLayout *ngIf="company">
-        <Image verticalAlignment="top" row="0" col="0" rowSpan="2" height="110" width="110" [src]="company.logo" class="thumb p-4"></Image>
-        <GridLayout rows="auto auto auto auto auto auto auto 150 200" columns="*">
-            <label row="0" col="0" [text]="company.name" textWrap="true"></label>
-            <Label row="1" col="0" [text]="company.description" textWrap="true"></Label>
-            <Label row="2" col="0" [text]="company.website"></Label>
-            <Label row="3" col="0" [text]="company.email"></Label>
-            <Label row="4" col="0" [text]="company.phone"></Label>
-            <Label row="5" col="0" [text]="company.street"></Label>
-            <Label row="6" col="0" [text]="company.city + ' ' + company.state + ', ' + company.zip"></Label>
-            <StackLayout row="7" col="0">
-                <ListView [items]="company.issues" class="list-group">
-                    <ng-template let-issue="item">
-                        <StackLayout orientation="vertical">
-                            <Label [text]="' > ' + issue.id + ': ' + issue.option" class="list-group-item-text"></Label>
-                        </StackLayout>
-                    </ng-template>
-                </ListView>
-            </StackLayout>
-            <StackLayout class="list-group-item" row="8" col="0">
-                <ListView [items]="company.locations" class="list-group">
-                    <ng-template let-location="item">
-                        <StackLayout orientation="vertical">
-                            <Label [text]="' > ' + location.id + ': ' + location.name" class="list-group-item-text"></Label>
-                        </StackLayout>
-                    </ng-template>
-                </ListView>
-            </StackLayout>
+<StackLayout class="page m-15">
+    <DockLayout stretchLastChild="true">
+        <StackLayout orientation="horizontal" horizontalAlignment="center" *ngIf="message" dock="top">
+            <Label [text]="message"></Label>
+        </StackLayout>
+        <GridLayout rows="auto" columns="*, *, *" dock="bottom">
+            <Button row="0" col="0" colSpan="3" class="btn" text="Reset Data" (tap)="reset()"></Button>
         </GridLayout>
-    </StackLayout>
+        <GridLayout *ngIf="company" rows="auto auto auto auto *" columns="*, *, *">
+            <Image row="0" col="0" colSpan="3" [src]="company.logo" class="thumb p-4" horizontalAlignment="center" height="100"></Image>
+            <label row="1" col="0" colSpan="3" [text]="company.name" class="h2 m-10 text-center" textWrap="true"></label>
+            <Button row="2" col="0" colspan="3" [text]="('fa-ambulance' | fonticon) + '\nNew Repair Order'" class="m-10 fa" [style]="newBtnStyle" [nsRouterLink]="['/neworder']"></Button>
+            <Button row="3" col="0" [text]="('fa-upload' | fonticon) + '\nPending\nOrders'" class="m-10 fa" textWrap="true" [style]="pendBtnStyle"></Button>
+            <Button row="3" col="1" [text]="('fa-hourglass-half' | fonticon) + '\nActive\nOrders'" class="m-10 fa" textWrap="true" [style]="actvBtnStyle"></Button>
+            <Button row="3" col="2" [text]="('fa-archive' | fonticon) + '\nArchived\nOrders'" class="m-10 fa" textWrap="true" [style]="archBtnStyle"></Button>
+        </GridLayout>
+    </DockLayout>
 </StackLayout>

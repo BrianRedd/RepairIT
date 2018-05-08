@@ -19,6 +19,10 @@ export class HomeComponent implements OnInit {
     message: string;
     actionBarStyle: string = "background-color: #006A5C;";
     actionBarTextStyle: string = "color: #FFFFFF";
+    newBtnStyle: string = "color: #FFFFFF; height: 100; ";
+    pendBtnStyle: string = "color: #FFFFFF; height: 75; ";
+    actvBtnStyle: string = "color: #FFFFFF; height: 75; ";
+    archBtnStyle: string = "color: #FFFFFF; height: 75; ";
 
     constructor(
         private companyService: CompanyService,
@@ -53,12 +57,17 @@ export class HomeComponent implements OnInit {
             this.company.locations = this.couchbaseService.getDocument("locations").locations;
             this.actionBarStyle = "background-color: " + this.company.colors[0].hex + ";";
             this.userLoggedIn();
+            this.newBtnStyle += "background-color: " + this.company.colors[1].hex + ";";
+            this.pendBtnStyle += "background-color: " + this.company.colors[0].hex + ";";
+            this.actvBtnStyle += "background-color: " + this.company.colors[1].hex + ";";
+            this.archBtnStyle += "background-color: " + this.company.colors[0].hex + ";";
         }
     }
 
     userLoggedIn() {
         if (getString("currentuser") === "") {
-
+            //TO DO: ADD LOGIN MODAL (drop down to choose associate, only enter password if one is configured)
+            //From App Config: numusers, users, currentusername, currentuserid, usernane_{x}, userid_{x}, userpw_{x}
         } else {
             this.message = getString("currentusername") + " signed in";
             let toast = new Toasty(this.message, "short", "middle");
