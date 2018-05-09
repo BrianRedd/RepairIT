@@ -54,24 +54,26 @@ export class NewuserComponent implements OnInit {
     ngOnInit() {
     }
 
+    onFieldChange(field, args) {
+        let textField = <TextField>args.object;
+        this.newuserForm.patchValue({ [field]: textField.text })
+    }
+
     onFirstNameChange(args) {
         let textField = <TextField>args.object;
         this.userid_first = textField.text.substring(0,2);
         this.newuserForm.patchValue({associateid: this.userid_first + this.userid_last});
-        //console.log(textField.text);
     };
 
     onLastNameChange(args) {
         let textField = <TextField>args.object;
         this.userid_last = textField.text.substring(0,2);
         this.newuserForm.patchValue({associateid: this.userid_first + this.userid_last});
-        //console.log(textField.text);
     };
 
     onIdChange(args) {
         let textField = <TextField>args.object;
         this.newuserForm.patchValue({associateid: textField.text.toUpperCase()});
-        //console.log(textField.text);
     };
 
     submit() {

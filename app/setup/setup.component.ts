@@ -59,6 +59,11 @@ export class SetupComponent {
         this.setupForm.patchValue({"companyid": textField.text.toUpperCase()});
     };
 
+    onFieldChange(field, args) {
+        let textField = <TextField>args.object;
+        this.setupForm.patchValue({ [field]: textField.text })
+    }
+
     submit() {
         this.message = "";
         this.companyService.getCompanies()

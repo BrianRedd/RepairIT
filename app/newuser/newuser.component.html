@@ -12,9 +12,9 @@
         <Label class="h3 m-15" row="2" col="0" text="Last Name"></Label>
         <TextField class="input input-border" row="2" col="1" formControlName="lastname" id="lastname" hint="Last Name" [text]="" (textChange)="onLastNameChange($event)"></TextField>
         <Label class="h3 m-15" row="3" col="0" text="Password (optional)"></Label>
-        <TextField class="input input-border" row="3" col="1" formControlName="associatepw" id="associatepw" hint="Password" [text]="" secure="true"></TextField>
+        <TextField class="input input-border" row="3" col="1" formControlName="associatepw" id="associatepw" hint="Password" [text]="" secure="true" (textChange)="onFieldChange('associatepw', $event)"></TextField>
         <Label class="h3 m-15" row="4" col="0" text="Associate ID"></Label>
-        <TextField class="input input-border" row="4" col="1" formControlName="associateid" id="associateid" hint="Associate ID" [text]="" (textChange)="onIdChange($event)"></TextField>
+        <TextField class="input input-border" row="4" col="1" formControlName="associateid" id="associateid" hint="Associate ID" [text]="" (textChange)="onIdChange($event)" (blur)="onIdChange($event)"></TextField>
         <Button class="btn btn-primary btn-active m-15" row="5" col="1" text="Submit" (tap)="submit()" [isEnabled]="newuserForm.valid"></Button>
     </GridLayout>
     <Button class="btn" text="Reset Data" (tap)="reset()"></Button>

@@ -7,7 +7,8 @@
             <Label [text]="message"></Label>
         </StackLayout>
         <GridLayout rows="auto" columns="*, *, *" dock="bottom">
-            <Button row="0" col="0" colSpan="3" class="btn" text="Reset Data" (tap)="reset()"></Button>
+            <Button row="0" col="0" class="fa m-15 btn-rounded-lg btn-outline" [text]="('fa-cog' | fonticon)" (tap)="reset()"></Button>
+            <Button row="0" col="2" class="fa m-15 btn-rounded-lg btn-outline" [text]="('fa-info-circle' | fonticon)"></Button>
         </GridLayout>
         <GridLayout *ngIf="company" rows="auto auto auto auto *" columns="*, *, *">
             <Image row="0" col="0" colSpan="3" [src]="company.logo" class="thumb p-4" horizontalAlignment="center" height="100"></Image>

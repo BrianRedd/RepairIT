@@ -1,0 +1,21 @@
+<StackLayout class="modal-view-style">
+    <StackLayout [visibility]="activeModal === 'addressState' ? 'visible' : 'collapsed'">
+        <ListPicker id="statePicker" [items]="stateArray" selectedIndex="0" class="p-10"></ListPicker>
+    </StackLayout>
+    <StackLayout [visibility]="activeModal === 'issue' ? 'visible' : 'collapsed'">
+        <ListPicker id="issuePicker" [items]="issueArray" selectedIndex="0" class="p-10"></ListPicker>
+    </StackLayout>
+    <StackLayout [visibility]="activeModal === 'repairLoc' ? 'visible' : 'collapsed'">
+        <ListPicker id="repairLocPicker" [items]="repairLocArray" selectedIndex="0" class="p-10"></ListPicker>
+    </StackLayout>
+    <StackLayout [visibility]="activeModal === 'shopLoc' ? 'visible' : 'collapsed'">
+        <ListPicker id="shopLocPicker" [items]="shopLocArray" selectedIndex="0" class="p-10"></ListPicker>
+    </StackLayout>
+    <StackLayout [visibility]="activeModal === 'estRepair_t' ? 'visible' : 'collapsed'">
+        <TimePicker id="timePicker"></TimePicker>
+    </StackLayout>
+    <StackLayout [visibility]="activeModal === 'estRepair_d' ? 'visible' : 'collapsed'">
+        <DatePicker id="datePicker"></DatePicker>
+    </StackLayout>
+    <Button class="btn btn-primary btn-active" text="Submit" (tap)="submit()"></Button>
+</StackLayout>
