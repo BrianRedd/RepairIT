@@ -17,5 +17,4 @@
         <TextField class="input input-border" row="4" col="1" formControlName="associateid" id="associateid" hint="Associate ID" [text]="" (textChange)="onIdChange($event)" (blur)="onIdChange($event)"></TextField>
         <Button class="btn btn-primary btn-active m-15" row="5" col="1" text="Submit" (tap)="submit()" [isEnabled]="newuserForm.valid"></Button>
     </GridLayout>
-    <Button class="btn" text="Reset Data" (tap)="reset()"></Button>
 </StackLayout>

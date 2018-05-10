@@ -24,6 +24,7 @@ export class SetupComponent {
     setupForm: FormGroup;
     actionBarStyle: string = "background-color: #006A5C;";
     actionBarTextStyle: string = "color: #FFFFFF";
+    thinking: boolean = false;
 
     constructor(
         private formBuilder: FormBuilder,
@@ -66,11 +67,13 @@ export class SetupComponent {
 
     submit() {
         this.message = "";
+        this.thinking = true;
         this.companyService.getCompanies()
             .subscribe(companies => {
+                this.thinking = false;
                 this.companies = companies;
                 this.confirm();
-            }, errmess => this.message = <any>errmess);
+            }, errmess => this.message = "Unable to connect to server:\n [" + <any>errmess + "] ");
     }
 
     confirm() {

@@ -1,6 +1,6 @@
 import { Component, OnInit, Inject, ViewContainerRef } from "@angular/core";
 import { OrderVO } from "../shared/orderVO";
-import { getString, setString } from "application-settings";
+import { getString, setString, getNumber, setNumber } from "application-settings";
 import { CouchbaseService } from "../services/couchbase.service";
 import { RouterExtensions } from "nativescript-angular/router";
 import { TNSFontIconService } from "nativescript-ngx-fonticon";
@@ -16,6 +16,7 @@ import * as enums from "ui/enums";
 import { ModalDialogService, ModalDialogOptions } from "nativescript-angular/modal-dialog";
 import { OrderModalComponent } from "../ordermodal/ordermodal.component";
 import { DisplayOrderModalComponent } from "../displayordermodal/displayordermodal.component";
+import { OrderService } from "../services/order.service"
 
 @Component({
     selector: "app-neworder",
@@ -26,6 +27,8 @@ import { DisplayOrderModalComponent } from "../displayordermodal/displayordermod
 export class NeworderComponent implements OnInit {
 
     orderForm: FormGroup;
+    orders: OrderVO[];
+    newOrder: Array<any> = [];
     message: string;
     formBlock: boolean = false;
     activeslide: number = 0;
@@ -35,6 +38,7 @@ export class NeworderComponent implements OnInit {
     slide_2: View;
     actionBarStyle: string = "background-color: #006A5C;";
     actionBarTextStyle: string = "color: #FFFFFF";
+    orderID: string;
     issuesMore: boolean = false;
     sameDayRepair: boolean = true;
     picture_front: boolean = false;
@@ -48,6 +52,7 @@ export class NeworderComponent implements OnInit {
         private page: Page,
         private modalService: ModalDialogService,
         private vcRef: ViewContainerRef,
+        private orderService: OrderService,
         private routerExtensions: RouterExtensions
     ) {
         this.actionBarStyle = "background-color: " + this.couchbaseService.getDocument("colors").colors[0].hex + ";";
@@ -62,7 +67,7 @@ export class NeworderComponent implements OnInit {
             email: ["", Validators.required],
             phone: ["", Validators.required],
             issue: ["", Validators.required],
-            issuedetail: [""],
+            issueDetail: [""],
             repairLoc: [""],
             estRepair: [""],
             repairCost: ["none"],
@@ -74,6 +79,7 @@ export class NeworderComponent implements OnInit {
     }
 
     ngOnInit() {
+        this.orderID = getString("currentuserid") + getNumber("nextOrderNumber").toString();
     }
 
     onFieldChange(field, args) {
@@ -287,9 +293,40 @@ export class NeworderComponent implements OnInit {
     }
 
     submit() {
+        let curDate = new Date().toString();
+        this.newOrder = [{
+            "id" : this.orderID,
+            "firstName" : this.orderForm.get("firstName").value,
+            "lastName" : this.orderForm.get("lastName").value,
+            "addressStreet" : this.orderForm.get("addressStreet").value,
+            "addressCity" : this.orderForm.get("addressCity").value,
+            "addressState" : this.orderForm.get("addressState").value,
+            "addressZip" : this.orderForm.get("addressZip").value,
+            "email" : this.orderForm.get("email").value,
+            "phone" : this.orderForm.get("phone").value,
+            "issue" : this.orderForm.get("issue").value,
+            "issueDetail" : this.orderForm.get("issueDetail").value,
+            "repairLoc" : this.orderForm.get("repairLoc").value,
+            "repairCost" : this.orderForm.get("repairCost").value,
+            "repairPaid": this.orderForm.get("repairPaid").value,
+            "shipCost" : this.orderForm.get("shipCost").value,
+            "shipPaid" : this.orderForm.get("shipPaid").value,
+            "estRepair" : this.orderForm.get("estRepair").value,
+            "shopLoc" : this.orderForm.get("shopLoc").value,
+            "uploaded" : false,
+            "accepted" : false,
+            "acceptedDateTime" : "",
+            "shippedOffsite" : false,
+            "shippedDateTime" : "",
+            "completed" : false,
+            "completedDateTime" : "",
+            "delivered" : false,
+            "deliveredDateTime" : "",
+            "editedDateTime" : curDate
+        }];
         if (this.orderForm.get("shopLoc").value) {
             setString("defaultLoc", this.orderForm.get("shopLoc").value);
         }
-        this.createFormDisplayModal(["confirm", "Sample Text"]);
+        this.createFormDisplayModal(["confirm", this.newOrder]);
     }
 }

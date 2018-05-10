@@ -3,7 +3,7 @@
 </ActionBar>
 <StackLayout class="page m-15">
     <DockLayout stretchLastChild="true">
-        <StackLayout orientation="horizontal" horizontalAlignment="center" *ngIf="message" dock="top">
+        <StackLayout orientation="horizontal" horizontalAlignment="center" *ngIf="message" dock="top" class="p-b-5">
             <Label [text]="message"></Label>
         </StackLayout>
         <GridLayout rows="auto" columns="*, *, *" dock="bottom">

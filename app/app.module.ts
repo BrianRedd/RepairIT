@@ -17,6 +17,7 @@ import { DisplayOrderModalComponent } from "./displayordermodal/displayordermoda
 import { CompanyService } from "./services/company.service";
 import { CouchbaseService } from "./services/couchbase.service";
 import { ProcessHTTPMsgService } from "./services/process-httpmsg.service";
+import { OrderService } from "./services/order.service";
 import { BaseURL } from "./shared/baseurl";
 
 @NgModule({
@@ -50,7 +51,8 @@ import { BaseURL } from "./shared/baseurl";
         {provide: 'BaseURL', useValue: BaseURL},
         ProcessHTTPMsgService,
         CompanyService,
-        CouchbaseService
+        CouchbaseService,
+        OrderService
     ],
     schemas: [
         NO_ERRORS_SCHEMA

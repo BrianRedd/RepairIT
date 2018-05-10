@@ -12,7 +12,7 @@
     </StackLayout>
     <StackLayout orientation="vertical" [formGroup]="orderForm" (swipe)="onSwipe($event)">
         <GridLayout id="slide_0" [visibility]="activeslide === 0 ? 'visible' : 'collapsed'" class="m-5" rows="auto, auto, auto, auto, auto, auto, auto, *" columns="*, *, *">
-            <Label row="0" col="0" colSpan="3" text="Customer Information" class="h2 m-15" textAlignment="center"></Label>
+            <Label row="0" col="0" colSpan="3" [text]="'[' + orderID + ']: Customer Information'" class="h3 text-uppercase m-b-15"></Label>
             <Label row="1" col="0" text="Name*" textWrap="true" class="h3 m-t-15"></Label>
             <TextField row="1" col="1" formControlName="firstName" id="firstName" hint="First" [text]="" class="input input-border" (textChange)="onFieldChange('first', $event)"></TextField>
             <TextField row="1" col="2" formControlName="lastName" id="lastName" hint="Last" [text]="" class="input input-border" (textChange)="onFieldChange('last', $event)"></TextField>
@@ -34,7 +34,7 @@
         </GridLayout>
 
         <GridLayout id="slide_1" [visibility]="activeslide === 1 ? 'visible' : 'collapsed'" class="m-5" rows="auto, auto, auto, auto, auto, *" columns="*, *, *">
-            <Label row="0" col="0" colSpan="3" text="Product Information" class="h2 m-15" textAlignment="center"></Label>
+            <Label row="0" col="0" colSpan="3" [text]="'[' + orderID + ']: Product Information'" class="h3 text-uppercase m-b-15"></Label>
             <Label row="1" col="0" colSpan="3" text="Pictures:*" textWrap="true" class="h3 m-t-15"></Label>
             <GridLayout row="2" col="0" colSpan="3" orientation="horizontal" rows="auto" columns="*, *, *">
                 <Button row="0" col="0" [text]="('fa-camera' | fonticon) + '\n\nFront*'" height="100" width="100" (tap)="picture('front')" class="fa btn btn-outline"></Button>
@@ -44,7 +44,7 @@
             <Label row="3" col="0" text="Type of Repair*" textWrap="true" class="h3 m-t-15"></Label>
             <TextField row="3" col="1" colSpan="2" formControlName="issue" id="issue" hint="Type of Repair" [text]="" class="input input-border" (tap)="createModalView('issue')" (textChange)="onFieldChange('issue', $event)" (blur)="validate('issue', $event)"></TextField>
             <Label row="4" col="0" [text]="'Details' + (issuesMore ? '*' : '')" textWrap="true" class="h3 m-t-15"></Label>
-            <TextField row="4" col="1" colSpan="2" formControlName="issuedetail" id="issuedetail" hint="Details" [text]="" class="input input-border" (textChange)="onFieldChange('issuedetail', $event)" (blur)="validate('issuedetail', $event)"></TextField>
+            <TextField row="4" col="1" colSpan="2" formControlName="issueDetail" id="issueDetail" hint="Details" [text]="" class="input input-border" (textChange)="onFieldChange('issueDetail', $event)" (blur)="validate('issueDetail', $event)"></TextField>
             <GridLayout row="5" col="0" colSpan="3" orientation="horizontal" rows="auto" columns="*, *, *, *, *, *">
                 <Button row="0" col="0" [text]="('fa-chevron-circle-left' | fonticon)" (tap)="prevSlide()" class="fa btn-outline"></Button>
                 <Button row="0" col="1" colSpan="2" text="Cancel" (tap)="cancel()" class="btn"></Button>
@@ -54,7 +54,7 @@
         </GridLayout>
 
         <GridLayout id="slide_2" [visibility]="activeslide === 2 ? 'visible' : 'collapsed'" class="m-5" rows="auto, auto, auto, auto, auto, auto, *" columns="*, *, *">
-            <Label row="0" col="0" colSpan="3" text="Repair Details" class="h2 m-15" textAlignment="center"></Label>
+            <Label row="0" col="0" colSpan="3" [text]="'[' + orderID + ']: Repair Details'" class="h3 text-uppercase m-b-15"></Label>
             <Label row="1" col="0" text="Repair Location" textWrap="true" class="h3 m-t-15"></Label>
             <TextField row="1" col="1" colSpan="2" formControlName="repairLoc" id="repairLoc" hint="Repair Location" [text]="" class="input input-border" (tap)="createModalView('repairLoc')" (textChange)="onFieldChange('repairLoc', $event)" (blur)="validate('repairLoc', $event)"></TextField>
             <Label row="2" col="0" text="Repair Cost" textWrap="true" class="h3 m-t-15"></Label>

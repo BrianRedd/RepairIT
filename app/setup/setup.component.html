@@ -5,6 +5,9 @@
     <StackLayout orientation="horizontal" horizontalAlignment="center" *ngIf="message">
         <Label [text]="message"></Label>
     </StackLayout>
+    <StackLayout orientation="horizontal" horizontalAlignment="center" *ngIf="thinking">
+        <ActivityIndicator busy="true" width="50" height="50" class="activity-indicator"></ActivityIndicator>
+    </StackLayout>
     <GridLayout class="m-5" rows="auto auto auto auto auto" columns="*, *" [formGroup]="setupForm">
         <Label class="h3 m-15" row="0" col="0" colSpan="2" text="Please enter Company ID and Password, as provided by the RepairIT implementation team." textWrap="true"></Label>
         <Label class="h4 m-15" row="1" col="0" colSpan="2" text="If you do not have a Company ID and Password, please contact us by clicking button at bottom of page." textWrap="true"></Label>

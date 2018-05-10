@@ -1,6 +1,7 @@
 import { Component, OnInit } from "@angular/core";
 import { ModalDialogParams } from "nativescript-angular/modal-dialog";
 import { Page } from 'ui/page';
+import { OrderVO } from "../shared/orderVO";
 import { CouchbaseService } from "../services/couchbase.service";
 
 @Component({
@@ -10,7 +11,7 @@ import { CouchbaseService } from "../services/couchbase.service";
 export class DisplayOrderModalComponent implements OnInit {
 
     displayType: string;
-    orderID: string;
+    order: OrderVO;
     orderFormHead: string = "<html><body>";
     orderFormBody: string;
     orderFormFoot: string = "</body></html>"
@@ -21,8 +22,8 @@ export class DisplayOrderModalComponent implements OnInit {
         private couchbaseService: CouchbaseService
     ) {
         this.displayType = params.context[0];
-        this.orderID = params.context[1]
-        this.orderFormBody = "<h1>This is sample HTML content!</h1><h2>Display Type: " + this.displayType + "</h2><h2>Order ID: " + this.orderID + "</h2>";
+        this.order = params.context[1];
+        this.orderFormBody = "<h1>This is sample HTML content!</h1><h2>Display Type: " + this.displayType + "</h2><h2>Order ID: " + JSON.stringify(this.order) + "</h2>";
     }
 
     ngOnInit() {}
