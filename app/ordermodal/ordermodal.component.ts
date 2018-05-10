@@ -54,6 +54,10 @@ export class OrderModalComponent implements OnInit {
     public submit() {
         let response: any;
         let picker: any;
+        let timePicker: TimePicker;
+        let datePicker: DatePicker;
+        let selDate: any;
+        let selTime: any;
         switch(this.activeModal) {
             case "addressState":
                 picker = <ListPicker>this.page.getViewById<ListPicker>('statePicker');
@@ -72,17 +76,28 @@ export class OrderModalComponent implements OnInit {
                 response = this.shopLocArray[picker.selectedIndex];
                 break;
             case "estRepair_t":
-            case "estRepair_d":
-                let timePicker: TimePicker = <TimePicker>this.page.getViewById<TimePicker>('timePicker');
-                let datePicker: DatePicker = <DatePicker>this.page.getViewById<DatePicker>('datePicker');
-                let selDate = datePicker.date;
-                let selTime = timePicker.time;
+                timePicker = <TimePicker>this.page.getViewById<TimePicker>('timePicker');
+                datePicker = <DatePicker>this.page.getViewById<DatePicker>('datePicker');
+                selDate = datePicker.date;
+                selTime = timePicker.time;
                 response = new Date(selDate.getFullYear(),
                                     selDate.getMonth(),
                                     selDate.getDate(),
                                     selTime.getHours(),
                                     selTime.getMinutes());
-                response = response.toISOString();
+                response = response.toTimeString();
+                break;
+            case "estRepair_d":
+                timePicker = <TimePicker>this.page.getViewById<TimePicker>('timePicker');
+                datePicker = <DatePicker>this.page.getViewById<DatePicker>('datePicker');
+                selDate = datePicker.date;
+                selTime = timePicker.time;
+                response = new Date(selDate.getFullYear(),
+                                    selDate.getMonth(),
+                                    selDate.getDate(),
+                                    selTime.getHours(),
+                                    selTime.getMinutes());
+                response = response.toDateString();
                 break;
             default:
                 break;

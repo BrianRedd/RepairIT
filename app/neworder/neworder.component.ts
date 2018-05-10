@@ -15,6 +15,7 @@ import { SwipeGestureEventData, SwipeDirection } from "ui/gestures";
 import * as enums from "ui/enums";
 import { ModalDialogService, ModalDialogOptions } from "nativescript-angular/modal-dialog";
 import { OrderModalComponent } from "../ordermodal/ordermodal.component";
+import { DisplayOrderModalComponent } from "../displayordermodal/displayordermodal.component";
 
 @Component({
     selector: "app-neworder",
@@ -36,6 +37,8 @@ export class NeworderComponent implements OnInit {
     actionBarTextStyle: string = "color: #FFFFFF";
     issuesMore: boolean = false;
     sameDayRepair: boolean = true;
+    picture_front: boolean = false;
+    picture_side: boolean = false;
 
     
     constructor(
@@ -62,11 +65,11 @@ export class NeworderComponent implements OnInit {
             issuedetail: [""],
             repairLoc: [""],
             estRepair: [""],
-            repairCost: [""],
+            repairCost: ["none"],
             repairPaid: false,            
-            shipCost: [""],
+            shipCost: ["none"],
             shipPaid: false,
-            shopLoc: [""]
+            shopLoc: getString("defaultLoc")
         });        
     }
 
@@ -195,10 +198,42 @@ export class NeworderComponent implements OnInit {
             })
     }
 
-    submit() {}
+    createFormDisplayModal(args) {
+        let options: ModalDialogOptions = {
+            viewContainerRef: this.vcRef,
+            context: args,
+            fullscreen: true
+        }
+        this.modalService.showModal(DisplayOrderModalComponent, options)
+            .then((result: any) => {
 
-    cancel() {
-        this.routerExtensions.back();
+            });
+    }
+
+    picture(type: string) {
+        let message: string = "Click!"
+        switch (type) {
+            case "front":
+                if (!this.picture_front) {
+                    this.picture_front = true;
+                } else {
+                    message = "Re-click!"
+                }
+                break;
+            case "side":
+                if (!this.picture_side) {
+                    this.picture_side = true;
+                } else {
+                    message = "Re-click!"
+                }
+                break;
+            case "add":
+                break;
+            default:
+                break;
+        }
+        let toast = new Toasty(message, "short", "center");
+        toast.show();
     }
 
     nextSlide() {
@@ -245,5 +280,16 @@ export class NeworderComponent implements OnInit {
                 });
             });
         });
+    }
+
+    cancel() {
+        this.routerExtensions.back();
+    }
+
+    submit() {
+        if (this.orderForm.get("shopLoc").value) {
+            setString("defaultLoc", this.orderForm.get("shopLoc").value);
+        }
+        this.createFormDisplayModal(["confirm", "Sample Text"]);
     }
 }

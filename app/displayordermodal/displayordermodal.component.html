@@ -1,0 +1,8 @@
+<StackLayout class="modal-view-style">
+    <WebView [src]="orderFormHead + orderFormBody + orderFormFoot"></WebView>
+
+    <StackLayout orientation="vertical">
+        <Button class="btn btn-primary btn-active" text="Cancel" (tap)="cancel()"></Button>
+        <Button class="btn btn-primary btn-active" text="Submit" (tap)="submit()"></Button>
+    </StackLayout>
+</StackLayout>

@@ -28,7 +28,7 @@
             <GridLayout row="7" col="0" colSpan="3" orientation="horizontal" rows="auto" columns="*, *, *, *, *, *">
                 <Button row="0" col="0" [text]="('fa-chevron-circle-left' | fonticon)" (tap)="prevSlide()" class="fa btn-outline"></Button>
                 <Button row="0" col="1" colSpan="2" text="Cancel" (tap)="cancel()" class="btn"></Button>
-                <Button row="0" col="3" colspan="2" text="Submit" (tap)="submit()" [isEnabled]="orderForm.valid && !formBlock" class="btn btn-primary"></Button>
+                <Button row="0" col="3" colspan="2" text="Submit" (tap)="submit()" [isEnabled]="orderForm.valid && !formBlock && picture_front && picture_side" class="btn btn-primary"></Button>
                 <Button row="0" col="5" [text]="('fa-chevron-circle-right' | fonticon)" (tap)="nextSlide()" class="fa btn-outline"></Button>
             </GridLayout>
         </GridLayout>
@@ -37,9 +37,9 @@
             <Label row="0" col="0" colSpan="3" text="Product Information" class="h2 m-15" textAlignment="center"></Label>
             <Label row="1" col="0" colSpan="3" text="Pictures:*" textWrap="true" class="h3 m-t-15"></Label>
             <GridLayout row="2" col="0" colSpan="3" orientation="horizontal" rows="auto" columns="*, *, *">
-                <Button row="0" col="0" [text]="('fa-camera' | fonticon) + '\n\nFront*'" height="100" width="100" (tap)="picture(1)" class="fa btn-outline"></Button>
-                <Button row="0" col="1" [text]="('fa-camera' | fonticon) + '\n\nSide*'" height="100" width="100" (tap)="picture(2)" class="fa btn-outline"></Button>
-                <Button row="0" col="2" [text]="('fa-plus-square' | fonticon) + '\n\nAdditional'" height="100" width="100" (tap)="addpicture()" class="fa btn-outline"></Button>
+                <Button row="0" col="0" [text]="('fa-camera' | fonticon) + '\n\nFront*'" height="100" width="100" (tap)="picture('front')" class="fa btn btn-outline"></Button>
+                <Button row="0" col="1" [text]="('fa-camera' | fonticon) + '\n\nSide*'" height="100" width="100" (tap)="picture('side')" class="fa btn btn-outline" [isEnabled]="picture_front"></Button>
+                <Button row="0" col="2" [text]="('fa-plus-square' | fonticon) + '\n\nAdditional'" height="100" width="100" (tap)="picture('add')" class="fa btn btn-outline" [isEnabled]="picture_front && picture_side"></Button>
             </GridLayout>
             <Label row="3" col="0" text="Type of Repair*" textWrap="true" class="h3 m-t-15"></Label>
             <TextField row="3" col="1" colSpan="2" formControlName="issue" id="issue" hint="Type of Repair" [text]="" class="input input-border" (tap)="createModalView('issue')" (textChange)="onFieldChange('issue', $event)" (blur)="validate('issue', $event)"></TextField>
@@ -48,7 +48,7 @@
             <GridLayout row="5" col="0" colSpan="3" orientation="horizontal" rows="auto" columns="*, *, *, *, *, *">
                 <Button row="0" col="0" [text]="('fa-chevron-circle-left' | fonticon)" (tap)="prevSlide()" class="fa btn-outline"></Button>
                 <Button row="0" col="1" colSpan="2" text="Cancel" (tap)="cancel()" class="btn"></Button>
-                <Button row="0" col="3" colspan="2" text="Submit" (tap)="submit()" [isEnabled]="orderForm.valid && !formBlock" class="btn btn-primary"></Button>
+                <Button row="0" col="3" colspan="2" text="Submit" (tap)="submit()" [isEnabled]="orderForm.valid && !formBlock && picture_front && picture_side" class="btn btn-primary"></Button>
                 <Button row="0" col="5" [text]="('fa-chevron-circle-right' | fonticon)" (tap)="nextSlide()" class="fa btn-outline"></Button>
             </GridLayout>
         </GridLayout>
@@ -57,11 +57,11 @@
             <Label row="0" col="0" colSpan="3" text="Repair Details" class="h2 m-15" textAlignment="center"></Label>
             <Label row="1" col="0" text="Repair Location" textWrap="true" class="h3 m-t-15"></Label>
             <TextField row="1" col="1" colSpan="2" formControlName="repairLoc" id="repairLoc" hint="Repair Location" [text]="" class="input input-border" (tap)="createModalView('repairLoc')" (textChange)="onFieldChange('repairLoc', $event)" (blur)="validate('repairLoc', $event)"></TextField>
-            <Label row="2" col="0" [text]="'Estimated Repair ' + (sameDayRepair ? 'Time' : 'Date')" textWrap="true" class="h3 m-t-15"></Label>
-            <TextField row="2" col="1" colSpan="2" formControlName="estRepair" id="estRepair" [hint]="'Estimated Repair ' + (sameDayRepair ? 'Time' : 'Date')" [text]="" class="input input-border" (textChange)="onFieldChange('estRepair', $event)" (tap)="estimateRepair()"></TextField>
-            <Label row="3" col="0" text="Repair Cost" textWrap="true" class="h3 m-t-15"></Label>
-            <TextField row="3" col="1" formControlName="repairCost" id="repairCost" hint="Repair Cost" [text]="" class="input input-border" (textChange)="onFieldChange('repairCost', $event)"></TextField>
-            <Switch row="3" col="2" checked="false" formControlName="repairPaid" class="m-t-15"></Switch>
+            <Label row="2" col="0" text="Repair Cost" textWrap="true" class="h3 m-t-15"></Label>
+            <TextField row="2" col="1" formControlName="repairCost" id="repairCost" hint="Repair Cost" [text]="" class="input input-border" (textChange)="onFieldChange('repairCost', $event)"></TextField>
+            <Switch row="2" col="2" checked="false" formControlName="repairPaid" text="Paid" class="m-t-15"></Switch>
+            <Label row="3" col="0" [text]="'Estimated Repair ' + (sameDayRepair ? 'Time' : 'Date')" textWrap="true" class="h3 m-t-15"></Label>
+            <TextField row="3" col="1" colSpan="2" formControlName="estRepair" id="estRepair" [hint]="'Estimated Repair ' + (sameDayRepair ? 'Time' : 'Date')" [text]="" class="input input-border" (textChange)="onFieldChange('estRepair', $event)" (tap)="estimateRepair()"></TextField>
             <Label row="4" col="0" text="Shipping Cost" textWrap="true" class="h3 m-t-15"></Label>
             <TextField row="4" col="1" formControlName="shipCost" id="shipCost" hint="Shipping Cost" [text]="" class="input input-border" (textChange)="onFieldChange('shipCost', $event)"></TextField>
             <Switch row="4" col="2" checked="false" formControlName="shipPaid" class="m-t-15"></Switch>
@@ -70,7 +70,7 @@
             <GridLayout row="6" col="0" colSpan="3" orientation="horizontal" rows="auto" columns="*, *, *, *, *, *">
                 <Button row="0" col="0" [text]="('fa-chevron-circle-left' | fonticon)" (tap)="prevSlide()" class="fa btn-outline"></Button>
                 <Button row="0" col="1" colSpan="2" text="Cancel" (tap)="cancel()" class="btn"></Button>
-                <Button row="0" col="3" colspan="2" text="Submit" (tap)="submit()" [isEnabled]="orderForm.valid && !formBlock" class="btn btn-primary"></Button>
+                <Button row="0" col="3" colspan="2" text="Submit" (tap)="submit()" [isEnabled]="orderForm.valid && !formBlock && picture_front && picture_side" class="btn btn-primary"></Button>
                 <Button row="0" col="5" [text]="('fa-chevron-circle-right' | fonticon)" (tap)="nextSlide()" class="fa btn-outline"></Button>
             </GridLayout>
         </GridLayout>

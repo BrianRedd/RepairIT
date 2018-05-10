@@ -37,13 +37,13 @@ export class SetupComponent {
             companyid: ["", Validators.required],
             companypw: ["", Validators.required]
         });
-        if (this.couchbaseService.getDocument("colors")) {
+        if (this.couchbaseService.getDocument("colors")) {//create empty colors CBdoc
             this.couchbaseService.deleteDocument("colors");
         }
-        if (this.couchbaseService.getDocument("issues")) {
+        if (this.couchbaseService.getDocument("issues")) { //create empty issues CBdoc
             this.couchbaseService.deleteDocument("issues");
         }
-        if (this.couchbaseService.getDocument("locations")) {
+        if (this.couchbaseService.getDocument("locations")) { //create empty locations CBdoc
             this.couchbaseService.deleteDocument("locations");
         }
         this.couchbaseService.createDocument({"colors": []}, "colors");
@@ -74,7 +74,7 @@ export class SetupComponent {
     }
 
     confirm() {
-        //console.log("Entered: " + this.setupForm.get("companyid").value + ":" + this.setupForm.get("companypw").value);
+        //when forms submitted, compare entered company ID and password with available from JSON-server
         for (let i: number = 0; i < this.companies.length; i++ ) {
             if (this.setupForm.get("companyid").value !== this.companies[i].id ||
                 this.setupForm.get("companypw").value !== this.companies[i].password ) {
@@ -95,26 +95,28 @@ export class SetupComponent {
                         const toast = new Toasty(this.message, "short", "center");
                         toast.show();
                     } else {
-                        setString("Company", this.company.name);
-                        setString("CompanyID", this.company.id);
-                        setString("CompanyPW", this.company.password);
-                        setString("Logo", this.company.logo);
-                        setString("CompanyEmail", this.company.email);
-                        setString("CompanyWebsite", this.company.website);
-                        setString("CompanyPhone", this.company.phone);
-                        setString("CompanyDescription", this.company.description);
-                        setString("CompanyStreet", this.company.street);
-                        setString("CompanyCity", this.company.city);
-                        setString("CompanyState", this.company.state);
-                        setString("CompanyZip", this.company.zip);
-                        this.couchbaseService.updateDocument("colors", {"colors": this.company.colors});
-                        //console.log("***COLORS", this.couchbaseService.getDocument("colors"));
-                        this.couchbaseService.updateDocument("issues", {"issues": this.company.issues});
-                        //console.log("***ISSUES", this.couchbaseService.getDocument("issues"));
-                        this.couchbaseService.updateDocument("locations", {"locations": this.company.locations});
-                        //console.log("***LOCATIONS", this.couchbaseService.getDocument("locations"));
-                        setNumber("numusers", 0);
-                        setString("users", "");
+                        setString("Company", this.company.name); //Company name
+                        setString("CompanyID", this.company.id); //Compamy ID
+                        setString("CompanyPW", this.company.password); //Company access PW
+                        setString("Logo", this.company.logo); //URL to company logo
+                        setString("CompanyEmail", this.company.email); //Company email address (for receiving sent forms)
+                        setString("CompanyWebsite", this.company.website); //Company website (for About)
+                        setString("CompanyPhone", this.company.phone); //Company phone (for About)
+                        setString("CompanyDescription", this.company.description); //Company description (for About)
+                        setString("CompanyStreet", this.company.street); //Company Street (for About)
+                        setString("CompanyCity", this.company.city); //Company City (for about)
+                        setString("CompanyState", this.company.state); //Company State (for about)
+                        setString("CompanyZip", this.company.zip); //Company Zip (for about)
+                        this.couchbaseService.updateDocument("colors", {"colors": this.company.colors}); //Company colors (2; for app display)
+                        this.couchbaseService.updateDocument("issues", {"issues": this.company.issues}); //List of common repair types
+                        this.couchbaseService.updateDocument("locations", {"locations": this.company.locations});//List of company store locations
+                        setString("defaultLoc", this.company.locations[0]);//default store location, starting with first in company list, updated when form is submitted
+
+                        setNumber("nextOrderNumber", 1000); //next Order Number, increment with each order
+                        this.couchbaseService.createDocument({"orders": []}, "orders"); //set empty "orders" document
+
+                        setNumber("numusers", 0); //number of users (0 to start)
+                        setString("users", "");//string of user ID (empty to start), delimited with "|"
 
                         this.message = "RepairIT App Configured for " + this.company.name;
                         const toast = new Toasty(this.message, "long", "center");

@@ -12,6 +12,7 @@ import { SetupComponent } from "./setup/setup.component";
 import { NewuserComponent } from "./newuser/newuser.component";
 import { NeworderComponent } from "./neworder/neworder.component";
 import { OrderModalComponent } from "./ordermodal/ordermodal.component";
+import { DisplayOrderModalComponent } from "./displayordermodal/displayordermodal.component";
 
 import { CompanyService } from "./services/company.service";
 import { CouchbaseService } from "./services/couchbase.service";
@@ -38,10 +39,12 @@ import { BaseURL } from "./shared/baseurl";
         SetupComponent,
         NewuserComponent,
         NeworderComponent,
-        OrderModalComponent
+        OrderModalComponent,
+        DisplayOrderModalComponent
     ],
     entryComponents: [
-        OrderModalComponent
+        OrderModalComponent,
+        DisplayOrderModalComponent
     ],
     providers: [
         {provide: 'BaseURL', useValue: BaseURL},
