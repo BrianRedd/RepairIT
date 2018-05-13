@@ -28,7 +28,37 @@ export class NeworderComponent implements OnInit {
 
     orderForm: FormGroup;
     orders: OrderVO[];
-    newOrder: Array<any> = [];
+    newOrder: OrderVO = {
+        id: "",
+        firstName: "",
+        lastName: "",
+        addressStreet: "",
+        addressCity: "",
+        addressState: "",
+        addressZip: "",
+        email: "",
+        phone: "",
+        image: [],
+        issue: "",
+        issueDetail: "",
+        repairLoc: "",
+        repairCost: 0,
+        repairPaid: false,
+        shipCost: 0,
+        shipPaid: false,
+        estRepair: "",
+        shopLoc: "",
+        uploaded: false,
+        accepted: false,
+        acceptedDateTime: "",
+        shippedOffsite: false,
+        shippedDateTime: "",
+        completed: false,
+        completedDateTime: "",
+        delivered: false,
+        deliveredDateTime: "",
+        editedDateTime: ""
+    };
     message: string;
     formBlock: boolean = false;
     activeslide: number = 0;
@@ -58,24 +88,24 @@ export class NeworderComponent implements OnInit {
         this.actionBarStyle = "background-color: " + this.couchbaseService.getDocument("colors").colors[0].hex + ";";
         this.orderForm = this.formBuilder.group({
             //TO DO: Break into three slides: Customer, Item Details (inc pics), Repair Details
-            firstName: ["", Validators.required],
-            lastName: ["", Validators.required],
-            addressStreet: ["", Validators.required],
-            addressCity: ["", Validators.required],
-            addressState: ["", Validators.required],
-            addressZip: ["", Validators.required],
-            email: ["", Validators.required],
-            phone: ["", Validators.required],
+            firstName: ["John", Validators.required],
+            lastName: ["Testcust", Validators.required],
+            addressStreet: ["123 Address Street #123", Validators.required],
+            addressCity: ["Denver", Validators.required],
+            addressState: ["CO", Validators.required],
+            addressZip: ["80001", Validators.required],
+            email: ["test@customer.com", Validators.required],
+            phone: ["3035551234", Validators.required],
             issue: ["", Validators.required],
             issueDetail: [""],
-            repairLoc: [""],
-            estRepair: [""],
-            repairCost: ["none"],
-            repairPaid: false,            
-            shipCost: ["none"],
+            repairLoc: ["Onsite: Same Day", Validators.required],
+            estRepair: ["", Validators.required],
+            repairCost: 0,
+            repairPaid: false,
+            shipCost: 0,
             shipPaid: false,
             shopLoc: getString("defaultLoc")
-        });        
+        });
     }
 
     ngOnInit() {
@@ -293,37 +323,41 @@ export class NeworderComponent implements OnInit {
     }
 
     submit() {
-        let curDate = new Date().toString();
-        this.newOrder = [{
-            "id" : this.orderID,
-            "firstName" : this.orderForm.get("firstName").value,
-            "lastName" : this.orderForm.get("lastName").value,
-            "addressStreet" : this.orderForm.get("addressStreet").value,
-            "addressCity" : this.orderForm.get("addressCity").value,
-            "addressState" : this.orderForm.get("addressState").value,
-            "addressZip" : this.orderForm.get("addressZip").value,
-            "email" : this.orderForm.get("email").value,
-            "phone" : this.orderForm.get("phone").value,
-            "issue" : this.orderForm.get("issue").value,
-            "issueDetail" : this.orderForm.get("issueDetail").value,
-            "repairLoc" : this.orderForm.get("repairLoc").value,
-            "repairCost" : this.orderForm.get("repairCost").value,
-            "repairPaid": this.orderForm.get("repairPaid").value,
-            "shipCost" : this.orderForm.get("shipCost").value,
-            "shipPaid" : this.orderForm.get("shipPaid").value,
-            "estRepair" : this.orderForm.get("estRepair").value,
-            "shopLoc" : this.orderForm.get("shopLoc").value,
-            "uploaded" : false,
-            "accepted" : false,
-            "acceptedDateTime" : "",
-            "shippedOffsite" : false,
-            "shippedDateTime" : "",
-            "completed" : false,
-            "completedDateTime" : "",
-            "delivered" : false,
-            "deliveredDateTime" : "",
-            "editedDateTime" : curDate
-        }];
+        let curDate = new Date().toDateString();
+        this.newOrder.id = this.orderID;
+        this.newOrder.firstName = this.orderForm.get("firstName").value;
+        this.newOrder.lastName = this.orderForm.get("lastName").value;
+        this.newOrder.addressStreet = this.orderForm.get("addressStreet").value;
+        this.newOrder.addressCity = this.orderForm.get("addressCity").value;
+        this.newOrder.addressState = this.orderForm.get("addressState").value;
+        this.newOrder.addressZip = this.orderForm.get("addressZip").value;
+        this.newOrder.email = this.orderForm.get("email").value;
+        this.newOrder.phone = this.orderForm.get("phone").value;
+        this.newOrder.issue = this.orderForm.get("issue").value;
+        this.newOrder.issueDetail = this.orderForm.get("issueDetail").value;
+        this.newOrder.repairLoc = this.orderForm.get("repairLoc").value;
+        this.newOrder.repairCost = this.orderForm.get("repairCost").value;
+        this.newOrder.repairPaid = this.orderForm.get("repairPaid").value;
+        if (!this.newOrder.repairCost) {
+            this.newOrder.repairPaid = true;
+        }
+        this.newOrder.shipCost = this.orderForm.get("shipCost").value;
+        this.newOrder.shipPaid = this.orderForm.get("shipPaid").value;
+        if (!this.newOrder.shipCost) {
+            this.newOrder.shipPaid = true;
+        }
+        this.newOrder.estRepair = this.orderForm.get("estRepair").value;
+        this.newOrder.shopLoc = this.orderForm.get("shopLoc").value;
+        this.newOrder.uploaded = false;
+        this.newOrder.accepted = false;
+        this.newOrder.acceptedDateTime = "";
+        this.newOrder.shippedOffsite = false;
+        this.newOrder.shippedDateTime = "";
+        this.newOrder.completed = false;
+        this.newOrder.completedDateTime = "";
+        this.newOrder.delivered = false;
+        this.newOrder.deliveredDateTime = "";
+        this.newOrder.editedDateTime = curDate;
         if (this.orderForm.get("shopLoc").value) {
             setString("defaultLoc", this.orderForm.get("shopLoc").value);
         }
