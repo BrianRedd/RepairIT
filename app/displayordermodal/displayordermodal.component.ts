@@ -39,9 +39,7 @@ export class DisplayOrderModalComponent implements OnInit {
         }
         html += "<tr><td colspan='2'><span style='text-decoration:underline;'>Client Details:</span></td></tr>";
         html += "<tr><td width='33%'>Name:</td><td width='67%' style='border:1px solid #CCCCCC;'>" + this.order.firstName + " " + this.order.lastName + "</td></tr>";
-        this.orderFormBody += "<li>addressStreet: </li>";
-        html += "<tr><td width='33%'>Address:</td><td width='67%' style='border:1px solid #CCCCCC;'>" + this.order.addressStreet + "</td></tr>";
-        html += "<tr><td width='33%'></td><td width='67%' style='border:1px solid #CCCCCC;'>" + this.order.addressCity + ", " + this.order.addressState + " " + this.order.addressZip + "</td></tr>";
+        html += "<tr><td width='33%'>Address:</td><td width='67%' style='border:1px solid #CCCCCC;'>" + this.order.addressStreet + "<br/>" + this.order.addressCity + ", " + this.order.addressState + " " + this.order.addressZip + "</td></tr>";
         html += "<tr><td width='33%'>Email: </td><td width='67%' style='border:1px solid #CCCCCC;'>" + this.order.email + "</td></tr>";
         html += "<tr><td width='33%'>Phone: </td><td width='67%' style='border:1px solid #CCCCCC;'>" + this.order.phone.substring(0,3) + "-" + this.order.phone.substring(3,6) + "-" + this.order.phone.substring(6) + "</td></tr>";
         html += "<tr><td colspan='2'><span style='text-decoration:underline;'>Repair Details:</span></td></tr>";
@@ -66,7 +64,10 @@ export class DisplayOrderModalComponent implements OnInit {
             }
             html += "</td></tr>";
         }
-        html += "<tr><td width='33%'>Estimated Repair Completion</td><td width='67%' style='border:1px solid #CCCCCC;'>" + this.order.estRepair + "</td></tr>";
+        html += "<tr><td width='33%'>Estimated Repair Completion:</td><td width='67%' style='border:1px solid #CCCCCC;'>" + this.order.estRepair + "</td></tr>";
+        if (this.order.notes) {
+            html += "<tr><td width='33%'>Additional Notes:</td><td width='67%' style='border:1px solid #CCCCCC;'>" + this.order.notes + "</td></tr>";
+        }
         /*this.orderFormBody += "<li>uploaded: " + this.order.uploaded + "</li>";
         html += "<tr><td width='33%'></td><td width='67%' style='border:1px solid #CCCCCC;'></td></tr>";
         this.orderFormBody += "<li>accepted: " + this.order.accepted + "</li>";

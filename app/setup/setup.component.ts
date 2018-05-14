@@ -3,6 +3,7 @@ import { CompanyVO } from "../shared/companyVO";
 import { CompanyService } from "../services/company.service";
 import { getString, setString, setNumber } from "application-settings";
 import { CouchbaseService } from "../services/couchbase.service";
+import { OrderService } from "../services/order.service";
 import { RouterExtensions } from "nativescript-angular/router";
 import { TNSFontIconService } from "nativescript-ngx-fonticon";
 import { Validators, FormBuilder, FormGroup } from "@angular/forms";
@@ -30,6 +31,7 @@ export class SetupComponent {
         private formBuilder: FormBuilder,
         private companyService: CompanyService,
         private couchbaseService: CouchbaseService,
+        private orderService: OrderService,
         private fonticon: TNSFontIconService,
         private routerExtensions: RouterExtensions
     ) {
@@ -116,7 +118,7 @@ export class SetupComponent {
                         setString("defaultLoc", this.company.locations[0]);//default store location, starting with first in company list, updated when form is submitted
 
                         setNumber("nextOrderNumber", 1000); //next Order Number, increment with each order
-                        this.couchbaseService.createDocument({"orders": []}, "orders"); //set empty "orders" document
+                        this.orderService.initializeOrders();//initialize empty "orders" document
 
                         setNumber("numusers", 0); //number of users (0 to start)
                         setString("users", "");//string of user ID (empty to start), delimited with "|"

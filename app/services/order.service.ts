@@ -17,6 +17,10 @@ export class OrderService {
         private couchbaseService: CouchbaseService
     ) {}
 
+    initializeOrders(): Observable<OrderVO[]> {
+        return this.couchbaseService.createDocument({"orders" : []}, "orders")
+    }; 
+
     getOrders(): Observable<OrderVO[]> {
         return this.couchbaseService.getDocument("orders");
         /*return this.http.get(BaseURL + "companies")
@@ -37,4 +41,15 @@ export class OrderService {
                 return this.processHTTPMsgService.handleError(error);
             });*/
     }
+
+    updateOrders(data): Observable<OrderVO[]> {
+        this.couchbaseService.updateDocument("orders", data);
+        return this.couchbaseService.getDocument("orders");
+    }
+
+    getPendingOrders() {};
+
+    getActiveOrders() {};
+
+    getCompletedOrders() {};
 }

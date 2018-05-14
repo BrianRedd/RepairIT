@@ -1,8 +1,9 @@
 <StackLayout class="modal-view-style">
     <WebView [src]="orderFormHead + orderFormBody + orderFormFoot"></WebView>
 
-    <StackLayout orientation="horizontal">
-        <Button class="btn btn-primary btn-active" text="Cancel" (tap)="cancel()"></Button>
-        <Button class="btn btn-primary btn-active" text="Submit" (tap)="submit()"></Button>
-    </StackLayout>
+    <Label [visibility]="confirm ? 'visible' : 'collapsed'" class="m-5 body" textWrap="true" [text]="'By clicking &quot;Accept&quot;, I, ' + order.firstName + ' ' + order.lastName + ', hereby agree that the information above is correct and agreed upon.'"></Label>
+    <GridLayout rows="auto" columns="*, *">
+        <Button [visibility]="confirm ? 'visible' : 'collapsed'" row="0" col="0" class="btn btn-primary btn-active" text="Cancel" (tap)="cancel()"></Button>
+        <Button row="0" col="1" class="btn btn-primary btn-active" [text]="confirm ? 'Accept' : 'Close'" (tap)="submit()"></Button>
+    </GridLayout>
 </StackLayout>

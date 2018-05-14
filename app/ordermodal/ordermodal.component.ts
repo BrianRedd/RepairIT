@@ -85,7 +85,7 @@ export class OrderModalComponent implements OnInit {
                                     selDate.getDate(),
                                     selTime.getHours(),
                                     selTime.getMinutes());
-                response = response.toTimeString();
+                response = response.toDateString() + " " + response.toTimeString();
                 break;
             case "estRepair_d":
                 timePicker = <TimePicker>this.page.getViewById<TimePicker>('timePicker');

@@ -7,6 +7,7 @@ import { TNSFontIconService } from "nativescript-ngx-fonticon";
 import { Validators, FormBuilder, FormGroup } from "@angular/forms";
 import { Toasty } from "nativescript-toasty";
 import { TextField } from "ui/text-field";
+import { TextView } from "ui/text-view";
 import { Switch } from "ui/switch";
 import { confirm } from "ui/dialogs";
 import { Page } from "ui/page";
@@ -16,7 +17,8 @@ import * as enums from "ui/enums";
 import { ModalDialogService, ModalDialogOptions } from "nativescript-angular/modal-dialog";
 import { OrderModalComponent } from "../ordermodal/ordermodal.component";
 import { DisplayOrderModalComponent } from "../displayordermodal/displayordermodal.component";
-import { OrderService } from "../services/order.service"
+import { OrderService } from "../services/order.service";
+
 
 @Component({
     selector: "app-neworder",
@@ -27,7 +29,7 @@ import { OrderService } from "../services/order.service"
 export class NeworderComponent implements OnInit {
 
     orderForm: FormGroup;
-    orders: OrderVO[];
+    orders: any;
     newOrder: OrderVO = {
         id: "",
         firstName: "",
@@ -38,7 +40,7 @@ export class NeworderComponent implements OnInit {
         addressZip: "",
         email: "",
         phone: "",
-        image: [],
+        images: [],
         issue: "",
         issueDetail: "",
         repairLoc: "",
@@ -48,6 +50,7 @@ export class NeworderComponent implements OnInit {
         shipPaid: false,
         estRepair: "",
         shopLoc: "",
+        notes: "",
         uploaded: false,
         accepted: false,
         acceptedDateTime: "",
@@ -62,12 +65,14 @@ export class NeworderComponent implements OnInit {
     message: string;
     formBlock: boolean = false;
     activeslide: number = 0;
-    numslides: number = 3;
+    numslides: number = 4;
     slide_0: View;
     slide_1: View;
     slide_2: View;
+    slide_3: View;
     actionBarStyle: string = "background-color: #006A5C;";
     actionBarTextStyle: string = "color: #FFFFFF";
+    nextOrderNumber: number;
     orderID: string;
     issuesMore: boolean = false;
     sameDayRepair: boolean = true;
@@ -88,14 +93,14 @@ export class NeworderComponent implements OnInit {
         this.actionBarStyle = "background-color: " + this.couchbaseService.getDocument("colors").colors[0].hex + ";";
         this.orderForm = this.formBuilder.group({
             //TO DO: Break into three slides: Customer, Item Details (inc pics), Repair Details
-            firstName: ["John", Validators.required],
-            lastName: ["Testcust", Validators.required],
-            addressStreet: ["123 Address Street #123", Validators.required],
-            addressCity: ["Denver", Validators.required],
-            addressState: ["CO", Validators.required],
-            addressZip: ["80001", Validators.required],
-            email: ["test@customer.com", Validators.required],
-            phone: ["3035551234", Validators.required],
+            firstName: ["", Validators.required],
+            lastName: ["", Validators.required],
+            addressStreet: ["", Validators.required],
+            addressCity: ["", Validators.required],
+            addressState: ["", Validators.required],
+            addressZip: ["", Validators.required],
+            email: ["", Validators.required],
+            phone: ["", Validators.required],
             issue: ["", Validators.required],
             issueDetail: [""],
             repairLoc: ["Onsite: Same Day", Validators.required],
@@ -104,12 +109,14 @@ export class NeworderComponent implements OnInit {
             repairPaid: false,
             shipCost: 0,
             shipPaid: false,
-            shopLoc: getString("defaultLoc")
+            shopLoc: getString("defaultLoc"),
+            notes: [""]
         });
     }
 
     ngOnInit() {
-        this.orderID = getString("currentuserid") + getNumber("nextOrderNumber").toString();
+        this.nextOrderNumber = getNumber("nextOrderNumber");
+        this.orderID = getString("currentuserid") + this.nextOrderNumber.toString();
     }
 
     onFieldChange(field, args) {
@@ -242,25 +249,35 @@ export class NeworderComponent implements OnInit {
         }
         this.modalService.showModal(DisplayOrderModalComponent, options)
             .then((result: any) => {
-
+                if (result) {
+                    this.orders = this.orderService.getOrders();
+                    this.orders.orders.push(this.newOrder);
+                    this.orderService.updateOrders(this.orders);
+                    console.log(this.orderService.getOrders());
+                    this.message = "Order " + this.orderID + " added!";
+                    let toast = new Toasty(this.message, "short", "center");
+                    toast.show();
+                    this.nextOrderNumber ++;
+                    setNumber("nextOrderNumber", this.nextOrderNumber);
+                    this.routerExtensions.navigate(["/home"]);
+                } else {
+                    this.message = "Information not yet accepted."
+                    let toast = new Toasty(this.message, "short", "center");
+                    toast.show();
+                }
             });
     }
 
     picture(type: string) {
-        let message: string = "Click!"
         switch (type) {
             case "front":
                 if (!this.picture_front) {
                     this.picture_front = true;
-                } else {
-                    message = "Re-click!"
                 }
                 break;
             case "side":
                 if (!this.picture_side) {
                     this.picture_side = true;
-                } else {
-                    message = "Re-click!"
                 }
                 break;
             case "add":
@@ -268,8 +285,6 @@ export class NeworderComponent implements OnInit {
             default:
                 break;
         }
-        let toast = new Toasty(message, "short", "center");
-        toast.show();
     }
 
     nextSlide() {
@@ -277,7 +292,7 @@ export class NeworderComponent implements OnInit {
         let middleCard = this.page.getViewById<View>('slide_' + this.activeslide);
         let rightCard = this.page.getViewById<View>('slide_' + (this.activeslide + (this.numslides + 1)) % this.numslides);
 
-        leftCard.animate({
+        rightCard.animate({
             translate: {x: 2000, y: 0}
         }).then(() => {
             middleCard.animate({
@@ -300,7 +315,7 @@ export class NeworderComponent implements OnInit {
         let middleCard = this.page.getViewById<View>('slide_' + this.activeslide);
         let rightCard = this.page.getViewById<View>('slide_' + (this.activeslide + (this.numslides + 1)) % this.numslides);
 
-        rightCard.animate({
+        leftCard.animate({
             translate: {x: -2000, y: 0}
         }).then(() => {
             middleCard.animate({
@@ -348,6 +363,7 @@ export class NeworderComponent implements OnInit {
         }
         this.newOrder.estRepair = this.orderForm.get("estRepair").value;
         this.newOrder.shopLoc = this.orderForm.get("shopLoc").value;
+        this.newOrder.notes = this.orderForm.get("notes").value;
         this.newOrder.uploaded = false;
         this.newOrder.accepted = false;
         this.newOrder.acceptedDateTime = "";

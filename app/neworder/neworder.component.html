@@ -9,6 +9,7 @@
         <Label class="fa" [text]="(activeslide === 0 ? 'fa-circle' : 'fa-circle-o') | fonticon"></Label>
         <Label class="m-l-15 fa" [text]="(activeslide === 1 ? 'fa-circle' : 'fa-circle-o') | fonticon"></Label>
         <Label class="m-l-15 fa" [text]="(activeslide === 2 ? 'fa-circle' : 'fa-circle-o') | fonticon"></Label>
+        <Label class="m-l-15 fa" [text]="(activeslide === 3 ? 'fa-circle' : 'fa-circle-o') | fonticon"></Label>
     </StackLayout>
     <StackLayout orientation="vertical" [formGroup]="orderForm" (swipe)="onSwipe($event)">
         <GridLayout id="slide_0" [visibility]="activeslide === 0 ? 'visible' : 'collapsed'" class="m-5" rows="auto, auto, auto, auto, auto, auto, auto, *" columns="*, *, *">
@@ -68,6 +69,17 @@
             <TextField row="5" col="1" formControlName="shipCost" id="shipCost" hint="Shipping Cost" [text]="" class="input input-border" (textChange)="onFieldChange('shipCost', $event)"></TextField>
             <Switch row="5" col="2" checked="false" formControlName="shipPaid" class="m-t-15"></Switch>
             <GridLayout row="6" col="0" colSpan="3" orientation="horizontal" rows="auto" columns="*, *, *, *, *, *">
+                <Button row="0" col="0" [text]="('fa-chevron-circle-left' | fonticon)" (tap)="prevSlide()" class="fa btn-outline"></Button>
+                <Button row="0" col="1" colSpan="2" text="Cancel" (tap)="cancel()" class="btn"></Button>
+                <Button row="0" col="3" colspan="2" text="Submit" (tap)="submit()" [isEnabled]="orderForm.valid && !formBlock && picture_front && picture_side" class="btn btn-primary"></Button>
+                <Button row="0" col="5" [text]="('fa-chevron-circle-right' | fonticon)" (tap)="nextSlide()" class="fa btn-outline"></Button>
+            </GridLayout>
+        </GridLayout>
+
+        <GridLayout id="slide_3" [visibility]="activeslide === 3 ? 'visible' : 'collapsed'" class="m-5" rows="auto, *, auto" columns="*">
+            <Label row="0" col="0" [text]="'[' + orderID + ']: Additional Notes'" class="h3 text-uppercase m-b-15"></Label>
+            <TextView row="1" col="0" formControlName="notes" id="notes" [text]="" class="input input-border"></TextView>
+            <GridLayout row="6" col="0" orientation="horizontal" rows="auto" columns="*, *, *, *, *, *">
                 <Button row="0" col="0" [text]="('fa-chevron-circle-left' | fonticon)" (tap)="prevSlide()" class="fa btn-outline"></Button>
                 <Button row="0" col="1" colSpan="2" text="Cancel" (tap)="cancel()" class="btn"></Button>
                 <Button row="0" col="3" colspan="2" text="Submit" (tap)="submit()" [isEnabled]="orderForm.valid && !formBlock && picture_front && picture_side" class="btn btn-primary"></Button>
