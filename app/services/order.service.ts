@@ -17,11 +17,13 @@ export class OrderService {
         private couchbaseService: CouchbaseService
     ) {}
 
-    initializeOrders(): Observable<OrderVO[]> {
-        return this.couchbaseService.createDocument({"orders" : []}, "orders")
+    initializeOrders() {
+        console.log("Initializing Orders DB Document")
+        return this.couchbaseService.createDocument({"orders": []}, "orders")
     }; 
 
-    getOrders(): Observable<OrderVO[]> {
+    getOrders() {
+        console.log("Retrieving Orders");
         return this.couchbaseService.getDocument("orders");
         /*return this.http.get(BaseURL + "companies")
             .map(res => {
@@ -31,25 +33,28 @@ export class OrderService {
             });*/
     }
 
-    getOrder(id: string): Observable<OrderVO> {
+    /*getOrder(id: string): Observable<OrderVO> {
         let orders = this.couchbaseService.getDocument("orders");
-        return orders[id];
-        /*return this.http.get(BaseURL + "companies/" + id)
+        return orders.orders[id];
+        return this.http.get(BaseURL + "companies/" + id)
             .map(res => {
                 return this.processHTTPMsgService.extractData(res);
             }).catch(error => {
                 return this.processHTTPMsgService.handleError(error);
-            });*/
-    }
+            });
+    }*/
 
-    updateOrders(data): Observable<OrderVO[]> {
+    updateOrders(data) {
+        console.log("Updating Orders");
         this.couchbaseService.updateDocument("orders", data);
         return this.couchbaseService.getDocument("orders");
     }
 
-    getPendingOrders() {};
+    /*getPendingOrders(): Observable<OrderVO[]> {
+        let orders = this.getOrders();
+    };
 
     getActiveOrders() {};
 
-    getCompletedOrders() {};
+    getCompletedOrders() {};*/
 }

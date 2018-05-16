@@ -90,7 +90,7 @@ export class NeworderComponent implements OnInit {
         private orderService: OrderService,
         private routerExtensions: RouterExtensions
     ) {
-        this.actionBarStyle = "background-color: " + this.couchbaseService.getDocument("colors").colors[0].hex + ";";
+        this.actionBarStyle = "background-color: " + this.couchbaseService.getDocument("colors").colors[1].hex + ";";
         this.orderForm = this.formBuilder.group({
             //TO DO: Break into three slides: Customer, Item Details (inc pics), Repair Details
             firstName: ["", Validators.required],
@@ -250,10 +250,10 @@ export class NeworderComponent implements OnInit {
         this.modalService.showModal(DisplayOrderModalComponent, options)
             .then((result: any) => {
                 if (result) {
+                    this.newOrder.acceptedDateTime = new Date().toDateString();
                     this.orders = this.orderService.getOrders();
                     this.orders.orders.push(this.newOrder);
                     this.orderService.updateOrders(this.orders);
-                    console.log(this.orderService.getOrders());
                     this.message = "Order " + this.orderID + " added!";
                     let toast = new Toasty(this.message, "short", "center");
                     toast.show();

@@ -14,9 +14,9 @@
             <Image row="0" col="0" colSpan="3" [src]="company.logo" class="thumb p-4" horizontalAlignment="center" height="100"></Image>
             <label row="1" col="0" colSpan="3" [text]="company.name" class="h2 m-10 text-center" textWrap="true"></label>
             <Button row="2" col="0" colspan="3" [text]="('fa-ambulance' | fonticon) + '\nNew Repair Order'" class="m-10 fa" [style]="newBtnStyle" [nsRouterLink]="['/neworder']"></Button>
-            <Button row="3" col="0" [text]="('fa-upload' | fonticon) + '\nPending\nOrders'" class="m-10 fa" textWrap="true" [style]="pendBtnStyle"></Button>
-            <Button row="3" col="1" [text]="('fa-hourglass-half' | fonticon) + '\nActive\nOrders'" class="m-10 fa" textWrap="true" [style]="actvBtnStyle"></Button>
-            <Button row="3" col="2" [text]="('fa-archive' | fonticon) + '\nArchived\nOrders'" class="m-10 fa" textWrap="true" [style]="archBtnStyle"></Button>
+            <Button row="3" col="0" [text]="('fa-upload' | fonticon) + '\nPending\nOrders'" class="m-10 fa" textWrap="true" [style]="pendBtnStyle" [nsRouterLink]="['/pending']"></Button>
+            <Button row="3" col="1" [text]="('fa-hourglass-half' | fonticon) + '\nActive\nOrders'" class="m-10 fa" textWrap="true" [style]="actvBtnStyle" [nsRouterLink]="['/active']"></Button>
+            <Button row="3" col="2" [text]="('fa-archive' | fonticon) + '\nArchived\nOrders'" class="m-10 fa" textWrap="true" [style]="archBtnStyle" [nsRouterLink]="['/archive']"></Button>
         </GridLayout>
     </DockLayout>
 </StackLayout>

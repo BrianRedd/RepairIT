@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject } from "@angular/core";
+import { Component, OnInit } from "@angular/core";
 import { CompanyVO } from "../shared/companyVO";
 import { CompanyService } from "../services/company.service";
 import { getString, setString, clear } from "application-settings";

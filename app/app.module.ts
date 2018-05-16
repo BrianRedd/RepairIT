@@ -11,6 +11,9 @@ import { HomeComponent } from "./home/home.component";
 import { SetupComponent } from "./setup/setup.component";
 import { NewuserComponent } from "./newuser/newuser.component";
 import { NeworderComponent } from "./neworder/neworder.component";
+import { PendingComponent } from "./pending/pending.component";
+import { ActiveComponent } from "./active/active.component";
+import { ArchiveComponent } from "./archive/archive.component";
 import { OrderModalComponent } from "./ordermodal/ordermodal.component";
 import { DisplayOrderModalComponent } from "./displayordermodal/displayordermodal.component";
 
@@ -40,6 +43,9 @@ import { BaseURL } from "./shared/baseurl";
         SetupComponent,
         NewuserComponent,
         NeworderComponent,
+        PendingComponent,
+        ActiveComponent,
+        ArchiveComponent,
         OrderModalComponent,
         DisplayOrderModalComponent
     ],
