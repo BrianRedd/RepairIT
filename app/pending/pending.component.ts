@@ -22,7 +22,7 @@ export class PendingComponent implements OnInit {
 
     actionBarStyle: string = "background-color: #006A5C;";
     actionBarTextStyle: string = "color: #FFFFFF";
-    orders: any;
+    orders: OrderVO[];
 
     constructor(
         private couchbaseService: CouchbaseService,
@@ -37,7 +37,8 @@ export class PendingComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.orders = this.orderService.getOrders();
+        this.orders = this.orderService.getOrders().orders;
+        console.log("Pending; this.orders", this.orders);
     }
 
     goBack() {
@@ -55,7 +56,12 @@ export class PendingComponent implements OnInit {
             });
     }
 
-    displayOrder(order) {};
+    displayOrder(order) {
+        //let toast = new Toasty("Tapped Order ID " + order.id, "short", "top");
+        //toast.show();
+        //console.log(order);
+        this.createDisplayOrderModal(["pending", order]);
+    };
 
     sendAll(order) {};
 
