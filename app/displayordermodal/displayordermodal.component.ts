@@ -2,7 +2,9 @@ import { Component, OnInit } from "@angular/core";
 import { ModalDialogParams } from "nativescript-angular/modal-dialog";
 import { Page } from 'ui/page';
 import { OrderVO } from "../shared/orderVO";
-import { CouchbaseService } from "../services/couchbase.service";
+//import { CouchbaseService } from "../services/couchbase.service";
+//import { OrderService } from "../services/order.service";
+import { Order } from "tns-core-modules/ui/layouts/flexbox-layout/flexbox-layout";
 
 @Component({
     moduleId: module.id,
@@ -15,17 +17,14 @@ export class DisplayOrderModalComponent implements OnInit {
     orderFormHead: string = "<html><body>";
     orderFormBody: string;
     orderFormFoot: string = "</body></html>"
-    confirm: boolean = false;
 
     constructor(
+        //private couchbaseService: CouchbaseService,
+        //private orderService: OrderService,
         private params: ModalDialogParams,
-        private page: Page,
-        private couchbaseService: CouchbaseService
+        private page: Page
     ) {
         this.displayType = params.context[0];
-        if (this.displayType === "confirm") {
-            this.confirm = true;
-        }
         this.order = params.context[1];
         this.renderDisplay();
     }
@@ -34,8 +33,9 @@ export class DisplayOrderModalComponent implements OnInit {
 
     renderDisplay() {
         let html: string = "<table>"
-        if (!this.confirm) {
+        if (this.displayType !== "confirm") {
             html += "<tr><td width='33%'>Order #:</td><td width='67%' style='border:1px solid #CCCCCC;'>" + this.order.id + "</td></tr>";
+            html += "<tr><td width='33%'>Last Modified:</td><td width='67%' style='border:1px solid #CCCCCC;'>" + this.order.editedDateTime + "</td></tr>";
         }
         html += "<tr><td colspan='2'><span style='text-decoration:underline;'>Client Details:</span></td></tr>";
         html += "<tr><td width='33%'>Name:</td><td width='67%' style='border:1px solid #CCCCCC;'>" + this.order.firstName + " " + this.order.lastName + "</td></tr>";
@@ -68,26 +68,34 @@ export class DisplayOrderModalComponent implements OnInit {
         if (this.order.notes) {
             html += "<tr><td width='33%'>Additional Notes:</td><td width='67%' style='border:1px solid #CCCCCC;'>" + this.order.notes + "</td></tr>";
         }
-        /*this.orderFormBody += "<li>uploaded: " + this.order.uploaded + "</li>";
-        html += "<tr><td width='33%'></td><td width='67%' style='border:1px solid #CCCCCC;'></td></tr>";
-        this.orderFormBody += "<li>accepted: " + this.order.accepted + "</li>";
-        this.orderFormBody += "<li>acceptedDateTime: " + this.order.acceptedDateTime + "</li>";
-        this.orderFormBody += "<li>shippedOffsite: " + this.order.shippedOffsite + "</li>";
-        this.orderFormBody += "<li>shippedDateTime: " + this.order.shippedDateTime + "</li>";
-        this.orderFormBody += "<li>completed: " + this.order.completed + "</li>";
-        this.orderFormBody += "<li>completedDateTime: " + this.order.completedDateTime + "</li>";
-        this.orderFormBody += "<li>delivered: " + this.order.delivered + "</li>";
-        this.orderFormBody += "<li>deliveredDateTime: " + this.order.deliveredDateTime + "</li>";
-        this.orderFormBody += "<li>editedDateTime: " + this.order.editedDateTime + "</li>";*/
         html += "</table>";
+        if (this.displayType !== "confirm") {
+            html += "<table width='100%'>"
+            if (this.displayType !== "pending") {
+                html += "<tr><td width='33%'>Uploaded:</td><td width='17%' style='border:1px solid #CCCCCC;'>" + this.order.uploaded + "</td><td width='50%' colspan='2'> </td></tr>";
+            }
+            html += "<tr><td width='33%'>Acccepted:</td><td width='17%' style='border:1px solid #CCCCCC;'>" + this.order.accepted + "</td>";
+            html += "<td width='15%'>Date:</td><td width='35%' style='border:1px solid #CCCCCC;'>" + this.order.acceptedDateTime + "</td></tr>";
+            html += "<tr><td width='33%'>Shipped</td><td width='17%' style='border:1px solid #CCCCCC;'>" + this.order.shippedOffsite + "</td>";
+            html += "<td width='15%'>Date:</td><td width='35%' style='border:1px solid #CCCCCC;'>" + this.order.shippedDateTime + "</td></tr>";
+            html += "<tr><td width='33%'>Completed:</td><td width='17%' style='border:1px solid #CCCCCC;'>" + this.order.completed + "</td>";
+            html += "<td width='15%'>Date:</td><td width='35%' style='border:1px solid #CCCCCC;'>" + this.order.completedDateTime + "</td></tr>";
+            html += "<tr><td width='33%'>Delivered:</td><td width='17%' style='border:1px solid #CCCCCC;'>" + this.order.delivered + "</td>";
+            html += "<td width='15%'>Date:</td><td width='35%' style='border:1px solid #CCCCCC;'>" + this.order.deliveredDateTime + "</td></tr>";
+            html += "</table>";
+        }
         this.orderFormBody = html;
     }
 
     cancel() {
-        this.params.closeCallback(false);
+        this.params.closeCallback('cancel');
+    }
+
+    upload() {
+        this.params.closeCallback(this.order);
     }
 
     submit() {
-        this.params.closeCallback(true);
+        this.params.closeCallback('submit');
     }
 }

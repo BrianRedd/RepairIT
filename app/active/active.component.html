@@ -2,4 +2,17 @@
     <NavigationButton android.systemIcon="ic_menu_back" (tap)="goBack()"></NavigationButton>
     <Label [text]="('fa-hourglass-half' | fonticon) + ' Active Orders'" class="h2 fa" [style]="actionBarTextStyle"></Label>
 </ActionBar>
-<StackLayout class="page m-15"></StackLayout>
+<StackLayout class="page">
+    <ListView [items]="aorders" class="list-group" *ngIf="aorders">
+        <ng-template let-order="item">
+            <StackLayout orientation="horizontal" class="list-group-item" (tap)="displayOrder(order)">
+                <GridLayout class="list-group-item" rows="*" columns="auto, auto, *, auto">
+                    <Label row="0" col="0" [text]="order.id" class="list-group-item-text" textAlignment="left"></Label>
+                    <Label row="0" col="1" [text]="('fa-upload' | fonticon)" [visibility]="order.uploaded ? 'visible' : 'collapsed'" class="list-group-item-text fa" textAlignment="center"></Label>
+                    <Label row="0" col="2" [text]="order.issue" class="list-group-item-text m-l-15" textWrap="true" textAlignment="left"></Label>
+                    <Label row="0" col="3" [text]="order.acceptedDateTime" class="list-group-item-text" textAlignment="right"></Label>
+                </GridLayout>
+            </StackLayout>
+        </ng-template>
+    </ListView>
+</StackLayout>

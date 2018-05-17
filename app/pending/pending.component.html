@@ -3,7 +3,7 @@
     <Label [text]="('fa-upload' | fonticon) + ' Pending Orders'" class="h2 fa" [style]="actionBarTextStyle"></Label>
 </ActionBar>
 <StackLayout class="page">
-    <ListView [items]="orders" class="list-group">
+    <ListView [items]="porders" class="list-group" *ngIf="porders">
         <ng-template let-order="item">
             <StackLayout orientation="horizontal" class="list-group-item" (tap)="displayOrder(order)">
                 <GridLayout class="list-group-item" rows="*" columns="auto, *, auto">

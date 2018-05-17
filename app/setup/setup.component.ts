@@ -117,7 +117,7 @@ export class SetupComponent {
                         this.couchbaseService.updateDocument("locations", {"locations": this.company.locations});//List of company store locations
                         setString("defaultLoc", this.company.locations[0]);//default store location, starting with first in company list, updated when form is submitted
 
-                        setNumber("nextOrderNumber", 1000); //next Order Number, increment with each order
+                        setNumber("nextOrderNumber", 1006); //next Order Number, increment with each order
                         this.orderService.initializeOrders();//initialize empty "orders" document
 
                         setNumber("numusers", 0); //number of users (0 to start)

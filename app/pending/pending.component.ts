@@ -1,6 +1,6 @@
 import { Component, OnInit, Inject, ViewContainerRef } from "@angular/core";
 import { OrderVO } from "../shared/orderVO";
-import { getString, setString } from "application-settings";
+import { getString, setString, getBoolean, setBoolean } from "application-settings";
 import { CouchbaseService } from "../services/couchbase.service";
 import { RouterExtensions } from "nativescript-angular/router";
 import { TNSFontIconService } from "nativescript-ngx-fonticon";
@@ -22,7 +22,8 @@ export class PendingComponent implements OnInit {
 
     actionBarStyle: string = "background-color: #006A5C;";
     actionBarTextStyle: string = "color: #FFFFFF";
-    orders: OrderVO[];
+    orders: OrderVO[]; //orders
+    porders: OrderVO[]; //pending orders only
 
     constructor(
         private couchbaseService: CouchbaseService,
@@ -37,11 +38,25 @@ export class PendingComponent implements OnInit {
     }
 
     ngOnInit() {
+        this.refreshOrders();
+    }
+
+    refreshOrders() {
         this.orders = this.orderService.getOrders().orders;
-        console.log("Pending; this.orders", this.orders);
+        this.porders = this.orders.filter((res) => {
+            //add only orders that have NOT been uploaded
+            return !res.uploaded;
+        });
+        if (this.porders.length === 0) {
+            setBoolean("pendingOrders", false);
+        }
+        //console.log("Pending Component > refreshOrders; this.orders", this.orders);
     }
 
     goBack() {
+        if (this.porders.length > 0) {
+            setBoolean("pendingOrders", true);
+        }
         this.routerExtensions.back();
     }
 
@@ -53,16 +68,26 @@ export class PendingComponent implements OnInit {
         }
         this.modalService.showModal(DisplayOrderModalComponent, options)
             .then((result: any) => {
+                if(result !== "submit") {
+                    let idx = this.orders.findIndex(res => res.id === result.id );
+                    this.uploadOrder(idx);
+                }
             });
     }
 
     displayOrder(order) {
-        //let toast = new Toasty("Tapped Order ID " + order.id, "short", "top");
-        //toast.show();
-        //console.log(order);
         this.createDisplayOrderModal(["pending", order]);
     };
 
-    sendAll(order) {};
+    uploadOrder(idx: number) {
+        //TODO: UPLOAD ORDER
+        let toast = new Toasty("Uploaded Order " + this.orders[idx].id + " (Coming Soon!)", "short", "top");
+        toast.show();
+        this.orders[idx].uploaded = true;
+        this.orderService.updateOrders(this.orders);
+        this.refreshOrders();
+    }
+
+    sendAll() {};
 
 }

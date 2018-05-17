@@ -22,6 +22,8 @@ export class ArchiveComponent implements OnInit {
 
     actionBarStyle: string = "background-color: #006A5C;";
     actionBarTextStyle: string = "color: #FFFFFF";
+    orders: OrderVO[]; //orders
+    corders: OrderVO[]; //completed orders only
 
     constructor(
         private couchbaseService: CouchbaseService,
@@ -35,10 +37,39 @@ export class ArchiveComponent implements OnInit {
         this.actionBarStyle = "background-color: " + this.couchbaseService.getDocument("colors").colors[0].hex + ";";
     }
 
-    ngOnInit() {}
+    ngOnInit() {
+        this.refreshOrders();
+    }
+
+    refreshOrders() {
+        this.orders = this.orderService.getOrders().orders;
+        this.corders = this.orders.filter((res) => {
+            //add only orders that HAVE been completed
+            return res.completed;
+        });
+    }
 
     goBack() {
         this.routerExtensions.back();
     }
+
+    createDisplayOrderModal(args) {
+        let options: ModalDialogOptions = {
+            viewContainerRef: this.vcRef,
+            context: args,
+            fullscreen: true
+        }
+        this.modalService.showModal(DisplayOrderModalComponent, options)
+            .then((result: any) => {
+                if(result !== "submit") {
+                    /*let idx = this.orders.findIndex(res => res.id === result.id );
+                    this.uploadOrder(idx);*/
+                }
+            });
+    }
+
+    displayOrder(order) {
+        this.createDisplayOrderModal(["active", order]);
+    };
 
 }

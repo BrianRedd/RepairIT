@@ -1,7 +1,7 @@
 import { Component, OnInit } from "@angular/core";
 import { CompanyVO } from "../shared/companyVO";
 import { CompanyService } from "../services/company.service";
-import { getString, setString, clear } from "application-settings";
+import { getString, setString, getBoolean, clear } from "application-settings";
 import { CouchbaseService } from "../services/couchbase.service";
 import { RouterExtensions } from "nativescript-angular/router";
 import { TNSFontIconService } from "nativescript-ngx-fonticon";
@@ -16,7 +16,7 @@ import { Toasty } from "nativescript-toasty";
 export class HomeComponent implements OnInit {
 
     company: any; 
-    message: string;
+    message: string = "";
     actionBarStyle: string = "background-color: #006A5C;";
     actionBarTextStyle: string = "color: #FFFFFF";
     newBtnStyle: string = "color: #FFFFFF; height: 100; ";
@@ -30,6 +30,11 @@ export class HomeComponent implements OnInit {
         private fonticon: TNSFontIconService,
         private routerExtensions: RouterExtensions
     ) {
+        if (getBoolean("pendingOrders")) {
+            this.message = "Orders are Pending";
+            let toast = new Toasty(this.message, "short", "middle");
+            toast.show();
+        }
     }
 
     ngOnInit() {
@@ -62,6 +67,19 @@ export class HomeComponent implements OnInit {
             this.actvBtnStyle += "background-color: " + this.company.colors[1].hex + ";";
             this.archBtnStyle += "background-color: " + this.company.colors[0].hex + ";";
         }
+        if (getBoolean("pendingOrders")) {
+            this.message = "Orders are Pending";
+            let toast = new Toasty(this.message, "short", "middle");
+            toast.show();
+        }
+    }
+
+    ngAfterViewInit() {
+        if (getBoolean("pendingOrders")) {
+            this.message = "Orders are Pending";
+            let toast = new Toasty(this.message, "short", "middle");
+            toast.show();
+        }
     }
 
     userLoggedIn() {
@@ -69,9 +87,9 @@ export class HomeComponent implements OnInit {
             //TO DO: ADD LOGIN MODAL (drop down to choose associate, only enter password if one is configured)
             //From App Config: numusers, users, currentusername, currentuserid, usernane_{x}, userid_{x}, userpw_{x}
         } else {
-            this.message = getString('currentusername') + " [" + getString('currentuserid') + "] signed in";
+            /*this.message = getString('currentusername') + " [" + getString('currentuserid') + "] signed in";
             let toast = new Toasty(this.message, "short", "middle");
-            toast.show();
+            toast.show();*/
         }
     }
 

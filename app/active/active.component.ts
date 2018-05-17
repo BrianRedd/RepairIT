@@ -1,6 +1,6 @@
 import { Component, OnInit, Inject, ViewContainerRef } from "@angular/core";
 import { OrderVO } from "../shared/orderVO";
-import { getString, setString } from "application-settings";
+import { getString, setString, getBoolean, setBoolean } from "application-settings";
 import { CouchbaseService } from "../services/couchbase.service";
 import { RouterExtensions } from "nativescript-angular/router";
 import { TNSFontIconService } from "nativescript-ngx-fonticon";
@@ -22,6 +22,8 @@ export class ActiveComponent implements OnInit {
 
     actionBarStyle: string = "background-color: #006A5C;";
     actionBarTextStyle: string = "color: #FFFFFF";
+    orders: OrderVO[]; //orders
+    aorders: OrderVO[]; //active orders only
 
     constructor(
         private couchbaseService: CouchbaseService,
@@ -35,10 +37,39 @@ export class ActiveComponent implements OnInit {
         this.actionBarStyle = "background-color: " + this.couchbaseService.getDocument("colors").colors[1].hex + ";";
     }
 
-    ngOnInit() {}
+    ngOnInit() {
+        this.refreshOrders();
+    }
+
+    refreshOrders() {
+        this.orders = this.orderService.getOrders().orders;
+        this.aorders = this.orders.filter((res) => {
+            //add only orders that have NOT been completed
+            return !res.completed;
+        });
+    }
 
     goBack() {
         this.routerExtensions.back();
     }
+
+    createDisplayOrderModal(args) {
+        let options: ModalDialogOptions = {
+            viewContainerRef: this.vcRef,
+            context: args,
+            fullscreen: true
+        }
+        this.modalService.showModal(DisplayOrderModalComponent, options)
+            .then((result: any) => {
+                if(result !== "submit") {
+                    /*let idx = this.orders.findIndex(res => res.id === result.id );
+                    this.uploadOrder(idx);*/
+                }
+            });
+    }
+
+    displayOrder(order) {
+        this.createDisplayOrderModal(["active", order]);
+    };
 
 }

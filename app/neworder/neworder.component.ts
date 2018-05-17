@@ -1,6 +1,6 @@
 import { Component, OnInit, Inject, ViewContainerRef } from "@angular/core";
 import { OrderVO } from "../shared/orderVO";
-import { getString, setString, getNumber, setNumber } from "application-settings";
+import { getString, setString, getNumber, setNumber, getBoolean, setBoolean } from "application-settings";
 import { CouchbaseService } from "../services/couchbase.service";
 import { RouterExtensions } from "nativescript-angular/router";
 import { TNSFontIconService } from "nativescript-ngx-fonticon";
@@ -116,7 +116,7 @@ export class NeworderComponent implements OnInit {
 
     ngOnInit() {
         this.nextOrderNumber = getNumber("nextOrderNumber");
-        this.orderID = getString("currentuserid") + this.nextOrderNumber.toString();
+        this.orderID = getString("currentuserid") + (this.nextOrderNumber).toString();
     }
 
     onFieldChange(field, args) {
@@ -250,6 +250,7 @@ export class NeworderComponent implements OnInit {
         this.modalService.showModal(DisplayOrderModalComponent, options)
             .then((result: any) => {
                 if (result) {
+                    this.newOrder.accepted = true;
                     this.newOrder.acceptedDateTime = new Date().toDateString();
                     this.orders = this.orderService.getOrders();
                     this.orders.orders.push(this.newOrder);
@@ -260,6 +261,7 @@ export class NeworderComponent implements OnInit {
                     this.nextOrderNumber ++;
                     setNumber("nextOrderNumber", this.nextOrderNumber);
                     this.routerExtensions.navigate(["/home"]);
+                    setBoolean("ordersPending", true);
                 } else {
                     this.message = "Information not yet accepted."
                     let toast = new Toasty(this.message, "short", "center");

@@ -40,8 +40,8 @@ export class OrderService {
             "estRepair": "Sat May 12 2018 18:00:00 GMT-0600 (MDT)",
             "shopLoc": "Georgia Renaissance Festival",
             "notes": "",
-            "uploaded": false,
-            "accepted": false,
+            "uploaded": true,
+            "accepted": true,
             "acceptedDateTime": "Sat May 12 2018",
             "shippedOffsite": false,
             "shippedDateTime": "",
@@ -72,7 +72,7 @@ export class OrderService {
             "shopLoc": "Georgia Renaissance Festival",
             "notes": "",
             "uploaded": false,
-            "accepted": false,
+            "accepted": true,
             "acceptedDateTime": "Sat May 12 2018",
             "shippedOffsite": false,
             "shippedDateTime": "",
@@ -103,7 +103,7 @@ export class OrderService {
             "shopLoc": "Georgia Renaissance Festival",
             "notes": "Got \"red stuff\" on feathers during an \"outing.\"",
             "uploaded": false,
-            "accepted": false,
+            "accepted": true,
             "acceptedDateTime": "Sat May 12 2018",
             "shippedOffsite": false,
             "shippedDateTime": "",
@@ -134,7 +134,7 @@ export class OrderService {
             "shopLoc": "Georgia Renaissance Festival",
             "notes": "",
             "uploaded": false,
-            "accepted": false,
+            "accepted": true,
             "acceptedDateTime": "Sat May 12 2018",
             "shippedOffsite": false,
             "shippedDateTime": "",
@@ -165,7 +165,7 @@ export class OrderService {
             "shopLoc": "Georgia Renaissance Festival",
             "notes": "",
             "uploaded": false,
-            "accepted": false,
+            "accepted": true,
             "acceptedDateTime": "Sat May 12 2018",
             "shippedOffsite": false,
             "shippedDateTime": "",
@@ -196,7 +196,7 @@ export class OrderService {
             "shopLoc": "Georgia Renaissance Festival",
             "notes": "",
             "uploaded": false,
-            "accepted": false,
+            "accepted": true,
             "acceptedDateTime": "Sat May 12 2018",
             "shippedOffsite": false,
             "shippedDateTime": "",
@@ -210,7 +210,7 @@ export class OrderService {
     }; 
 
     getOrders() {
-        console.log("Retrieving Orders");
+        console.log("OrderService > Retrieving Orders");
         return this.couchbaseService.getDocument("orders");
         /*return this.http.get(BaseURL + "companies")
             .map(res => {
@@ -232,8 +232,8 @@ export class OrderService {
     }*/
 
     updateOrders(data) {
-        console.log("Updating Orders");
-        this.couchbaseService.updateDocument("orders", data);
+        console.log("OrderService > Updating Orders");
+        this.couchbaseService.updateDocument("orders", {"orders": data});
         return this.couchbaseService.getDocument("orders");
     }
 
