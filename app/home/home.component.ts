@@ -71,15 +71,18 @@ export class HomeComponent implements OnInit {
             this.message = "Orders are Pending";
             let toast = new Toasty(this.message, "short", "middle");
             toast.show();
+        } else {
+            this.message = "";
         }
     }
 
-    ngAfterViewInit() {
+    goToPending() {
         if (getBoolean("pendingOrders")) {
             this.message = "Orders are Pending";
-            let toast = new Toasty(this.message, "short", "middle");
-            toast.show();
+        } else {
+            this.message = "";
         }
+        this.routerExtensions.navigate(["/pending"]);
     }
 
     userLoggedIn() {

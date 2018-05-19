@@ -211,7 +211,7 @@ export class OrderService {
 
     getOrders() {
         console.log("OrderService > Retrieving Orders");
-        return this.couchbaseService.getDocument("orders");
+        return this.couchbaseService.getDocument("orders").orders;
         /*return this.http.get(BaseURL + "companies")
             .map(res => {
                 return this.processHTTPMsgService.extractData(res);
@@ -234,7 +234,7 @@ export class OrderService {
     updateOrders(data) {
         console.log("OrderService > Updating Orders");
         this.couchbaseService.updateDocument("orders", {"orders": data});
-        return this.couchbaseService.getDocument("orders");
+        return this.getOrders();
     }
 
     /*getPendingOrders(): Observable<OrderVO[]> {

@@ -42,10 +42,10 @@ export class ActiveComponent implements OnInit {
     }
 
     refreshOrders() {
-        this.orders = this.orderService.getOrders().orders;
+        this.orders = this.orderService.getOrders();
         this.aorders = this.orders.filter((res) => {
-            //add only orders that have NOT been completed
-            return !res.completed;
+            //add only orders that have NOT been completed BUT have been uploaded
+            return !res.completed && res.uploaded;
         });
     }
 

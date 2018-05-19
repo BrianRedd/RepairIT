@@ -249,11 +249,11 @@ export class NeworderComponent implements OnInit {
         }
         this.modalService.showModal(DisplayOrderModalComponent, options)
             .then((result: any) => {
-                if (result) {
+                if (result === "submit") {
                     this.newOrder.accepted = true;
                     this.newOrder.acceptedDateTime = new Date().toDateString();
                     this.orders = this.orderService.getOrders();
-                    this.orders.orders.push(this.newOrder);
+                    this.orders.push(this.newOrder);
                     this.orderService.updateOrders(this.orders);
                     this.message = "Order " + this.orderID + " added!";
                     let toast = new Toasty(this.message, "short", "center");

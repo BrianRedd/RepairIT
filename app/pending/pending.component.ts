@@ -42,7 +42,8 @@ export class PendingComponent implements OnInit {
     }
 
     refreshOrders() {
-        this.orders = this.orderService.getOrders().orders;
+        this.orders = this.orderService.getOrders();
+        //console.log(this.orders);
         this.porders = this.orders.filter((res) => {
             //add only orders that have NOT been uploaded
             return !res.uploaded;
@@ -56,6 +57,8 @@ export class PendingComponent implements OnInit {
     goBack() {
         if (this.porders.length > 0) {
             setBoolean("pendingOrders", true);
+        } else {
+            setBoolean("pendingOrders", false);
         }
         this.routerExtensions.back();
     }
@@ -68,7 +71,7 @@ export class PendingComponent implements OnInit {
         }
         this.modalService.showModal(DisplayOrderModalComponent, options)
             .then((result: any) => {
-                if(result !== "submit") {
+                if(result !== "submit" && result !== "cancel") {
                     let idx = this.orders.findIndex(res => res.id === result.id );
                     this.uploadOrder(idx);
                 }

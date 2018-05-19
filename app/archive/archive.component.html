@@ -2,15 +2,22 @@
     <NavigationButton android.systemIcon="ic_menu_back" (tap)="goBack()"></NavigationButton>
     <Label [text]="('fa-archive' | fonticon) + ' Completed Orders'" class="h2 fa" [style]="actionBarTextStyle"></Label>
 </ActionBar>
-<StackLayout class="page">
-    <ListView [items]="corders" class="list-group" *ngIf="corders">
-        <ng-template let-order="item">
-            <StackLayout orientation="horizontal" class="list-group-item" (tap)="displayOrder(order)">
-                <GridLayout class="list-group-item" rows="*" columns="auto, *, auto">
-                    <Label row="0" col="0" [text]="order.id" class="list-group-item-text" textAlignment="left"></Label>
-                    <Label row="0" col="1" [text]="order.issue" class="list-group-item-text m-l-15" textWrap="true" textAlignment="left"></Label>
-                    <Label row="0" col="2" [text]="order.acceptedDateTime" class="list-group-item-text" textAlignment="right"></Label>
-                </GridLayout>
-            </StackLayout>
-        </ng-template>
-    </ListView>
+<GridLayout class="page" rows="auto, *" columns="*">
+    <StackLayout row="0" col="0" *ngIf="!corders.length">
+        <Label class="h2 m-10 text-center" text="No Completed Orders"></Label>
+    </StackLayout>
+    <ScrollView row="1" col="0">
+        <ListView [items]="corders" class="list-group" *ngIf="corders">
+            <Label text="testing"></Label>
+            <ng-template let-order="item">
+                <StackLayout orientation="horizontal" class="list-group-item" (tap)="displayOrder(order)">
+                    <GridLayout class="list-group-item" rows="*" columns="auto, *, auto">
+                        <Label row="0" col="0" [text]="order.id" class="list-group-item-text" textAlignment="left"></Label>
+                        <Label row="0" col="1" [text]="order.issue" class="list-group-item-text m-l-15" textWrap="true" textAlignment="left"></Label>
+                        <Label row="0" col="2" [text]="order.acceptedDateTime" class="list-group-item-text" textAlignment="right"></Label>
+                    </GridLayout>
+                </StackLayout>
+            </ng-template>
+        </ListView>
+    </ScrollView>
+</GridLayout>

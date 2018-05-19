@@ -42,7 +42,7 @@ export class ArchiveComponent implements OnInit {
     }
 
     refreshOrders() {
-        this.orders = this.orderService.getOrders().orders;
+        this.orders = this.orderService.getOrders();
         this.corders = this.orders.filter((res) => {
             //add only orders that HAVE been completed
             return res.completed;

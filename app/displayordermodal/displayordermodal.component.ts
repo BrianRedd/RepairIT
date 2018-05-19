@@ -1,9 +1,11 @@
 import { Component, OnInit } from "@angular/core";
 import { ModalDialogParams } from "nativescript-angular/modal-dialog";
+import { Toasty } from "nativescript-toasty";
+import { FormBuilder, FormGroup } from "@angular/forms";
+import { Switch } from "ui/switch";
+import { confirm } from "ui/dialogs";
 import { Page } from 'ui/page';
 import { OrderVO } from "../shared/orderVO";
-//import { CouchbaseService } from "../services/couchbase.service";
-//import { OrderService } from "../services/order.service";
 import { Order } from "tns-core-modules/ui/layouts/flexbox-layout/flexbox-layout";
 
 @Component({
@@ -14,22 +16,30 @@ export class DisplayOrderModalComponent implements OnInit {
 
     displayType: string;
     order: OrderVO;
-    orderFormHead: string = "<html><body>";
+    orderFormHead: string = "<html><head><style>.status{color:red;}.true{color:blue;}</style></head><body>";
     orderFormBody: string;
     orderFormFoot: string = "</body></html>"
+    displayForm: FormGroup;
 
     constructor(
-        //private couchbaseService: CouchbaseService,
-        //private orderService: OrderService,
+        private formBuilder: FormBuilder,
         private params: ModalDialogParams,
         private page: Page
     ) {
         this.displayType = params.context[0];
         this.order = params.context[1];
-        this.renderDisplay();
+        this.displayForm = this.formBuilder.group({
+            repairPaid: this.order.repairPaid,
+            shipPaid: this.order.shipPaid,
+            shippedOffsite: this.order.shippedOffsite,
+            completed: this.order.completed,
+            delivered: this.order.delivered
+        });
     }
 
-    ngOnInit() {}
+    ngOnInit() {
+        this.renderDisplay();
+    }
 
     renderDisplay() {
         let html: string = "<table>"
@@ -49,39 +59,38 @@ export class DisplayOrderModalComponent implements OnInit {
         }
         html += "<tr><td width='33%'>Shop Location:</td><td width='67%' style='border:1px solid #CCCCCC;'>" + this.order.shopLoc + "</td></tr>";
         html += "<tr><td width='33%'>Repair Location:</td><td width='67%' style='border:1px solid #CCCCCC;'>" + this.order.repairLoc + "</td></tr>";
-        this.orderFormBody += "<li>repairCost: " +  + "</li>";
-        if (this.order.repairCost > 0) {
-            html += "<tr><td width='33%'>Repair Cost:</td><td width='67%' style='border:1px solid #CCCCCC;'>$" + this.order.repairCost;
-            if (this.order.repairPaid) {
-                html += " <span style='color:red;'>PAID</span>";
-            }
-            html += "</td></tr>";
-        }
-        if (this.order.shipCost > 0) {
-            html += "<tr><td width='33%'>Shipping Cost:</td><td width='67%' style='border:1px solid #CCCCCC;'>$" + this.order.shipCost;
-            if (this.order.shipPaid) {
-                html += " <span style='color:red;'>PAID</span>";
-            }
-            html += "</td></tr>";
-        }
         html += "<tr><td width='33%'>Estimated Repair Completion:</td><td width='67%' style='border:1px solid #CCCCCC;'>" + this.order.estRepair + "</td></tr>";
         if (this.order.notes) {
             html += "<tr><td width='33%'>Additional Notes:</td><td width='67%' style='border:1px solid #CCCCCC;'>" + this.order.notes + "</td></tr>";
         }
+        this.orderFormBody += "<li>repairCost: " +  + "</li>";
+        if (this.order.repairCost > 0) {
+            html += "<tr><td width='33%'>Repair Cost:</td><td width='67%' style='border:1px solid #CCCCCC;'>$" + this.order.repairCost;
+            html += " <span class='status " + this.order.repairPaid + "'>" + (this.order.repairPaid ? 'PAID' : 'UNPAID') + "</span>";
+            html += "</td></tr>";
+        }
+        if (this.order.shipCost > 0) {
+            html += "<tr><td width='33%'>Shipping Cost:</td><td width='67%' style='border:1px solid #CCCCCC;'>$" + this.order.shipCost;
+            html += " <span class='status " + this.order.shipPaid + "'>" + (this.order.shipPaid ? 'PAID' : 'UNPAID') + "</span>";
+            html += "</td></tr>";
+        }
         html += "</table>";
         if (this.displayType !== "confirm") {
             html += "<table width='100%'>"
-            if (this.displayType !== "pending") {
-                html += "<tr><td width='33%'>Uploaded:</td><td width='17%' style='border:1px solid #CCCCCC;'>" + this.order.uploaded + "</td><td width='50%' colspan='2'> </td></tr>";
-            }
             html += "<tr><td width='33%'>Acccepted:</td><td width='17%' style='border:1px solid #CCCCCC;'>" + this.order.accepted + "</td>";
-            html += "<td width='15%'>Date:</td><td width='35%' style='border:1px solid #CCCCCC;'>" + this.order.acceptedDateTime + "</td></tr>";
-            html += "<tr><td width='33%'>Shipped</td><td width='17%' style='border:1px solid #CCCCCC;'>" + this.order.shippedOffsite + "</td>";
-            html += "<td width='15%'>Date:</td><td width='35%' style='border:1px solid #CCCCCC;'>" + this.order.shippedDateTime + "</td></tr>";
-            html += "<tr><td width='33%'>Completed:</td><td width='17%' style='border:1px solid #CCCCCC;'>" + this.order.completed + "</td>";
-            html += "<td width='15%'>Date:</td><td width='35%' style='border:1px solid #CCCCCC;'>" + this.order.completedDateTime + "</td></tr>";
-            html += "<tr><td width='33%'>Delivered:</td><td width='17%' style='border:1px solid #CCCCCC;'>" + this.order.delivered + "</td>";
-            html += "<td width='15%'>Date:</td><td width='35%' style='border:1px solid #CCCCCC;'>" + this.order.deliveredDateTime + "</td></tr>";
+            html += "<td width='15%' style='text-align:center;'>Date:</td><td width='35%' style='border:1px solid #CCCCCC;'>" + this.order.acceptedDateTime + "</td></tr>";
+            if (this.order.repairLoc === "Offsite" && this.order.shippedOffsite) {
+                html += "<tr><td width='33%'>Shipped</td><td width='17%' style='border:1px solid #CCCCCC;'>" + this.order.shippedOffsite + "</td>";
+                html += "<td width='15%' style='text-align:center;'>Date:</td><td width='35%' style='border:1px solid #CCCCCC;'>" + this.order.shippedDateTime + "</td></tr>";
+            }
+            if (this.order.completed) {
+                html += "<tr><td width='33%'>Completed:</td><td width='17%' style='border:1px solid #CCCCCC;'>" + this.order.completed + "</td>";
+                html += "<td width='15%' style='text-align:center;'>Date:</td><td width='35%' style='border:1px solid #CCCCCC;'>" + this.order.completedDateTime + "</td></tr>";
+            }
+            if (this.order.delivered) {
+                html += "<tr><td width='33%'>Delivered:</td><td width='17%' style='border:1px solid #CCCCCC;'>" + this.order.delivered + "</td>";
+                html += "<td width='15%' style='text-align:center;'>Date:</td><td width='35%' style='border:1px solid #CCCCCC;'>" + this.order.deliveredDateTime + "</td></tr>";
+           }
             html += "</table>";
         }
         this.orderFormBody = html;
