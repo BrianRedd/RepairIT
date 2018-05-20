@@ -3,11 +3,12 @@
     <Label [text]="('fa-hourglass-half' | fonticon) + ' Active Orders'" class="h2 fa" [style]="actionBarTextStyle"></Label>
 </ActionBar>
 <GridLayout class="page" rows="auto, *" columns="*">
-    <StackLayout row="0" col="0" *ngIf="!aorders.length">
+    <ActivityIndicator row="0" col="0" busy="true" *ngIf="loading" width="50" height="50" class="activity-indicator"></ActivityIndicator>
+    <StackLayout row="0" col="0" *ngIf="!loading && !aorders.length">
         <Label class="h2 m-10 text-center" text="No Active Orders"></Label>
     </StackLayout>
     <ScrollView row="1" col="0">
-        <ListView [items]="aorders" class="list-group" *ngIf="aorders">
+        <ListView [items]="aorders" class="list-group" *ngIf="aorders && !loading">
             <ng-template let-order="item">
                 <StackLayout orientation="horizontal" class="list-group-item" (tap)="displayOrder(order)">
                     <GridLayout class="list-group-item" rows="*" columns="auto, auto, *, auto">

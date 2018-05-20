@@ -1,33 +1,33 @@
 <StackLayout class="modal-view-style">
-    <WebView [src]="orderFormHead + orderFormBody + orderFormFoot"></WebView>
-
-    <!--form fields here-->
-    <StackLayout [visibility]="(displayType !== 'confirm') ? 'visible' : 'collapsed'" [formGroup]="displayForm" orientation="vertical" class="m-15">
-        <GridLayout [visibility]="(!order.repairPaid) ? 'visible' : 'collapsed'" rows="auto" columns="*, auto">
-            <Label row="0" col="0" text="Repair Cost Paid" textWrap="true" class="h3"></Label>
-            <Switch row="0" col="1" formControlName="repairPaid"></Switch>
+    <GridLayout rows="*, auto, auto" columns="*">
+        <WebView row="0" col="0" [src]="orderFormHead + orderFormBody + orderFormFoot"></WebView>
+        <StackLayout row="1" col="0" [visibility]="(displayType !== 'confirm') ? 'visible' : 'collapsed'" [formGroup]="displayForm" orientation="vertical" class="m-15">
+            <GridLayout [visibility]="(showRepair) ? 'visible' : 'collapsed'" rows="auto" columns="*, auto">
+                <Label row="0" col="0" text="Repair Cost Paid" textWrap="true" class="h3"></Label>
+                <Switch row="0" col="1" formControlName="repairPaid" (checkedChange)="formChange('repairPaid', $event)"></Switch>
+            </GridLayout>
+            <GridLayout [visibility]="(showShip) ? 'visible' : 'collapsed'" rows="auto" columns="*, auto">
+                <Label row="0" col="0" text="Shipping Cost Paid" textWrap="true" class="h3"></Label>
+                <Switch row="0" col="1" formControlName="shipPaid" (checkedChange)="formChange('shipPaid', $event)"></Switch>
+            </GridLayout>
+            <GridLayout [visibility]="(showOffsite) ? 'visible' : 'collapsed'" rows="auto" columns="*, auto">
+                <Label row="0" col="0" text="Shipping Offsite" textWrap="true" class="h3"></Label>
+                <Switch row="0" col="1" formControlName="shippedOffsite" [isEnabled]="(this.order.repairPaid && this.order.shipPaid)" (checkedChange)="formChange('shippedOffsite', $event)"></Switch>
+            </GridLayout>
+            <GridLayout [visibility]="(showComplete) ? 'visible' : 'collapsed'" rows="auto" columns="*, auto">
+                <Label row="0" col="0" text="Order Completed" textWrap="true" class="h3"></Label>
+                <Switch row="0" col="1" formControlName="completed" [isEnabled]="(this.order.repairPaid && this.order.shipPaid)" (checkedChange)="formChange('completed', $event)"></Switch>
+            </GridLayout>
+            <GridLayout [visibility]="(showDeliver) ? 'visible' : 'collapsed'" rows="auto" columns="*, auto">
+                <Label row="0" col="0" text="Order Delivered" textWrap="true" class="h3"></Label>
+                <Switch row="0" col="1" formControlName="delivered" [isEnabled]="(this.order.repairPaid && this.order.shipPaid && this.order.completed)" (checkedChange)="formChange('delivered', $event)"></Switch>
+            </GridLayout>
+        </StackLayout>
+        <Label row="1" col="0" [visibility]="(displayType === 'confirm') ? 'visible' : 'collapsed'" class="m-5 body" textWrap="true" [text]="'By clicking &quot;Accept&quot;, I, ' + order.firstName + ' ' + order.lastName + ', hereby agree that the information above is correct and agreed upon.'"></Label>
+        <GridLayout row="2" col="0" rows="auto" columns="*, *">
+            <Button [visibility]="(displayType === 'confirm') ? 'visible' : 'collapsed'" row="0" col="0" class="btn btn-primary btn-active fa" [text]="('fa-check-circle' | fonticon) + ' Accept'" (tap)="accept()"></Button>
+            <Button [visibility]="(displayType !== 'confirm') ? 'visible' : 'collapsed'" row="0" col="0" class="btn btn-primary btn-active fa" [text]="('fa-upload' | fonticon) + ' Upload'" (tap)="upload()"></Button>
+            <Button row="0" col="1" class="btn btn-active fa" [text]="('fa-times-circle' | fonticon) + '  ' + ((displayType === 'confirm') ? 'Cancel' :  'Close')" (tap)="close()"></Button>
         </GridLayout>
-        <GridLayout [visibility]="(order.repairLoc === 'Offsite' && !order.shipPaid) ? 'visible' : 'collapsed'" rows="auto" columns="*, auto">
-            <Label row="0" col="0" text="Shipping Cost Paid" textWrap="true" class="h3"></Label>
-            <Switch row="0" col="1" formControlName="shipPaid"></Switch>
-        </GridLayout>
-        <GridLayout [visibility]="(order.repairLoc === 'Offsite' && order.shipPaid && !order.shippedOffsite) ? 'visible' : 'collapsed'" rows="auto" columns="*, auto">
-            <Label row="0" col="0" text="Shipping Offsite" textWrap="true" class="h3"></Label>
-            <Switch row="0" col="1" formControlName="shippedOffsite"></Switch>
-        </GridLayout>
-        <GridLayout [visibility]="(order.repairPaid && !order.completed) ? 'visible' : 'collapsed'" rows="auto" columns="*, auto">
-            <Label row="0" col="0" text="Order Completed" textWrap="true" class="h3"></Label>
-            <Switch row="0" col="1" formControlName="completed"></Switch>
-        </GridLayout>
-        <GridLayout [visibility]="(order.repairPaid && order.completed && !order.delivered) ? 'visible' : 'collapsed'" rows="auto" columns="*, auto">
-            <Label row="0" col="0" text="Order Delivered" textWrap="true" class="h3"></Label>
-            <Switch row="0" col="1" formControlName="delivered"></Switch>
-        </GridLayout>
-    </StackLayout>
-    <Label [visibility]="(displayType === 'confirm') ? 'visible' : 'collapsed'" class="m-5 body" textWrap="true" [text]="'By clicking &quot;Accept&quot;, I, ' + order.firstName + ' ' + order.lastName + ', hereby agree that the information above is correct and agreed upon.'"></Label>
-    <GridLayout rows="auto" columns="*, *">
-        <Button [visibility]="(displayType === 'confirm') ? 'visible' : 'collapsed'" row="0" col="0" class="btn btn-primary btn-active fa" [text]="('fa-check-circle' | fonticon) + ' Accept'" (tap)="submit()"></Button>
-        <Button [visibility]="(displayType === 'pending') ? 'visible' : 'collapsed'" row="0" col="0" class="btn btn-primary btn-active fa" [text]="('fa-upload' | fonticon) + ' Upload'" (tap)="upload()"></Button>
-        <Button row="0" col="1" class="btn btn-active fa" [text]="('fa-times-circle' | fonticon) + '  ' + ((displayType === 'confirm') ? 'Cancel' :  'Close')" (tap)="cancel()"></Button>
     </GridLayout>
 </StackLayout>

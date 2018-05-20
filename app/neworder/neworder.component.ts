@@ -52,6 +52,7 @@ export class NeworderComponent implements OnInit {
         shopLoc: "",
         notes: "",
         uploaded: false,
+        uploadedDateTime: "",
         accepted: false,
         acceptedDateTime: "",
         shippedOffsite: false,
@@ -249,7 +250,7 @@ export class NeworderComponent implements OnInit {
         }
         this.modalService.showModal(DisplayOrderModalComponent, options)
             .then((result: any) => {
-                if (result === "submit") {
+                if (result === "accept") {
                     this.newOrder.accepted = true;
                     this.newOrder.acceptedDateTime = new Date().toDateString();
                     this.orders = this.orderService.getOrders();
@@ -353,14 +354,14 @@ export class NeworderComponent implements OnInit {
         this.newOrder.issue = this.orderForm.get("issue").value;
         this.newOrder.issueDetail = this.orderForm.get("issueDetail").value;
         this.newOrder.repairLoc = this.orderForm.get("repairLoc").value;
-        this.newOrder.repairCost = this.orderForm.get("repairCost").value;
+        this.newOrder.repairCost = parseInt(this.orderForm.get("repairCost").value);
         this.newOrder.repairPaid = this.orderForm.get("repairPaid").value;
-        if (!this.newOrder.repairCost) {
+        if (!this.newOrder.repairCost || this.newOrder.repairCost === 0) {
             this.newOrder.repairPaid = true;
         }
-        this.newOrder.shipCost = this.orderForm.get("shipCost").value;
+        this.newOrder.shipCost = parseInt(this.orderForm.get("shipCost").value);
         this.newOrder.shipPaid = this.orderForm.get("shipPaid").value;
-        if (!this.newOrder.shipCost) {
+        if (!this.newOrder.shipCost || this.newOrder.shipCost === 0) {
             this.newOrder.shipPaid = true;
         }
         this.newOrder.estRepair = this.orderForm.get("estRepair").value;

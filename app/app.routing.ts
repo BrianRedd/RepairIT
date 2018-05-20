@@ -9,6 +9,8 @@ import { NeworderComponent } from "./neworder/neworder.component";
 import { PendingComponent } from "./pending/pending.component";
 import { ActiveComponent } from "./active/active.component";
 import { ArchiveComponent } from "./archive/archive.component";
+import { SettingsComponent } from "./settings/settings.component";
+import { InfoComponent } from "./info/info.component";
 
 const routes: Routes = [
     { path: "", redirectTo: "/home", pathMatch: "full" },
@@ -18,7 +20,9 @@ const routes: Routes = [
     { path: "neworder", component: NeworderComponent },
     { path: "pending", component: PendingComponent },
     { path: "active", component: ActiveComponent },
-    { path: "archive", component: ArchiveComponent }
+    { path: "archive", component: ArchiveComponent },
+    { path: "settings", component: SettingsComponent },
+    { path: "info", component: InfoComponent }
 ];
 
 @NgModule({

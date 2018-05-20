@@ -41,14 +41,15 @@ export class OrderService {
             "shopLoc": "Georgia Renaissance Festival",
             "notes": "",
             "uploaded": true,
+            "uploadedDateTime": "Sat May 12 2018",
             "accepted": true,
             "acceptedDateTime": "Sat May 12 2018",
             "shippedOffsite": false,
             "shippedDateTime": "",
-            "completed": false,
-            "completedDateTime": "",
-            "delivered": false,
-            "deliveredDateTime": "",
+            "completed": true,
+            "completedDateTime": "Sat May 12 2018",
+            "delivered": true,
+            "deliveredDateTime": "Sat May 12 2018",
             "editedDateTime": "Sat May 12 2018"
           }, {
             "id": "TEAS1001",
@@ -64,8 +65,8 @@ export class OrderService {
             "issue": "Loose Fur",
             "issueDetail": "On neck",
             "repairLoc": "Onsite: Later Date",
-            "repairCost": 0,
-            "repairPaid": true,
+            "repairCost": 10,
+            "repairPaid": false,
             "shipCost": 0,
             "shipPaid": true,
             "estRepair": "Wed May 16 2018",
@@ -94,11 +95,11 @@ export class OrderService {
             "images": [],
             "issue": "Damaged Feathers",
             "issueDetail": "",
-            "repairLoc": "Onsite: Later Date",
-            "repairCost": "5.00",
+            "repairLoc": "Offsite",
+            "repairCost": 5,
             "repairPaid": true,
-            "shipCost": 0,
-            "shipPaid": true,
+            "shipCost": 5,
+            "shipPaid": false,
             "estRepair": "Mon May 21 2018",
             "shopLoc": "Georgia Renaissance Festival",
             "notes": "Got \"red stuff\" on feathers during an \"outing.\"",
@@ -125,11 +126,11 @@ export class OrderService {
             "images": [],
             "issue": "Broken Knob",
             "issueDetail": "",
-            "repairLoc": "Onsite: Later Date",
+            "repairLoc": "Offsite",
             "repairCost": 0,
             "repairPaid": true,
-            "shipCost": 0,
-            "shipPaid": true,
+            "shipCost": 10,
+            "shipPaid": false,
             "estRepair": "Wed May 16 2018",
             "shopLoc": "Georgia Renaissance Festival",
             "notes": "",
@@ -157,9 +158,9 @@ export class OrderService {
             "issue": "Breakage on Body*",
             "issueDetail": "Claws broken",
             "repairLoc": "Offsite",
-            "repairCost": "20.00",
+            "repairCost": 20,
             "repairPaid": true,
-            "shipCost": "15.00",
+            "shipCost": 15,
             "shipPaid": true,
             "estRepair": "Tue Jun 12 2018",
             "shopLoc": "Georgia Renaissance Festival",
@@ -188,9 +189,9 @@ export class OrderService {
             "issue": "Upgrade*",
             "issueDetail": "Replace right wing with vibranium one.",
             "repairLoc": "Offsite",
-            "repairCost": "200.00",
+            "repairCost": 200,
             "repairPaid": true,
-            "shipCost": "20.00",
+            "shipCost": 20,
             "shipPaid": true,
             "estRepair": "Thu Jul 12 2018",
             "shopLoc": "Georgia Renaissance Festival",
@@ -210,7 +211,6 @@ export class OrderService {
     }; 
 
     getOrders() {
-        console.log("OrderService > Retrieving Orders");
         return this.couchbaseService.getDocument("orders").orders;
         /*return this.http.get(BaseURL + "companies")
             .map(res => {
@@ -220,28 +220,7 @@ export class OrderService {
             });*/
     }
 
-    /*getOrder(id: string): Observable<OrderVO> {
-        let orders = this.couchbaseService.getDocument("orders");
-        return orders.orders[id];
-        return this.http.get(BaseURL + "companies/" + id)
-            .map(res => {
-                return this.processHTTPMsgService.extractData(res);
-            }).catch(error => {
-                return this.processHTTPMsgService.handleError(error);
-            });
-    }*/
-
     updateOrders(data) {
-        console.log("OrderService > Updating Orders");
-        this.couchbaseService.updateDocument("orders", {"orders": data});
-        return this.getOrders();
+        return (this.couchbaseService.updateDocument("orders", {"orders": data}));
     }
-
-    /*getPendingOrders(): Observable<OrderVO[]> {
-        let orders = this.getOrders();
-    };
-
-    getActiveOrders() {};
-
-    getCompletedOrders() {};*/
 }

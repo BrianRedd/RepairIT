@@ -1,0 +1,7 @@
+<ActionBar class="action-bar" [style]="actionBarStyle">
+    <NavigationButton android.systemIcon="ic_menu_back" (tap)="goBack()"></NavigationButton>
+    <Label [text]="('fa-cog' | fonticon) + ' Settings'" class="h2 fa" [style]="actionBarTextStyle"></Label>
+</ActionBar>
+<StackLayout class="page m-5">
+    <Button text="Reset Data" (tap)="reset()"></Button>
+</StackLayout>

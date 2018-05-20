@@ -3,11 +3,12 @@
     <Label [text]="('fa-upload' | fonticon) + ' Pending Orders'" class="h2 fa" [style]="actionBarTextStyle"></Label>
 </ActionBar>
 <GridLayout class="page" rows="auto, *" columns="*">
-    <StackLayout row="0" col="0" *ngIf="!porders.length">
+    <ActivityIndicator row="0" col="0" busy="true" *ngIf="loading" width="50" height="50" class="activity-indicator"></ActivityIndicator>
+    <StackLayout row="0" col="0" *ngIf="!loading && !porders.length">
         <Label class="h2 m-10 text-center" text="No Pending Orders"></Label>
     </StackLayout>
     <ScrollView row="1" col="0">
-        <ListView [items]="porders" class="list-group" *ngIf="porders">
+        <ListView [items]="porders" class="list-group" *ngIf="porders && !loading">
             <ng-template let-order="item">
                 <StackLayout orientation="horizontal" class="list-group-item" (tap)="displayOrder(order)">
                     <GridLayout class="list-group-item" rows="*" columns="auto, *, auto">
@@ -19,4 +20,5 @@
             </ng-template>
         </ListView>
     </ScrollView>
+    <ActivityIndicator busy="true" *ngIf="!porders" width="50" height="50" class="activity-indicator"></ActivityIndicator>
 </GridLayout>

@@ -14,6 +14,8 @@ import { NeworderComponent } from "./neworder/neworder.component";
 import { PendingComponent } from "./pending/pending.component";
 import { ActiveComponent } from "./active/active.component";
 import { ArchiveComponent } from "./archive/archive.component";
+import { SettingsComponent } from "./settings/settings.component";
+import { InfoComponent } from "./info/info.component";
 import { OrderModalComponent } from "./ordermodal/ordermodal.component";
 import { DisplayOrderModalComponent } from "./displayordermodal/displayordermodal.component";
 
@@ -46,6 +48,8 @@ import { BaseURL } from "./shared/baseurl";
         PendingComponent,
         ActiveComponent,
         ArchiveComponent,
+        SettingsComponent,
+        InfoComponent,
         OrderModalComponent,
         DisplayOrderModalComponent
     ],

@@ -3,21 +3,24 @@
     <Label [text]="('fa-archive' | fonticon) + ' Completed Orders'" class="h2 fa" [style]="actionBarTextStyle"></Label>
 </ActionBar>
 <GridLayout class="page" rows="auto, *" columns="*">
-    <StackLayout row="0" col="0" *ngIf="!corders.length">
+    <ActivityIndicator row="0" col="0" busy="true" *ngIf="loading" width="50" height="50" class="activity-indicator"></ActivityIndicator>
+    <StackLayout row="0" col="0" *ngIf="!loading && !corders.length">
         <Label class="h2 m-10 text-center" text="No Completed Orders"></Label>
     </StackLayout>
     <ScrollView row="1" col="0">
-        <ListView [items]="corders" class="list-group" *ngIf="corders">
+        <ListView [items]="corders" class="list-group" *ngIf="corders && !loading">
             <Label text="testing"></Label>
             <ng-template let-order="item">
                 <StackLayout orientation="horizontal" class="list-group-item" (tap)="displayOrder(order)">
-                    <GridLayout class="list-group-item" rows="*" columns="auto, *, auto">
+                    <GridLayout class="list-group-item" rows="*" columns="auto, auto, *, auto">
                         <Label row="0" col="0" [text]="order.id" class="list-group-item-text" textAlignment="left"></Label>
-                        <Label row="0" col="1" [text]="order.issue" class="list-group-item-text m-l-15" textWrap="true" textAlignment="left"></Label>
-                        <Label row="0" col="2" [text]="order.acceptedDateTime" class="list-group-item-text" textAlignment="right"></Label>
+                        <Label row="0" col="1" [text]="('fa-upload' | fonticon)" [visibility]="order.uploaded ? 'visible' : 'collapsed'" class="list-group-item-text fa m-l-5" textAlignment="center"></Label>
+                        <Label row="0" col="2" [text]="order.issue" class="list-group-item-text m-l-15" textWrap="true" textAlignment="left"></Label>
+                        <Label row="0" col="3" [text]="order.acceptedDateTime" class="list-group-item-text" textAlignment="right"></Label>
                     </GridLayout>
                 </StackLayout>
             </ng-template>
         </ListView>
     </ScrollView>
+    <ActivityIndicator busy="true" *ngIf="!corders" width="50" height="50" class="activity-indicator"></ActivityIndicator>
 </GridLayout>

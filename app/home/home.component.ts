@@ -96,13 +96,4 @@ export class HomeComponent implements OnInit {
         }
     }
 
-    reset() {
-        clear();
-        this.couchbaseService.deleteDocument("colors");
-        this.couchbaseService.deleteDocument("issues");
-        this.couchbaseService.deleteDocument("locations");
-        this.couchbaseService.deleteDocument("orders");
-        this.routerExtensions.navigate(["/setup"]);
-    }
-
 }

@@ -20,6 +20,7 @@ export interface OrderVO {
     shopLoc: string,
     notes: string,
     uploaded: boolean,
+    uploadedDateTime: string,
     accepted: boolean,
     acceptedDateTime: string,
     shippedOffsite: boolean,

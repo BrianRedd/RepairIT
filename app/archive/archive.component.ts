@@ -22,8 +22,9 @@ export class ArchiveComponent implements OnInit {
 
     actionBarStyle: string = "background-color: #006A5C;";
     actionBarTextStyle: string = "color: #FFFFFF";
-    orders: OrderVO[]; //orders
+    orders: any; //orders
     corders: OrderVO[]; //completed orders only
+    loading: boolean;
 
     constructor(
         private couchbaseService: CouchbaseService,
@@ -42,10 +43,13 @@ export class ArchiveComponent implements OnInit {
     }
 
     refreshOrders() {
+        this.loading = true;
+        this.corders = [];
         this.orders = this.orderService.getOrders();
         this.corders = this.orders.filter((res) => {
             //add only orders that HAVE been completed
-            return res.completed;
+            this.loading = false;
+            return res.delivered;
         });
     }
 
@@ -61,15 +65,32 @@ export class ArchiveComponent implements OnInit {
         }
         this.modalService.showModal(DisplayOrderModalComponent, options)
             .then((result: any) => {
-                if(result !== "submit") {
-                    /*let idx = this.orders.findIndex(res => res.id === result.id );
-                    this.uploadOrder(idx);*/
+                if(result === "accept" || result === "close") {
+                    //just close
+                } else if (result === "reload") {
+                    this.refreshOrders();
+                } else {
+                    let idx = this.orders.findIndex(res => res.id === result.id );
+                    this.uploadOrder(idx);
                 }
             });
     }
 
     displayOrder(order) {
         this.createDisplayOrderModal(["active", order]);
+        this.refreshOrders();
     };
+
+    uploadOrder(idx: number) {
+        let curDate: string = new Date().toDateString();
+        //TODO: UPLOAD ORDER
+        let toast = new Toasty("Uploaded Order " + this.orders[idx].id + " (Coming Soon!)", "short", "top");
+        toast.show();
+        this.orders = this.orderService.getOrders();
+        this.orders[idx].uploaded = true;
+        this.orders[idx].uploadedDateTime = curDate;
+        this.orderService.updateOrders(this.orders);
+        this.refreshOrders();
+    }
 
 }

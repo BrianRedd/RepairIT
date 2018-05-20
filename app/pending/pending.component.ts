@@ -22,8 +22,9 @@ export class PendingComponent implements OnInit {
 
     actionBarStyle: string = "background-color: #006A5C;";
     actionBarTextStyle: string = "color: #FFFFFF";
-    orders: OrderVO[]; //orders
+    orders: any; //orders
     porders: OrderVO[]; //pending orders only
+    loading: boolean;
 
     constructor(
         private couchbaseService: CouchbaseService,
@@ -42,16 +43,17 @@ export class PendingComponent implements OnInit {
     }
 
     refreshOrders() {
+        this.loading = true;
+        this.porders = [];
         this.orders = this.orderService.getOrders();
-        //console.log(this.orders);
         this.porders = this.orders.filter((res) => {
             //add only orders that have NOT been uploaded
+            this.loading = false;
             return !res.uploaded;
         });
         if (this.porders.length === 0) {
             setBoolean("pendingOrders", false);
         }
-        //console.log("Pending Component > refreshOrders; this.orders", this.orders);
     }
 
     goBack() {
@@ -71,7 +73,11 @@ export class PendingComponent implements OnInit {
         }
         this.modalService.showModal(DisplayOrderModalComponent, options)
             .then((result: any) => {
-                if(result !== "submit" && result !== "cancel") {
+                if(result === "accept" || result === "close") {
+                    //just close
+                } else if (result === "reload") {
+                    this.refreshOrders();
+                } else {
                     let idx = this.orders.findIndex(res => res.id === result.id );
                     this.uploadOrder(idx);
                 }
@@ -80,13 +86,17 @@ export class PendingComponent implements OnInit {
 
     displayOrder(order) {
         this.createDisplayOrderModal(["pending", order]);
+        this.refreshOrders();
     };
 
     uploadOrder(idx: number) {
+        let curDate: string = new Date().toDateString();
         //TODO: UPLOAD ORDER
         let toast = new Toasty("Uploaded Order " + this.orders[idx].id + " (Coming Soon!)", "short", "top");
         toast.show();
+        this.orders = this.orderService.getOrders();
         this.orders[idx].uploaded = true;
+        this.orders[idx].uploadedDateTime = curDate;
         this.orderService.updateOrders(this.orders);
         this.refreshOrders();
     }
