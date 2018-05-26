@@ -1,3 +1,5 @@
+import { ImageVO } from "./imageVO";
+
 export interface OrderVO {
     id: string,
     firstName: string,
@@ -8,7 +10,7 @@ export interface OrderVO {
     addressZip: string,
     email: string,
     phone: string,
-    images: Array<any>,
+    images: ImageVO[],
     issue: string,
     issueDetail: string,
     repairLoc: string,

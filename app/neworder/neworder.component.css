@@ -1,0 +1,12 @@
+.btn-img {
+    border-width: 2;
+    border-color: #FFFFFF;
+}
+
+.photo_valid {
+    color: #2EBCFF;
+}
+
+.photo_valid .btn-img {
+    border-color: #2EBCFF;
+}

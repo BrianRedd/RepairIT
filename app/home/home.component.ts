@@ -6,6 +6,7 @@ import { CouchbaseService } from "../services/couchbase.service";
 import { RouterExtensions } from "nativescript-angular/router";
 import { TNSFontIconService } from "nativescript-ngx-fonticon";
 import { Toasty } from "nativescript-toasty";
+import * as LocalNotifications from "nativescript-local-notifications";
 
 @Component({
     selector: "app-home",
@@ -71,7 +72,19 @@ export class HomeComponent implements OnInit {
                 setBoolean("notificationActive", true);
                 let toast = new Toasty(this.message, "short", "center");
                 toast.show();
-                //fire notification here
+                //Schedule local notification
+                LocalNotifications.requestPermission()
+                    .then((granted) => {
+                        console.log("Local Notification Permission Granted " + granted)
+                    });
+                LocalNotifications.schedule([{
+                    title: "RepairIT Has Pending Orders",
+                    body: "RepairIT has orders that have not been uploaded."
+                }]).then(() => {
+                    console.log("Local Notification scheduled");
+                }, (error) => {
+                    console.log("Local Notification Error occurred: " + error);
+                });
             }
         } else {
             this.message = "";

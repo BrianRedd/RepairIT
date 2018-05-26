@@ -40,7 +40,26 @@ export class NeworderComponent implements OnInit {
         addressZip: "",
         email: "",
         phone: "",
-        images: [],
+        images: [
+            {
+                id: 0,
+                asset: "res://blank_picture",
+                caption: "Front",
+                valid: true
+            },
+            {
+                id: 1,
+                asset: "res://blank_picture",
+                caption: "Side",
+                valid: false
+            },
+            {
+                id: 2,
+                asset: "res://blank_picture",
+                caption: "Additional",
+                valid: false
+            }
+        ],
         issue: "",
         issueDetail: "",
         repairLoc: "",
@@ -92,6 +111,7 @@ export class NeworderComponent implements OnInit {
         private routerExtensions: RouterExtensions
     ) {
         this.actionBarStyle = "background-color: " + this.couchbaseService.getDocument("colors").colors[1].hex + ";";
+
         this.orderForm = this.formBuilder.group({
             //TO DO: Break into three slides: Customer, Item Details (inc pics), Repair Details
             firstName: ["", Validators.required],
@@ -271,21 +291,32 @@ export class NeworderComponent implements OnInit {
             });
     }
 
-    picture(type: string) {
-        switch (type) {
-            case "front":
+    picture(id: number) {
+        switch(id) {
+            case 0: 
                 if (!this.picture_front) {
                     this.picture_front = true;
+                    this.newOrder.images[1].valid = true;
                 }
                 break;
-            case "side":
-                if (!this.picture_side) {
+            case 1: 
+                if (!this.picture_front) {
+                    return;
+                } else if (!this.picture_side){
                     this.picture_side = true;
+                    this.newOrder.images[2].valid = true;
                 }
-                break;
-            case "add":
                 break;
             default:
+                if (this.newOrder.images[2].valid) {
+                    let newPicture = {
+                        id: this.newOrder.images.length,
+                        asset: "res://blank_picture",
+                        caption: "Additional",
+                        valid: true
+                    };
+                    this.newOrder.images.push(newPicture);
+                }
                 break;
         }
     }
