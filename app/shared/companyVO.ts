@@ -13,5 +13,7 @@ export interface CompanyVO {
     state: string,
     zip: string,
     issues: Array<string>,
-    locations: Array<string>
+    locations: Array<string>,
+    initialOrderNumber: number,
+    productType: string
 }

@@ -1,6 +1,7 @@
 import { Component, OnInit } from "@angular/core";
 import { ModalDialogParams } from "nativescript-angular/modal-dialog";
 import { Toasty } from "nativescript-toasty";
+import { setBoolean } from "application-settings";
 import { FormBuilder, FormGroup } from "@angular/forms";
 import { Switch } from "ui/switch";
 import { confirm } from "ui/dialogs";
@@ -193,6 +194,7 @@ export class DisplayOrderModalComponent implements OnInit {
         let idx = orders.findIndex(res => res.id === this.order.id );
         orders[idx].editedDateTime = curDate;
         orders[idx].uploaded = false;
+        setBoolean("pendingOrders", true);
         if (this.order.repairPaid !== orders[idx].repairPaid) {
             orders[idx].repairPaid = this.order.repairPaid;
         }

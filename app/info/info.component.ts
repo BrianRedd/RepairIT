@@ -23,7 +23,7 @@ export class InfoComponent implements OnInit {
     ngOnInit() {}
 
     goBack() {
-        this.routerExtensions.back();
+        this.routerExtensions.navigate(["/home"], { clearHistory: true });
     }
 
 }

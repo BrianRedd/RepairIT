@@ -1,7 +1,7 @@
 import { Component, Inject } from "@angular/core";
 import { CompanyVO } from "../shared/companyVO";
 import { CompanyService } from "../services/company.service";
-import { getString, setString, setNumber } from "application-settings";
+import { getString, setString, setNumber, setBoolean } from "application-settings";
 import { CouchbaseService } from "../services/couchbase.service";
 import { OrderService } from "../services/order.service";
 import { RouterExtensions } from "nativescript-angular/router";
@@ -112,14 +112,13 @@ export class SetupComponent {
                         setString("CompanyCity", this.company.city); //Company City (for about)
                         setString("CompanyState", this.company.state); //Company State (for about)
                         setString("CompanyZip", this.company.zip); //Company Zip (for about)
+                        setString("ProductType", this.company.productType); //product type
                         this.couchbaseService.updateDocument("colors", {"colors": this.company.colors}); //Company colors (2; for app display)
                         this.couchbaseService.updateDocument("issues", {"issues": this.company.issues}); //List of common repair types
                         this.couchbaseService.updateDocument("locations", {"locations": this.company.locations});//List of company store locations
                         setString("defaultLoc", this.company.locations[0]);//default store location, starting with first in company list, updated when form is submitted
-
-                        setNumber("nextOrderNumber", 1006); //next Order Number, increment with each order
+                        setNumber("nextOrderNumber", this.company.initialOrderNumber); //next Order Number, increment with each order
                         this.orderService.initializeOrders();//initialize empty "orders" document
-
                         setNumber("numusers", 0); //number of users (0 to start)
                         setString("users", "");//string of user ID (empty to start), delimited with "|"
 
@@ -127,7 +126,7 @@ export class SetupComponent {
                         const toast = new Toasty(this.message, "long", "center");
                         toast.show();
                         
-                        this.routerExtensions.navigate(["/newuser"]);
+                        this.routerExtensions.navigate(["/newuser"], { clearHistory: true });
                     }
                 });
                 escape;

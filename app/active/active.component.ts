@@ -54,7 +54,7 @@ export class ActiveComponent implements OnInit {
     }
 
     goBack() {
-        this.routerExtensions.back();
+        this.routerExtensions.navigate(["/home"], { clearHistory: true });
     }
 
     createDisplayOrderModal(args) {

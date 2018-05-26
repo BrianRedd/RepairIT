@@ -104,7 +104,7 @@ export class NewuserComponent implements OnInit {
             this.message = username + "  added as Associate";
             let toast = new Toasty(this.message, "short", "center");
             toast.show();
-            this.routerExtensions.navigate(["/home"]);
+            this.routerExtensions.navigate(["/home"], { clearHistory: true });
         }
     }
 }

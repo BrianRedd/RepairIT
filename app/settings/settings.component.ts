@@ -24,7 +24,7 @@ export class SettingsComponent implements OnInit {
     ngOnInit() {}
 
     goBack() {
-        this.routerExtensions.back();
+        this.routerExtensions.navigate(["/home"], { clearHistory: true });
     }
 
     reset() {
@@ -33,7 +33,7 @@ export class SettingsComponent implements OnInit {
         this.couchbaseService.deleteDocument("issues");
         this.couchbaseService.deleteDocument("locations");
         this.couchbaseService.deleteDocument("orders");
-        this.routerExtensions.navigate(["/setup"]);
+        this.routerExtensions.navigate(["/setup"], { clearHistory: true });
     }
 
 }

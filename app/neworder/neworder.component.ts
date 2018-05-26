@@ -261,7 +261,7 @@ export class NeworderComponent implements OnInit {
                     toast.show();
                     this.nextOrderNumber ++;
                     setNumber("nextOrderNumber", this.nextOrderNumber);
-                    this.routerExtensions.navigate(["/home"]);
+                    this.routerExtensions.navigate(["/home"], { clearHistory: true });
                     setBoolean("ordersPending", true);
                 } else {
                     this.message = "Information not yet accepted."
@@ -337,7 +337,7 @@ export class NeworderComponent implements OnInit {
     }
 
     cancel() {
-        this.routerExtensions.back();
+        this.routerExtensions.navigate(["/home"], { clearHistory: true });
     }
 
     submit() {
@@ -377,6 +377,7 @@ export class NeworderComponent implements OnInit {
         this.newOrder.delivered = false;
         this.newOrder.deliveredDateTime = "";
         this.newOrder.editedDateTime = curDate;
+        setBoolean("pendingOrders", true);
         if (this.orderForm.get("shopLoc").value) {
             setString("defaultLoc", this.orderForm.get("shopLoc").value);
         }

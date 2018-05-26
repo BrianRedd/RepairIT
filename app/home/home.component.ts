@@ -1,7 +1,7 @@
 import { Component, OnInit } from "@angular/core";
 import { CompanyVO } from "../shared/companyVO";
 import { CompanyService } from "../services/company.service";
-import { getString, setString, getBoolean, clear } from "application-settings";
+import { getString, setString, getBoolean, setBoolean } from "application-settings";
 import { CouchbaseService } from "../services/couchbase.service";
 import { RouterExtensions } from "nativescript-angular/router";
 import { TNSFontIconService } from "nativescript-ngx-fonticon";
@@ -30,19 +30,11 @@ export class HomeComponent implements OnInit {
         private fonticon: TNSFontIconService,
         private routerExtensions: RouterExtensions
     ) {
-        if (getBoolean("pendingOrders")) {
-            this.message = "Orders are Pending";
-            let toast = new Toasty(this.message, "short", "middle");
-            toast.show();
-        }
     }
 
     ngOnInit() {
         if (getString("Company", "") === "") {
-            /*this.message = "RepairIT is not yet set up.";
-            const toast = new Toasty(this.message, "long", "center");
-            toast.show();*/
-            this.routerExtensions.navigate(["/setup"]);
+            this.routerExtensions.navigate(["/setup"], { clearHistory: true });
         } else {
             this.company = new Array<CompanyVO>();
             this.company.name = getString("Company");
@@ -67,22 +59,25 @@ export class HomeComponent implements OnInit {
             this.actvBtnStyle += "background-color: " + this.company.colors[1].hex + ";";
             this.archBtnStyle += "background-color: " + this.company.colors[0].hex + ";";
         }
-        if (getBoolean("pendingOrders")) {
-            this.message = "Orders are Pending";
-            let toast = new Toasty(this.message, "short", "middle");
-            toast.show();
-        } else {
-            this.message = "";
-        }
+        this.isPending();
     }
 
-    goToPending() {
+    isPending() {
         if (getBoolean("pendingOrders")) {
             this.message = "Orders are Pending";
+            if (getBoolean("notificationActive")) {
+                //notification already fired
+            } else {
+                setBoolean("notificationActive", true);
+                let toast = new Toasty(this.message, "short", "center");
+                toast.show();
+                //fire notification here
+            }
         } else {
             this.message = "";
+            setBoolean("notificationActive", false);
         }
-        this.routerExtensions.navigate(["/pending"]);
+        console.log('pendingOrders = ' + getBoolean("pendingOrders"), 'notificationActive = ' + getBoolean("notificationActive"));
     }
 
     userLoggedIn() {

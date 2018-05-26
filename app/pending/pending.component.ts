@@ -62,7 +62,7 @@ export class PendingComponent implements OnInit {
         } else {
             setBoolean("pendingOrders", false);
         }
-        this.routerExtensions.back();
+        this.routerExtensions.navigate(["/home"], { clearHistory: true });
     }
 
     createDisplayOrderModal(args) {
