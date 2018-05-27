@@ -72,6 +72,18 @@ export class DisplayOrderModalComponent implements OnInit {
         if (this.order.issueDetail) {
             html += "<tr><td width='33%'>Details:</td><td width='67%' class='border'> " + this.order.issueDetail + "</td></tr>";
         }
+        html += "<tr><td colspan='2'>";
+        if (this.order.images.length > 0) {
+            html += "<ul>";
+            for (var i: number = 0; i < this.order.images.length; i++ ) {
+                //html += "<image src='" +  this.order.images[i].asset + "' width='100' height='100'/>"
+                html += "<li>" + this.order.images[i].asset.substr(0,20) + "</li>"
+            }
+            html += "</ul>";
+        } else {
+            html += "<i>No Photos Available</i>";
+        }
+        html += "</td></tr>";
         html += "<tr><td width='33%'>Shop Location:</td><td width='67%' class='border'>" + this.order.shopLoc + "</td></tr>";
         html += "<tr><td width='33%'>Repair Location:</td><td width='67%' class='border'>" + this.order.repairLoc + "</td></tr>";
         html += "<tr><td width='33%'>Estimated Repair Completion:</td><td width='67%' class='border'>" + this.order.estRepair + "</td></tr>";

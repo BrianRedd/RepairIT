@@ -1,5 +1,6 @@
 import { Component, OnInit, Inject, ViewContainerRef } from "@angular/core";
 import { OrderVO } from "../shared/orderVO";
+import { ImageVO } from "../shared/imageVO";
 import { getString, setString, getNumber, setNumber, getBoolean, setBoolean } from "application-settings";
 import { CouchbaseService } from "../services/couchbase.service";
 import { RouterExtensions } from "nativescript-angular/router";
@@ -18,7 +19,9 @@ import { ModalDialogService, ModalDialogOptions } from "nativescript-angular/mod
 import { OrderModalComponent } from "../ordermodal/ordermodal.component";
 import { DisplayOrderModalComponent } from "../displayordermodal/displayordermodal.component";
 import { OrderService } from "../services/order.service";
-
+import * as camera from "nativescript-camera";
+import * as ImageSource from "image-source";
+import { Image } from "ui/image";
 
 @Component({
     selector: "app-neworder",
@@ -30,6 +33,7 @@ export class NeworderComponent implements OnInit {
 
     orderForm: FormGroup;
     orders: any;
+    blankPicture: string = "res://blank_picture";
     newOrder: OrderVO = {
         id: "",
         firstName: "",
@@ -43,20 +47,14 @@ export class NeworderComponent implements OnInit {
         images: [
             {
                 id: 0,
-                asset: "res://blank_picture",
-                caption: "Front",
+                asset: this.blankPicture,
+                caption: "Front*",
                 valid: true
             },
             {
                 id: 1,
-                asset: "res://blank_picture",
-                caption: "Side",
-                valid: false
-            },
-            {
-                id: 2,
-                asset: "res://blank_picture",
-                caption: "Additional",
+                asset: this.blankPicture,
+                caption: "Side*",
                 valid: false
             }
         ],
@@ -140,14 +138,18 @@ export class NeworderComponent implements OnInit {
         this.orderID = getString("currentuserid") + (this.nextOrderNumber).toString();
     }
 
-    onFieldChange(field, args) {
+    /*onFieldChange(field, args) {
+        //Not sure this is needed; removed (textChange)="onFieldChange('<field_name>', $event)" from .html
         let textField = <TextField>args.object;
         this.orderForm.patchValue({ [field]: textField.text })
-    }
+    }*/
 
     validate(field, args) {
         let textField = <TextField>args.object;
         let text = textField.text;
+        if (!text || text === undefined) {
+            text = "";
+        }
         switch(field) {
             case "addressZip":
                 text = text.replace(/\D/g,'');
@@ -291,35 +293,89 @@ export class NeworderComponent implements OnInit {
             });
     }
 
-    picture(id: number) {
+    takePicture(id: number) {
+        let newPicture: ImageVO;
         switch(id) {
             case 0: 
                 if (!this.picture_front) {
                     this.picture_front = true;
                     this.newOrder.images[1].valid = true;
                 }
+                this.capturePicture(id);
                 break;
             case 1: 
                 if (!this.picture_front) {
                     return;
                 } else if (!this.picture_side){
                     this.picture_side = true;
-                    this.newOrder.images[2].valid = true;
-                }
-                break;
-            default:
-                if (this.newOrder.images[2].valid) {
-                    let newPicture = {
-                        id: this.newOrder.images.length,
+                    newPicture = {
+                        id: 2,
                         asset: "res://blank_picture",
                         caption: "Additional",
                         valid: true
-                    };
+                    }
                     this.newOrder.images.push(newPicture);
+                }
+                this.capturePicture(id);
+                break;
+            default:
+                if (this.newOrder.images[id].valid) {
+                    if (id === this.newOrder.images.length - 1) {
+                        newPicture = {
+                            id: this.newOrder.images.length,
+                            asset: this.blankPicture,
+                            caption: "Additional",
+                            valid: true
+                        };
+                        this.newOrder.images.push(newPicture);
+                    }
+                    this.capturePicture(id);
                 }
                 break;
         }
     }
+
+    capturePicture(id: number) {
+        let isAvail = camera.isAvailable();
+        if (isAvail) {
+            camera.requestPermissions();
+            var options = {
+                width: 300,
+                height: 300,
+                keepAspectRatio: true,
+                saveToGallery: false
+            };
+            camera.takePicture(options)
+                .then((imageAsset) => {
+                    let image = <Image>this.page.getViewById<Image>('image_' + id);
+                    ImageSource.fromAsset(imageAsset).then((res) => {
+                        var base64: string = res.toBase64String("png", 70);
+                        //this.newOrder.images[id].asset = base64;
+                        //console.log(ImageSource.fromBase64(base64));
+                        image.src = ImageSource.fromBase64(base64);
+                    })
+                }).catch((error) => {
+                    console.log("Error taking picture: " + error);
+                });
+        }
+    }
+
+    /*imgTo64(asset: any) {
+        ImageSource.fromAsset(asset).then(res => {
+            console.log("imgTo64 > res", res);
+            return res.toBase64String("png", 70);
+        }).catch((error) => {
+            console.log("Error encoding imageAsset: " + error);
+        })
+    };
+
+    ImgFrom64(asset: any) {
+        let loadedBase64: any = ImageSource.fromBase64(asset);
+        if (loadedBase64) {
+            return loadedBase64;
+        }
+
+    };*/
 
     nextSlide() {
         let leftCard = this.page.getViewById<View>('slide_' + (this.activeslide + (this.numslides - 1)) % this.numslides);
@@ -408,6 +464,7 @@ export class NeworderComponent implements OnInit {
         this.newOrder.delivered = false;
         this.newOrder.deliveredDateTime = "";
         this.newOrder.editedDateTime = curDate;
+        console.log(JSON.stringify(this.newOrder));
         setBoolean("pendingOrders", true);
         if (this.orderForm.get("shopLoc").value) {
             setString("defaultLoc", this.orderForm.get("shopLoc").value);

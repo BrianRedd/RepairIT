@@ -75,7 +75,7 @@ export class HomeComponent implements OnInit {
                 //Schedule local notification
                 LocalNotifications.requestPermission()
                     .then((granted) => {
-                        console.log("Local Notification Permission Granted " + granted)
+                        console.log("Local Notification Permission Granted? " + granted)
                     });
                 LocalNotifications.schedule([{
                     title: "RepairIT Has Pending Orders",
@@ -90,7 +90,7 @@ export class HomeComponent implements OnInit {
             this.message = "";
             setBoolean("notificationActive", false);
         }
-        console.log('pendingOrders = ' + getBoolean("pendingOrders"), 'notificationActive = ' + getBoolean("notificationActive"));
+        //console.log('pendingOrders = ' + getBoolean("pendingOrders"), 'notificationActive = ' + getBoolean("notificationActive"));
     }
 
     userLoggedIn() {
