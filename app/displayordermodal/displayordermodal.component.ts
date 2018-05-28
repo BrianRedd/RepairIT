@@ -9,6 +9,9 @@ import { Page } from 'ui/page';
 import { OrderVO } from "../shared/orderVO";
 //import { Order } from "tns-core-modules/ui/layouts/flexbox-layout/flexbox-layout";
 import { OrderService } from "../services/order.service";
+import * as ImageSource from "image-source";
+import * as fs from "tns-core-modules/file-system";
+import { Image, imageSourceProperty } from "ui/image";
 
 @Component({
     moduleId: module.id,
@@ -28,6 +31,9 @@ export class DisplayOrderModalComponent implements OnInit {
     showComplete: boolean;
     showDeliver: boolean;
     dataChanged: boolean;
+    PhotoSource: Array<any> = [];
+    folder = fs.knownFolders.currentApp();
+    path: any;
 
     constructor(
         private formBuilder: FormBuilder,
@@ -44,6 +50,7 @@ export class DisplayOrderModalComponent implements OnInit {
             completed: this.order.completed,
             delivered: this.order.delivered
         });
+        this.updatePhotos();
     }
 
     ngOnInit() {
@@ -72,17 +79,21 @@ export class DisplayOrderModalComponent implements OnInit {
         if (this.order.issueDetail) {
             html += "<tr><td width='33%'>Details:</td><td width='67%' class='border'> " + this.order.issueDetail + "</td></tr>";
         }
-        html += "<tr><td colspan='2'>";
+        /*html += "<tr><td colspan='2'>";
         if (this.order.images.length > 0) {
             html += "<ul>";
-            for (var i: number = 0; i < this.order.images.length; i++ ) {
-                //html += "<image src='" +  this.order.images[i].asset + "' width='100' height='100'/>"
-                html += "<li>" + this.order.images[i].asset.substr(0,20) + "</li>"
+            for (var i: number = 0; i < this.order.images.length; i++ ) {                
+                path = fs.path.join(folder.path, this.order.id + "_" + i + ".png");
+                //image = <Image>this.page.getViewById<Image>('image_' + i);
+                console.log("image_" + i, ", ", ImageSource.fromFile(path));
+                //image.imageSource = ImageSource.fromFile(path);
+                html += "<image id='image_" + i + "' src='~" + ImageSource.fromFile(path) + "' width='100' height='100'/>"
+                //html += "<li>" + this.order.images[i].asset + "</li>"
             }
             html += "</ul>";
         } else {
             html += "<i>No Photos Available</i>";
-        }
+        }*/
         html += "</td></tr>";
         html += "<tr><td width='33%'>Shop Location:</td><td width='67%' class='border'>" + this.order.shopLoc + "</td></tr>";
         html += "<tr><td width='33%'>Repair Location:</td><td width='67%' class='border'>" + this.order.repairLoc + "</td></tr>";
@@ -125,6 +136,15 @@ export class DisplayOrderModalComponent implements OnInit {
             html += "</table>";
         }
         this.orderFormBody = html;
+    }
+
+    updatePhotos() {
+        if (this.order.images.length > 0) {
+            for (var i: number = 0; i < this.order.images.length; i ++ ) {
+                this.path = fs.path.join(this.folder.path, this.order.id + "_" + this.order.images[i].id + ".png");
+                this.PhotoSource[i] = ImageSource.fromFile(this.path);
+            }
+        }
     }
 
     close() {
@@ -171,6 +191,7 @@ export class DisplayOrderModalComponent implements OnInit {
                     break;
             }
             this.renderDisplay();
+            this.updatePhotos();
         }
     }
 

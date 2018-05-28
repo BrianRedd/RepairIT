@@ -21,7 +21,8 @@ import { DisplayOrderModalComponent } from "../displayordermodal/displayordermod
 import { OrderService } from "../services/order.service";
 import * as camera from "nativescript-camera";
 import * as ImageSource from "image-source";
-import { Image } from "ui/image";
+import { Image, imageSourceProperty } from "ui/image";
+import * as fs from "tns-core-modules/file-system";
 
 @Component({
     selector: "app-neworder",
@@ -96,7 +97,6 @@ export class NeworderComponent implements OnInit {
     sameDayRepair: boolean = true;
     picture_front: boolean = false;
     picture_side: boolean = false;
-
     
     constructor(
         private formBuilder: FormBuilder,
@@ -293,90 +293,6 @@ export class NeworderComponent implements OnInit {
             });
     }
 
-    takePicture(id: number) {
-        let newPicture: ImageVO;
-        switch(id) {
-            case 0: 
-                if (!this.picture_front) {
-                    this.picture_front = true;
-                    this.newOrder.images[1].valid = true;
-                }
-                this.capturePicture(id);
-                break;
-            case 1: 
-                if (!this.picture_front) {
-                    return;
-                } else if (!this.picture_side){
-                    this.picture_side = true;
-                    newPicture = {
-                        id: 2,
-                        asset: "res://blank_picture",
-                        caption: "Additional",
-                        valid: true
-                    }
-                    this.newOrder.images.push(newPicture);
-                }
-                this.capturePicture(id);
-                break;
-            default:
-                if (this.newOrder.images[id].valid) {
-                    if (id === this.newOrder.images.length - 1) {
-                        newPicture = {
-                            id: this.newOrder.images.length,
-                            asset: this.blankPicture,
-                            caption: "Additional",
-                            valid: true
-                        };
-                        this.newOrder.images.push(newPicture);
-                    }
-                    this.capturePicture(id);
-                }
-                break;
-        }
-    }
-
-    capturePicture(id: number) {
-        let isAvail = camera.isAvailable();
-        if (isAvail) {
-            camera.requestPermissions();
-            var options = {
-                width: 300,
-                height: 300,
-                keepAspectRatio: true,
-                saveToGallery: false
-            };
-            camera.takePicture(options)
-                .then((imageAsset) => {
-                    let image = <Image>this.page.getViewById<Image>('image_' + id);
-                    ImageSource.fromAsset(imageAsset).then((res) => {
-                        var base64: string = res.toBase64String("png", 70);
-                        //this.newOrder.images[id].asset = base64;
-                        //console.log(ImageSource.fromBase64(base64));
-                        image.src = ImageSource.fromBase64(base64);
-                    })
-                }).catch((error) => {
-                    console.log("Error taking picture: " + error);
-                });
-        }
-    }
-
-    /*imgTo64(asset: any) {
-        ImageSource.fromAsset(asset).then(res => {
-            console.log("imgTo64 > res", res);
-            return res.toBase64String("png", 70);
-        }).catch((error) => {
-            console.log("Error encoding imageAsset: " + error);
-        })
-    };
-
-    ImgFrom64(asset: any) {
-        let loadedBase64: any = ImageSource.fromBase64(asset);
-        if (loadedBase64) {
-            return loadedBase64;
-        }
-
-    };*/
-
     nextSlide() {
         let leftCard = this.page.getViewById<View>('slide_' + (this.activeslide + (this.numslides - 1)) % this.numslides);
         let middleCard = this.page.getViewById<View>('slide_' + this.activeslide);
@@ -438,6 +354,7 @@ export class NeworderComponent implements OnInit {
         this.newOrder.addressZip = this.orderForm.get("addressZip").value;
         this.newOrder.email = this.orderForm.get("email").value;
         this.newOrder.phone = this.orderForm.get("phone").value;
+        this.newOrder.images.pop();
         this.newOrder.issue = this.orderForm.get("issue").value;
         this.newOrder.issueDetail = this.orderForm.get("issueDetail").value;
         this.newOrder.repairLoc = this.orderForm.get("repairLoc").value;
@@ -470,5 +387,75 @@ export class NeworderComponent implements OnInit {
             setString("defaultLoc", this.orderForm.get("shopLoc").value);
         }
         this.createFormDisplayModal(["confirm", this.newOrder]);
+    }
+
+    takePicture(id: number) {
+        let newPicture: ImageVO;
+        switch(id) {
+            case 0: 
+                if (!this.picture_front) {
+                    this.picture_front = true;
+                    this.newOrder.images[1].valid = true;
+                }
+                this.capturePicture(id);
+                break;
+            case 1: 
+                if (!this.picture_front) {
+                    return;
+                } else if (!this.picture_side){
+                    this.picture_side = true;
+                    newPicture = {
+                        id: 2,
+                        asset: "res://blank_picture",
+                        caption: "Additional",
+                        valid: true
+                    }
+                    this.newOrder.images.push(newPicture);
+                }
+                this.capturePicture(id);
+                break;
+            default:
+                if (this.newOrder.images[id].valid) {
+                    if (id === this.newOrder.images.length - 1) {
+                        newPicture = {
+                            id: this.newOrder.images.length,
+                            asset: this.blankPicture,
+                            caption: "Additional",
+                            valid: true
+                        };
+                        this.newOrder.images.push(newPicture);
+                    }
+                    this.capturePicture(id);
+                }
+                break;
+        }
+    }
+
+    capturePicture(id: number) {
+        let isAvail = camera.isAvailable();
+        if (isAvail) {
+            camera.requestPermissions();
+            var options = {
+                width: 300,
+                height: 300,
+                keepAspectRatio: true,
+                saveToGallery: true
+            };
+            let image = <Image>this.page.getViewById<Image>('image_' + id);
+            camera.takePicture(options).then(imageAsset => {                
+                    image.src = imageAsset;
+                    let documents = fs.knownFolders.currentApp();
+                    let path = fs.path.join(documents.path, this.orderID + "_" + id + ".png");
+                    ImageSource.fromAsset(imageAsset).then((imgsrc) => {
+                        imgsrc.saveToFile(path, "png");
+                        console.log("path", path);
+                        this.newOrder.images[id].asset = path;
+                    });
+                    //const base64String = imageAsset.toBase64String("png", 70);
+                    //const base64String = android.util.Base64.encodeToString(imageAsset, android.util.Base64.NO_WRAP);
+                }).catch((error) => {
+                    console.log("Error taking picture: " + error);
+                });
+        }
     }
 }

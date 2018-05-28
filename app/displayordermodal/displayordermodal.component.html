@@ -1,7 +1,17 @@
 <StackLayout class="modal-view-style">
-    <GridLayout rows="*, auto, auto" columns="*">
-        <WebView row="0" col="0" [src]="orderFormHead + orderFormBody + orderFormFoot"></WebView>
-        <StackLayout row="1" col="0" [visibility]="(displayType !== 'confirm') ? 'visible' : 'collapsed'" [formGroup]="displayForm" orientation="vertical" class="m-15">
+    <GridLayout rows="*, auto, auto, auto" columns="*">
+        <ScrollView row="0" col="0">
+            <WebView [src]="orderFormHead + orderFormBody + orderFormFoot"></WebView>
+        </ScrollView>
+        <StackLayout row="1" col="0" colSpan="3" horizontalAlignment="center" [visibility]="(order.images.length > 0) ? 'visible' : 'hidden'">
+            <WrapLayout orientation="horizontal">
+                <StackLayout orientation="vertical" width="110" *ngFor="let image of order.images">
+                    <Image [id]="'image_' + image.id" [src]="PhotoSource[image.id]" height="100" width="100" class="m-5"></Image>
+                    <Label [text]="'image_' + image.id"></Label>
+                </StackLayout>
+            </WrapLayout>
+        </StackLayout>
+        <StackLayout row="2" col="0" [visibility]="(displayType !== 'confirm') ? 'visible' : 'collapsed'" [formGroup]="displayForm" orientation="vertical" class="m-15">
             <GridLayout [visibility]="(showRepair) ? 'visible' : 'collapsed'" rows="auto" columns="*, auto">
                 <Label row="0" col="0" text="Repair Cost Paid" textWrap="true" class="h3"></Label>
                 <Switch row="0" col="1" formControlName="repairPaid" (checkedChange)="formChange('repairPaid', $event)"></Switch>
@@ -23,8 +33,8 @@
                 <Switch row="0" col="1" formControlName="delivered" [isEnabled]="(this.order.repairPaid && this.order.shipPaid && this.order.completed)" (checkedChange)="formChange('delivered', $event)"></Switch>
             </GridLayout>
         </StackLayout>
-        <Label row="1" col="0" [visibility]="(displayType === 'confirm') ? 'visible' : 'collapsed'" class="m-5 body" textWrap="true" [text]="'By clicking &quot;Accept&quot;, I, ' + order.firstName + ' ' + order.lastName + ', hereby agree that the information above is correct and agreed upon.'"></Label>
-        <GridLayout row="2" col="0" rows="auto" columns="*, *">
+        <Label row="2" col="0" [visibility]="(displayType === 'confirm') ? 'visible' : 'collapsed'" class="m-5 body" textWrap="true" [text]="'By clicking &quot;Accept&quot;, I, ' + order.firstName + ' ' + order.lastName + ', hereby agree that the information above is correct and agreed upon.'"></Label>
+        <GridLayout row="3" col="0" rows="auto" columns="*, *">
             <Button [visibility]="(displayType === 'confirm') ? 'visible' : 'collapsed'" row="0" col="0" class="btn btn-primary btn-active fa" [text]="('fa-check-circle' | fonticon) + ' Accept'" (tap)="accept()"></Button>
             <Button [visibility]="(displayType !== 'confirm') ? 'visible' : 'collapsed'" row="0" col="0" class="btn btn-primary btn-active fa" [text]="('fa-upload' | fonticon) + ' Upload'" (tap)="upload()"></Button>
             <Button row="0" col="1" class="btn btn-active fa" [text]="('fa-times-circle' | fonticon) + '  ' + ((displayType === 'confirm') ? 'Cancel' :  'Close')" (tap)="close()"></Button>
