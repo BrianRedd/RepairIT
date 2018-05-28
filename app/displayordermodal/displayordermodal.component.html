@@ -7,7 +7,7 @@
             <WrapLayout orientation="horizontal">
                 <StackLayout orientation="vertical" width="110" *ngFor="let image of order.images">
                     <Image [id]="'image_' + image.id" [src]="PhotoSource[image.id]" height="100" width="100" class="m-5"></Image>
-                    <Label [text]="'image_' + image.id"></Label>
+                    <Label [text]="image.caption" class="text-center"></Label>
                 </StackLayout>
             </WrapLayout>
         </StackLayout>

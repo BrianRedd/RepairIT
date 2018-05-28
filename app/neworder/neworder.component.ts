@@ -45,20 +45,7 @@ export class NeworderComponent implements OnInit {
         addressZip: "",
         email: "",
         phone: "",
-        images: [
-            {
-                id: 0,
-                asset: this.blankPicture,
-                caption: "Front*",
-                valid: true
-            },
-            {
-                id: 1,
-                asset: this.blankPicture,
-                caption: "Side*",
-                valid: false
-            }
-        ],
+        images: [],
         issue: "",
         issueDetail: "",
         repairLoc: "",
@@ -95,8 +82,7 @@ export class NeworderComponent implements OnInit {
     orderID: string;
     issuesMore: boolean = false;
     sameDayRepair: boolean = true;
-    picture_front: boolean = false;
-    picture_side: boolean = false;
+    required_photos_taken: boolean = false;
     
     constructor(
         private formBuilder: FormBuilder,
@@ -111,7 +97,6 @@ export class NeworderComponent implements OnInit {
         this.actionBarStyle = "background-color: " + this.couchbaseService.getDocument("colors").colors[1].hex + ";";
 
         this.orderForm = this.formBuilder.group({
-            //TO DO: Break into three slides: Customer, Item Details (inc pics), Repair Details
             firstName: ["", Validators.required],
             lastName: ["", Validators.required],
             addressStreet: ["", Validators.required],
@@ -131,18 +116,21 @@ export class NeworderComponent implements OnInit {
             shopLoc: getString("defaultLoc"),
             notes: [""]
         });
+        let photos = this.couchbaseService.getDocument("requiredPhotos").requiredPhotos;
+        for (var i: number = 0; i < photos.length; i++ ) {
+            this.newOrder.images[i] = {
+                "id": i,
+                "asset": this.blankPicture,
+                "caption": photos[i] + "*",
+                "valid": (i === 0) ? true : false
+            };
+        }
     }
 
     ngOnInit() {
         this.nextOrderNumber = getNumber("nextOrderNumber");
         this.orderID = getString("currentuserid") + (this.nextOrderNumber).toString();
     }
-
-    /*onFieldChange(field, args) {
-        //Not sure this is needed; removed (textChange)="onFieldChange('<field_name>', $event)" from .html
-        let textField = <TextField>args.object;
-        this.orderForm.patchValue({ [field]: textField.text })
-    }*/
 
     validate(field, args) {
         let textField = <TextField>args.object;
@@ -339,6 +327,54 @@ export class NeworderComponent implements OnInit {
         });
     }
 
+    takePicture(id: number) {
+        let isAvail = camera.isAvailable();
+        if (isAvail) {
+            camera.requestPermissions();
+            var options = {
+                width: 300,
+                height: 300,
+                keepAspectRatio: true,
+                saveToGallery: true
+            };
+            let image = <Image>this.page.getViewById<Image>('image_' + id);
+            camera.takePicture(options).then(imageAsset => {  
+                let documents = fs.knownFolders.currentApp();
+                let path = fs.path.join(documents.path, this.orderID + "_" + id + ".png");
+                ImageSource.fromAsset(imageAsset).then((imgsrc) => {
+                    if (id < this.newOrder.images.length - 1) {
+                        this.newOrder.images[id + 1].valid = true;
+                        image.src = imageAsset;
+                    } else if (id === this.newOrder.images.length - 1) {
+                        this.required_photos_taken = true;
+                        image.src = imageAsset;
+                    } else {
+                        let newPicture: ImageVO;
+                        newPicture = {
+                            id: id,
+                            asset: path,
+                            caption: "Additional",
+                            valid: true
+                        };
+                        this.newOrder.images.push(newPicture);
+                    }
+                    imgsrc.saveToFile(path, "png");
+                    this.newOrder.images[id].asset = path;
+                });              
+            }).catch((error) => {
+                console.log("Error taking picture: " + error);
+            });
+        } else {
+            this.message = "Camera is unavailable."
+            let toast = new Toasty(this.message, "long", "center");
+            toast.show();
+        }
+    }
+
+    takeAdditionalPicture() {
+        this.takePicture(this.newOrder.images.length);
+    }
+
     cancel() {
         this.routerExtensions.navigate(["/home"], { clearHistory: true });
     }
@@ -354,7 +390,6 @@ export class NeworderComponent implements OnInit {
         this.newOrder.addressZip = this.orderForm.get("addressZip").value;
         this.newOrder.email = this.orderForm.get("email").value;
         this.newOrder.phone = this.orderForm.get("phone").value;
-        this.newOrder.images.pop();
         this.newOrder.issue = this.orderForm.get("issue").value;
         this.newOrder.issueDetail = this.orderForm.get("issueDetail").value;
         this.newOrder.repairLoc = this.orderForm.get("repairLoc").value;
@@ -381,81 +416,11 @@ export class NeworderComponent implements OnInit {
         this.newOrder.delivered = false;
         this.newOrder.deliveredDateTime = "";
         this.newOrder.editedDateTime = curDate;
-        console.log(JSON.stringify(this.newOrder));
+        //console.log(JSON.stringify(this.newOrder));
         setBoolean("pendingOrders", true);
         if (this.orderForm.get("shopLoc").value) {
             setString("defaultLoc", this.orderForm.get("shopLoc").value);
         }
         this.createFormDisplayModal(["confirm", this.newOrder]);
-    }
-
-    takePicture(id: number) {
-        let newPicture: ImageVO;
-        switch(id) {
-            case 0: 
-                if (!this.picture_front) {
-                    this.picture_front = true;
-                    this.newOrder.images[1].valid = true;
-                }
-                this.capturePicture(id);
-                break;
-            case 1: 
-                if (!this.picture_front) {
-                    return;
-                } else if (!this.picture_side){
-                    this.picture_side = true;
-                    newPicture = {
-                        id: 2,
-                        asset: "res://blank_picture",
-                        caption: "Additional",
-                        valid: true
-                    }
-                    this.newOrder.images.push(newPicture);
-                }
-                this.capturePicture(id);
-                break;
-            default:
-                if (this.newOrder.images[id].valid) {
-                    if (id === this.newOrder.images.length - 1) {
-                        newPicture = {
-                            id: this.newOrder.images.length,
-                            asset: this.blankPicture,
-                            caption: "Additional",
-                            valid: true
-                        };
-                        this.newOrder.images.push(newPicture);
-                    }
-                    this.capturePicture(id);
-                }
-                break;
-        }
-    }
-
-    capturePicture(id: number) {
-        let isAvail = camera.isAvailable();
-        if (isAvail) {
-            camera.requestPermissions();
-            var options = {
-                width: 300,
-                height: 300,
-                keepAspectRatio: true,
-                saveToGallery: true
-            };
-            let image = <Image>this.page.getViewById<Image>('image_' + id);
-            camera.takePicture(options).then(imageAsset => {                
-                    image.src = imageAsset;
-                    let documents = fs.knownFolders.currentApp();
-                    let path = fs.path.join(documents.path, this.orderID + "_" + id + ".png");
-                    ImageSource.fromAsset(imageAsset).then((imgsrc) => {
-                        imgsrc.saveToFile(path, "png");
-                        console.log("path", path);
-                        this.newOrder.images[id].asset = path;
-                    });
-                    //const base64String = imageAsset.toBase64String("png", 70);
-                    //const base64String = android.util.Base64.encodeToString(imageAsset, android.util.Base64.NO_WRAP);
-                }).catch((error) => {
-                    console.log("Error taking picture: " + error);
-                });
-        }
     }
 }

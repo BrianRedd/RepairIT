@@ -32,6 +32,7 @@ export class SettingsComponent implements OnInit {
         this.couchbaseService.deleteDocument("colors");
         this.couchbaseService.deleteDocument("issues");
         this.couchbaseService.deleteDocument("locations");
+        this.couchbaseService.deleteDocument("requiredPhotos");
         this.couchbaseService.deleteDocument("orders");
         this.routerExtensions.navigate(["/setup"], { clearHistory: true });
     }

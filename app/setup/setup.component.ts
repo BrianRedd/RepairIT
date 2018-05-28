@@ -49,9 +49,13 @@ export class SetupComponent {
         if (this.couchbaseService.getDocument("locations")) { //create empty locations CBdoc
             this.couchbaseService.deleteDocument("locations");
         }
+        if (this.couchbaseService.getDocument("requiredPhotos")) { //create empty locations CBdoc
+            this.couchbaseService.deleteDocument("requiredPhotos");
+        }
         this.couchbaseService.createDocument({"colors": []}, "colors");
         this.couchbaseService.createDocument({"issues": []}, "issues");
         this.couchbaseService.createDocument({"locations": []}, "locations");
+        this.couchbaseService.createDocument({"requiredPhotos": []}, "requiredPhotos");
     }
 
     ngOnInit() {
@@ -116,6 +120,7 @@ export class SetupComponent {
                         this.couchbaseService.updateDocument("colors", {"colors": this.company.colors}); //Company colors (2; for app display)
                         this.couchbaseService.updateDocument("issues", {"issues": this.company.issues}); //List of common repair types
                         this.couchbaseService.updateDocument("locations", {"locations": this.company.locations});//List of company store locations
+                        this.couchbaseService.updateDocument("requiredPhotos", {"requiredPhotos": this.company.requiredPhotos});//list of required photos
                         setString("defaultLoc", this.company.locations[0]);//default store location, starting with first in company list, updated when form is submitted
                         setNumber("nextOrderNumber", this.company.initialOrderNumber); //next Order Number, increment with each order
                         this.orderService.initializeOrders();//initialize empty "orders" document

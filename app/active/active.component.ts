@@ -11,6 +11,8 @@ import { View } from "ui/core/view";
 import { ModalDialogService, ModalDialogOptions } from "nativescript-angular/modal-dialog";
 import { DisplayOrderModalComponent } from "../displayordermodal/displayordermodal.component";
 import { OrderService } from "../services/order.service";
+import * as ImageSource from "image-source";
+import * as fs from "file-system";
 
 @Component({
     selector: "app-active",
@@ -25,6 +27,7 @@ export class ActiveComponent implements OnInit {
     orders: any; //orders
     aorders: OrderVO[]; //active orders only
     loading: boolean;
+    folder = fs.knownFolders.currentApp();
 
     constructor(
         private couchbaseService: CouchbaseService,
