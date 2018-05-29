@@ -1,16 +1,17 @@
 import { Component, OnInit, Inject, ViewContainerRef } from "@angular/core";
-import { OrderVO } from "../shared/orderVO";
 import { getString, setString, getBoolean, setBoolean } from "application-settings";
 import { CouchbaseService } from "../services/couchbase.service";
+import { OrderService } from "../services/order.service";
+import { UploadService } from "../services/upload.service";
+import { ModalDialogService, ModalDialogOptions } from "nativescript-angular/modal-dialog";
+import { DisplayOrderModalComponent } from "../displayordermodal/displayordermodal.component";
+import { OrderVO } from "../shared/orderVO";
 import { RouterExtensions } from "nativescript-angular/router";
 import { TNSFontIconService } from "nativescript-ngx-fonticon";
 import { Toasty } from "nativescript-toasty";
 import { confirm } from "ui/dialogs";
 import { Page } from "ui/page";
 import { View } from "ui/core/view";
-import { ModalDialogService, ModalDialogOptions } from "nativescript-angular/modal-dialog";
-import { DisplayOrderModalComponent } from "../displayordermodal/displayordermodal.component";
-import { OrderService } from "../services/order.service";
 import * as ImageSource from "image-source";
 import * as fs from "file-system";
 
@@ -31,6 +32,7 @@ export class ActiveComponent implements OnInit {
 
     constructor(
         private couchbaseService: CouchbaseService,
+        private uploadService: UploadService,
         private fonticon: TNSFontIconService,
         private page: Page,
         private modalService: ModalDialogService,
@@ -85,10 +87,11 @@ export class ActiveComponent implements OnInit {
     };
 
     uploadOrder(idx: number) {
-        //TODO: UPLOAD ORDER
         let curDate: string = new Date().toDateString();
-        let toast = new Toasty("Uploaded Order " + this.orders[idx].id + " (Coming Soon!)", "short", "top");
-        toast.show();
+        //TODO: UPLOAD ORDER
+        //let toast = new Toasty("Uploaded Order " + this.orders[idx].id + " (Coming Soon!)", "short", "top");
+        //toast.show();
+        this.uploadService.sendEmail(idx, "active");
         this.orders = this.orderService.getOrders();
         this.orders[idx].uploaded = true;
         this.orders[idx].uploadedDateTime = curDate;

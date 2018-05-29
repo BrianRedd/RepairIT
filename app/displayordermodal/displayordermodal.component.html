@@ -21,7 +21,7 @@
                 <Switch row="0" col="1" formControlName="shipPaid" (checkedChange)="formChange('shipPaid', $event)"></Switch>
             </GridLayout>
             <GridLayout [visibility]="(showOffsite) ? 'visible' : 'collapsed'" rows="auto" columns="*, auto">
-                <Label row="0" col="0" text="Shipping Offsite" textWrap="true" class="h3"></Label>
+                <Label row="0" col="0" text="Shipped Offsite" textWrap="true" class="h3"></Label>
                 <Switch row="0" col="1" formControlName="shippedOffsite" [isEnabled]="(this.order.repairPaid && this.order.shipPaid)" (checkedChange)="formChange('shippedOffsite', $event)"></Switch>
             </GridLayout>
             <GridLayout [visibility]="(showComplete) ? 'visible' : 'collapsed'" rows="auto" columns="*, auto">

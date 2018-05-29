@@ -124,6 +124,7 @@ export class SetupComponent {
                         setString("defaultLoc", this.company.locations[0]);//default store location, starting with first in company list, updated when form is submitted
                         setNumber("nextOrderNumber", this.company.initialOrderNumber); //next Order Number, increment with each order
                         this.orderService.initializeOrders();//initialize empty "orders" document
+                        setBoolean("FirstUse", true);
                         setNumber("numusers", 0); //number of users (0 to start)
                         setString("users", "");//string of user ID (empty to start), delimited with "|"
 

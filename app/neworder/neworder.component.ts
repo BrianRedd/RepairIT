@@ -121,7 +121,7 @@ export class NeworderComponent implements OnInit {
             this.newOrder.images[i] = {
                 "id": i,
                 "asset": this.blankPicture,
-                "caption": photos[i] + "*",
+                "caption": photos[i],
                 "valid": (i === 0) ? true : false
             };
         }
@@ -380,6 +380,9 @@ export class NeworderComponent implements OnInit {
     }
 
     submit() {
+        if (getBoolean("FirstUse")) {
+            setBoolean("FirstUse", false);
+        }
         let curDate = new Date().toDateString();
         this.newOrder.id = this.orderID;
         this.newOrder.firstName = this.orderForm.get("firstName").value;

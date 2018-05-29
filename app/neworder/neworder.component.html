@@ -34,24 +34,24 @@
             </GridLayout>
         </GridLayout>
 
-        <GridLayout id="slide_1" [visibility]="activeslide === 1 ? 'visible' : 'collapsed'" class="m-5" rows="auto, auto, 180, auto, auto, *" columns="*, *, *">
+        <GridLayout id="slide_1" [visibility]="activeslide === 1 ? 'visible' : 'collapsed'" class="m-5" rows="auto, auto, auto, auto, 180, *" columns="*, *, *">
             <Label row="0" col="0" colSpan="3" [text]="'[' + orderID + ']: Product Information'" class="h3 text-uppercase m-b-15"></Label>
-            <Label row="1" col="0" colSpan="3" text="Pictures:*" textWrap="true" class="label font-weight-bold m-t-15 m-l-15 p-2"></Label>
-            <StackLayout row="2" col="0" colSpan="3" horizontalAlignment="center">
+            <Label row="1" col="0" text="Type of Repair*" textWrap="true" class="label font-weight-bold m-15 p-2"></Label>
+            <TextField row="1" col="1" colSpan="2" formControlName="issue" id="issue" hint="Type of Repair" [text]="" class="input input-border" (tap)="createModalView('issue')" (textChange)="validate('issue', $event)"></TextField>
+            <Label row="2" col="0" [text]="'Details' + (issuesMore ? '*' : '')" textWrap="true" class="label font-weight-bold m-15 p-2"></Label>
+            <TextField row="2" col="1" colSpan="2" formControlName="issueDetail" id="issueDetail" hint="Details" [text]="" class="input input-border" (blur)="validate('issueDetail', $event)"></TextField>
+            <Label row="3" col="0" colSpan="3" text="Pictures:*" textWrap="true" class="label font-weight-bold m-t-15 m-l-15 p-2"></Label>
+            <StackLayout row="4" col="0" colSpan="3" horizontalAlignment="center">
                 <ScrollView>
                     <WrapLayout orientation="horizontal">
                         <StackLayout orientation="vertical" width="120" *ngFor="let image of newOrder.images" [class]="'photo_' + (image.valid ? 'valid' : 'invalid')" (tap)="takePicture(image.id)">
                             <Image [id]="'image_' + image.id" [src]="image.asset" height="100" width="100" class="btn-img"></Image>
-                            <Label [text]="('fa-camera' | fonticon) + ' ' + image.caption" class="m-10 fa text-center"></Label>
+                            <Label [text]="('fa-camera' | fonticon) + ' ' + image.caption + '*'" class="m-10 fa text-center"></Label>
                         </StackLayout>
                     </WrapLayout>
                 </ScrollView>
                 <Button [visibility]="required_photos_taken ? 'visible' : 'collapsed'" [text]="('fa-camera' | fonticon) + ' Additional Photo'" (tap)="takeAdditionalPicture()" class="fa btn-outline"></Button>
             </StackLayout>
-            <Label row="3" col="0" text="Type of Repair*" textWrap="true" class="label font-weight-bold m-15 p-2"></Label>
-            <TextField row="3" col="1" colSpan="2" formControlName="issue" id="issue" hint="Type of Repair" [text]="" class="input input-border" (tap)="createModalView('issue')" (textChange)="validate('issue', $event)"></TextField>
-            <Label row="4" col="0" [text]="'Details' + (issuesMore ? '*' : '')" textWrap="true" class="label font-weight-bold m-15 p-2"></Label>
-            <TextField row="4" col="1" colSpan="2" formControlName="issueDetail" id="issueDetail" hint="Details" [text]="" class="input input-border" (blur)="validate('issueDetail', $event)"></TextField>
             <GridLayout row="5" col="0" colSpan="3" orientation="horizontal" rows="auto" columns="*, *, *, *, *, *">
                 <Button row="0" col="0" [text]="('fa-chevron-circle-left' | fonticon)" (tap)="prevSlide()" class="fa btn-outline"></Button>
                 <Button row="0" col="1" colSpan="2" text="Cancel" (tap)="cancel()" class="btn"></Button>

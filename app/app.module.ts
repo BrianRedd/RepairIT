@@ -23,6 +23,7 @@ import { CompanyService } from "./services/company.service";
 import { CouchbaseService } from "./services/couchbase.service";
 import { ProcessHTTPMsgService } from "./services/process-httpmsg.service";
 import { OrderService } from "./services/order.service";
+import { UploadService } from "./services/upload.service";
 import { BaseURL } from "./shared/baseurl";
 
 @NgModule({
@@ -62,7 +63,8 @@ import { BaseURL } from "./shared/baseurl";
         ProcessHTTPMsgService,
         CompanyService,
         CouchbaseService,
-        OrderService
+        OrderService,
+        UploadService
     ],
     schemas: [
         NO_ERRORS_SCHEMA

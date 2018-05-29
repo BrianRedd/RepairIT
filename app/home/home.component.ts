@@ -18,6 +18,7 @@ export class HomeComponent implements OnInit {
 
     company: any; 
     message: string = "";
+    FirstUse: boolean;
     actionBarStyle: string = "background-color: #006A5C;";
     actionBarTextStyle: string = "color: #FFFFFF";
     newBtnStyle: string = "color: #FFFFFF; height: 100; ";
@@ -61,6 +62,7 @@ export class HomeComponent implements OnInit {
             this.archBtnStyle += "background-color: " + this.company.colors[0].hex + ";";
         }
         this.isPending();
+        this.FirstUse = getBoolean("FirstUse");
     }
 
     isPending() {
@@ -75,13 +77,13 @@ export class HomeComponent implements OnInit {
                 //Schedule local notification
                 LocalNotifications.requestPermission()
                     .then((granted) => {
-                        console.log("Local Notification Permission Granted? " + granted)
+                        //console.log("Local Notification Permission Granted? " + granted)
                     });
                 LocalNotifications.schedule([{
                     title: "RepairIT Has Pending Orders",
                     body: "RepairIT has orders that have not been uploaded."
                 }]).then(() => {
-                    console.log("Local Notification scheduled");
+                    //console.log("Local Notification scheduled");
                 }, (error) => {
                     console.log("Local Notification Error occurred: " + error);
                 });
@@ -90,7 +92,6 @@ export class HomeComponent implements OnInit {
             this.message = "";
             setBoolean("notificationActive", false);
         }
-        //console.log('pendingOrders = ' + getBoolean("pendingOrders"), 'notificationActive = ' + getBoolean("notificationActive"));
     }
 
     userLoggedIn() {

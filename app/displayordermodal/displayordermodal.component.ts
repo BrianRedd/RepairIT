@@ -79,21 +79,6 @@ export class DisplayOrderModalComponent implements OnInit {
         if (this.order.issueDetail) {
             html += "<tr><td width='33%'>Details:</td><td width='67%' class='border'> " + this.order.issueDetail + "</td></tr>";
         }
-        /*html += "<tr><td colspan='2'>";
-        if (this.order.images.length > 0) {
-            html += "<ul>";
-            for (var i: number = 0; i < this.order.images.length; i++ ) {                
-                path = fs.path.join(folder.path, this.order.id + "_" + i + ".png");
-                //image = <Image>this.page.getViewById<Image>('image_' + i);
-                console.log("image_" + i, ", ", ImageSource.fromFile(path));
-                //image.imageSource = ImageSource.fromFile(path);
-                html += "<image id='image_" + i + "' src='~" + ImageSource.fromFile(path) + "' width='100' height='100'/>"
-                //html += "<li>" + this.order.images[i].asset + "</li>"
-            }
-            html += "</ul>";
-        } else {
-            html += "<i>No Photos Available</i>";
-        }*/
         html += "</td></tr>";
         html += "<tr><td width='33%'>Shop Location:</td><td width='67%' class='border'>" + this.order.shopLoc + "</td></tr>";
         html += "<tr><td width='33%'>Repair Location:</td><td width='67%' class='border'>" + this.order.repairLoc + "</td></tr>";
@@ -101,7 +86,6 @@ export class DisplayOrderModalComponent implements OnInit {
         if (this.order.notes) {
             html += "<tr><td width='33%'>Additional Notes:</td><td width='67%' class='border'>" + this.order.notes + "</td></tr>";
         }
-        this.orderFormBody += "<li>repairCost: " +  + "</li>";
         if (this.order.repairCost > 0) {
             html += "<tr><td width='33%'>Repair Cost:</td><td width='67%' class='border'>$" + this.order.repairCost.toFixed(2);
             html += " <span class='status " + this.order.repairPaid + "'>" + (this.order.repairPaid ? 'PAID' : 'UNPAID') + "</span>";
