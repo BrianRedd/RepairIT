@@ -2,4 +2,25 @@
     <NavigationButton android.systemIcon="ic_menu_back" (tap)="goBack()"></NavigationButton>
     <Label [text]="('fa-info-circle' | fonticon) + ' Information'" class="h2 fa" [style]="actionBarTextStyle"></Label>
 </ActionBar>
-<StackLayout class="page m-5"></StackLayout>
+<StackLayout class="page m-5">
+    <DockLayout stretchLastChild="true">
+        <StackLayout dock="bottom">
+            <Label text="RepairIt &copy; 2018, R. Brian Redd www.rbrianredd.com me@rbrianredd.com" class="text-center" textWrap="true"></Label>
+        </StackLayout>
+        <StackLayout>
+            <Label text="RepairIT&trade; Repair Management App, licensed to:" class="text-center m-b-5"></Label>
+            <Image [src]="company.logo" class="thumb p-4" horizontalAlignment="center" height="100"></Image>
+            <Label [text]="company.name" class="h2 m-10 text-center" textWrap="true"></Label>
+            <Label [text]="company.website" class="m-b-5 text-center" textWrap="true"></Label>
+            <GridLayout rows="auto,auto" columns="*,*" class="m-10">
+                <Label row="0" col="0" [text]="company.street" textWrap="true"></Label>
+                <Label row="1" col="0" [text]="company.city + ' ' + company.state + ', ' + company.zip" textWrap="true"></Label>
+                <Label row="0" col="1" [text]="company.phone"></Label>
+                <Label row="1" col="1" [text]="company.email"></Label>
+            </GridLayout>
+            <Label [text]="company.description" class="m-10" textWrap="true"></Label>
+            <GridLayout row="*" col="*"></GridLayout>
+        </StackLayout>
+    </DockLayout>
+</StackLayout>
+-

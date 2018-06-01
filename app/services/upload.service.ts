@@ -14,7 +14,7 @@ export class UploadService {
     ) {}
 
     sendEmail(id: number, sourcepage: string) {
-        console.log("Upload Service > sendEmail()");
+        console.log("Upload Service > sendEmail(" + id + ", " + sourcepage + ")");
         let orders = this.orderService.getOrders();
         let order = orders[id];
         let hasAttachments: boolean = false;
