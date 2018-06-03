@@ -24,7 +24,6 @@ export class InfoComponent implements OnInit {
         this.company = new Array<CompanyVO>();
         this.company.name = getString("Company");
         this.company.id= getString("CompanyID");
-        this.company.password = getString("CompanyPW");
         this.company.logo = getString("Logo");
         this.company.email = getString("CompanyEmail");
         this.company.website = getString("CompanyWebsite");
