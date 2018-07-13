@@ -1,12 +1,12 @@
 import { Component, Inject, OnInit } from "@angular/core";
-import { getString, setString, getNumber, setNumber, clear } from "application-settings";
-import { CouchbaseService } from "../services/couchbase.service";
+import { getString, setString, getNumber, setNumber, clear } from "tns-core-modules/application-settings/application-settings";
+import { CouchbaseService } from "~/services/couchbase.service";
 import { RouterExtensions } from "nativescript-angular/router";
 import { TNSFontIconService } from "nativescript-ngx-fonticon";
 import { Validators, FormBuilder, FormGroup } from "@angular/forms";
-import { TextField } from "ui/text-field";
+import { TextField } from "tns-core-modules/ui/text-field/text-field";
 import { Toasty } from "nativescript-toasty";
-import { confirm } from "ui/dialogs";
+import { confirm } from "tns-core-modules/ui/dialogs/dialogs";
 
 @Component({
     selector: "app-newuser",
@@ -32,9 +32,9 @@ export class NewuserComponent implements OnInit {
         private routerExtensions: RouterExtensions
     ) {
         let colors = this.couchbaseService.getDocument("colors").colors;
-        //console.log("colors", JSON.stringify(colors));
-        if (colors[0].hex) {
-            this.actionBarStyle = "background-color: " + colors[0].hex + ";";
+        console.log("colors", JSON.stringify(colors));
+        if (colors[0]) {
+            this.actionBarStyle = "background-color: " + colors[0] + ";";
         }
         this.users = getString("users", "");
         this.numusers = getNumber("numusers");

@@ -1,5 +1,4 @@
 import { Injectable } from "@angular/core";
-import { CompanyVO } from "~/shared/companyVO";
 import { Observable } from "rxjs/Observable";
 import { HttpClient } from "@angular/common/http";
 import { BaseURL } from "~/shared/baseurl";
@@ -7,16 +6,17 @@ import { ProcessHTTPMsgService } from "~/services/process-httpmsg.service";
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/delay';
 import 'rxjs/add/operator/catch';
+import { UserVO } from "../shared/userVO";
 
 @Injectable()
-export class CompanyService {
+export class UserService {
     constructor(
         public http: HttpClient,
         private processHTTPMsgService: ProcessHTTPMsgService
     ) {}
 
-    getCompanies(): Observable<CompanyVO[]> {
-        return this.http.get(BaseURL + "companies")
+    getUsers(): Observable<UserVO[]> {
+        return this.http.get(BaseURL + "users")
             /*.map((res) => {
                 return this.processHTTPMsgService.extractData(res);
             })
@@ -25,9 +25,8 @@ export class CompanyService {
             });
     }
 
-    getCompany(id: string): Observable<CompanyVO> {
-        //console.log("getCompany", id);
-        return this.http.get(BaseURL + "companies/" + id)
+    getUser(username: string): Observable<UserVO> {
+        return this.http.get(BaseURL + "users?associateID=" + username)
             /*.map(res => {
                 return this.processHTTPMsgService.extractData(res);
             })*/
@@ -36,8 +35,8 @@ export class CompanyService {
             });
     }
 
-    setupCompany(code: string): Observable<CompanyVO> {
-        return this.http.get(BaseURL + "setup?code=" + code)
+    newUser(user: UserVO): Observable<UserVO> {
+        return this.http.post(BaseURL + "users", user)
             .catch((error) => {
                 return this.processHTTPMsgService.handleError(error);
             });

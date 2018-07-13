@@ -1,8 +1,8 @@
 import { Component, OnInit } from "@angular/core";
-import { CouchbaseService } from "../services/couchbase.service";
+import { CouchbaseService } from "~/services/couchbase.service";
 import { RouterExtensions } from "nativescript-angular/router";
-import { getString } from "application-settings";
-import { CompanyVO } from "../shared/companyVO";
+import { getString } from "tns-core-modules/application-settings/application-settings";
+import { CompanyVO } from "~/shared/companyVO";
 
 @Component({
     selector: "app-info",
@@ -20,7 +20,7 @@ export class InfoComponent implements OnInit {
         private couchbaseService: CouchbaseService,
         private routerExtensions: RouterExtensions
     ){
-        this.actionBarStyle = "background-color: " + this.couchbaseService.getDocument("colors").colors[0].hex + ";";
+       // this.actionBarStyle = "background-color: " + this.couchbaseService.getDocument("colors").colors[0].hex + ";";
         this.company = new Array<CompanyVO>();
         this.company.name = getString("Company");
         this.company.id= getString("CompanyID");

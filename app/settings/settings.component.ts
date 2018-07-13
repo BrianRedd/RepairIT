@@ -1,7 +1,7 @@
 import { Component, OnInit } from "@angular/core";
-import { CouchbaseService } from "../services/couchbase.service";
+import { CouchbaseService } from "~/services/couchbase.service";
 import { RouterExtensions } from "nativescript-angular/router";
-import { getString, setString, getBoolean, clear } from "application-settings";
+import { getString, setString, getBoolean, clear } from "tns-core-modules/application-settings/application-settings";
 
 @Component({
     selector: "app-settings",
@@ -18,7 +18,7 @@ export class SettingsComponent implements OnInit {
         private couchbaseService: CouchbaseService,
         private routerExtensions: RouterExtensions
     ){
-        this.actionBarStyle = "background-color: " + this.couchbaseService.getDocument("colors").colors[1].hex + ";";
+        //this.actionBarStyle = "background-color: " + this.couchbaseService.getDocument("colors").colors[1].hex + ";";
     }
 
     ngOnInit() {}

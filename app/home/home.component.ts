@@ -1,8 +1,8 @@
 import { Component, OnInit } from "@angular/core";
-import { CompanyVO } from "../shared/companyVO";
-import { CompanyService } from "../services/company.service";
-import { getString, setString, getBoolean, setBoolean } from "application-settings";
-import { CouchbaseService } from "../services/couchbase.service";
+import { CompanyVO } from "~/shared/companyVO";
+import { CompanyService } from "~/services/company.service";
+import { getString, setString, getBoolean, setBoolean } from "tns-core-modules/application-settings/application-settings";
+import { CouchbaseService } from "~/services/couchbase.service";
 import { RouterExtensions } from "nativescript-angular/router";
 import { TNSFontIconService } from "nativescript-ngx-fonticon";
 import { Toasty } from "nativescript-toasty";
@@ -54,12 +54,12 @@ export class HomeComponent implements OnInit {
             this.company.colors = this.couchbaseService.getDocument("colors").colors;
             this.company.issues = this.couchbaseService.getDocument("issues").issues;
             this.company.locations = this.couchbaseService.getDocument("locations").locations;
-            this.actionBarStyle = "background-color: " + this.company.colors[0].hex + ";";
+            //this.actionBarStyle = "background-color: " + this.company.colors[0].hex + ";";
             this.userLoggedIn();
-            this.newBtnStyle += "background-color: " + this.company.colors[1].hex + ";";
-            this.pendBtnStyle += "background-color: " + this.company.colors[0].hex + ";";
-            this.actvBtnStyle += "background-color: " + this.company.colors[1].hex + ";";
-            this.archBtnStyle += "background-color: " + this.company.colors[0].hex + ";";
+            //this.newBtnStyle += "background-color: " + this.company.colors[1].hex + ";";
+            //this.pendBtnStyle += "background-color: " + this.company.colors[0].hex + ";";
+            //this.actvBtnStyle += "background-color: " + this.company.colors[1].hex + ";";
+            //this.archBtnStyle += "background-color: " + this.company.colors[0].hex + ";";
         }
         this.isPending();
         this.FirstUse = getBoolean("FirstUse");

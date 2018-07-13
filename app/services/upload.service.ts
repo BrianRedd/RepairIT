@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
-import { OrderService } from "./order.service";
-import { CouchbaseService } from "./couchbase.service";
-import { getString } from "application-settings";
+import { OrderService } from "~/services/order.service";
+import { CouchbaseService } from "~/services/couchbase.service";
+import { getString } from "tns-core-modules/application-settings/application-settings";
 import { Toasty } from "nativescript-toasty";
 import * as Email from "nativescript-email";
 

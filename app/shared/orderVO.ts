@@ -1,4 +1,4 @@
-import { ImageVO } from "./imageVO";
+import { ImageVO } from "~/shared/imageVO";
 
 export interface OrderVO {
     id: string,

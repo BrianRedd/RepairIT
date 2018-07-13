@@ -1,10 +1,10 @@
 import { Component, OnInit } from "@angular/core";
 import { ModalDialogParams } from "nativescript-angular/modal-dialog";
-import { DatePicker } from 'ui/date-picker';
-import { TimePicker } from 'ui/time-picker';
-import { ListPicker } from 'ui/list-picker';
-import { Page } from 'ui/page';
-import { CouchbaseService } from "../services/couchbase.service";
+import { DatePicker } from 'tns-core-modules/ui/date-picker/date-picker';
+import { TimePicker } from 'tns-core-modules/ui/time-picker/time-picker';
+import { ListPicker } from 'tns-core-modules/ui/list-picker/list-picker';
+import { Page } from 'tns-core-modules/ui/page/page';
+import { CouchbaseService } from "~/services/couchbase.service";
 
 @Component({
     moduleId: module.id,

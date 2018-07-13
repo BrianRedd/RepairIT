@@ -1,17 +1,17 @@
 import { Component, OnInit } from "@angular/core";
 import { ModalDialogParams } from "nativescript-angular/modal-dialog";
 import { Toasty } from "nativescript-toasty";
-import { setBoolean } from "application-settings";
+import { setBoolean } from "tns-core-modules/application-settings/application-settings";
 import { FormBuilder, FormGroup } from "@angular/forms";
-import { Switch } from "ui/switch";
-import { confirm } from "ui/dialogs";
-import { Page } from 'ui/page';
-import { OrderVO } from "../shared/orderVO";
+import { Switch } from "tns-core-modules/ui/switch/switch";
+import { confirm } from "tns-core-modules/ui/dialogs/dialogs";
+import { Page } from 'tns-core-modules/ui/page/page';
+import { OrderVO } from "~/shared/orderVO";
 //import { Order } from "tns-core-modules/ui/layouts/flexbox-layout/flexbox-layout";
-import { OrderService } from "../services/order.service";
-import * as ImageSource from "image-source";
-import * as fs from "tns-core-modules/file-system";
-import { Image, imageSourceProperty } from "ui/image";
+import { OrderService } from "~/services/order.service";
+import * as ImageSource from "tns-core-modules/image-source/image-source";
+import * as fs from "tns-core-modules/file-system/file-system";
+import { Image, imageSourceProperty } from "tns-core-modules/ui/image/image";
 
 @Component({
     moduleId: module.id,

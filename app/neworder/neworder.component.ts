@@ -1,28 +1,28 @@
 import { Component, OnInit, Inject, ViewContainerRef } from "@angular/core";
-import { OrderVO } from "../shared/orderVO";
-import { ImageVO } from "../shared/imageVO";
-import { getString, setString, getNumber, setNumber, getBoolean, setBoolean } from "application-settings";
-import { CouchbaseService } from "../services/couchbase.service";
+import { OrderVO } from "~/shared/orderVO";
+import { ImageVO } from "~/shared/imageVO";
+import { getString, setString, getNumber, setNumber, getBoolean, setBoolean } from "tns-core-modules/application-settings/application-settings";
+import { CouchbaseService } from "~/services/couchbase.service";
 import { RouterExtensions } from "nativescript-angular/router";
 import { TNSFontIconService } from "nativescript-ngx-fonticon";
 import { Validators, FormBuilder, FormGroup } from "@angular/forms";
 import { Toasty } from "nativescript-toasty";
-import { TextField } from "ui/text-field";
-import { TextView } from "ui/text-view";
-import { Switch } from "ui/switch";
-import { confirm } from "ui/dialogs";
-import { Page } from "ui/page";
-import { View } from "ui/core/view";
-import { SwipeGestureEventData, SwipeDirection } from "ui/gestures";
-import * as enums from "ui/enums";
+import { TextField } from "tns-core-modules/ui/text-field/text-field";
+import { TextView } from "tns-core-modules/ui/text-view/text-view";
+import { Switch } from "tns-core-modules/ui/switch/switch";
+import { confirm } from "tns-core-modules/ui/dialogs/dialogs";
+import { Page } from "tns-core-modules/ui/page/page";
+import { View } from "tns-core-modules/ui/core/view/view";
+import { SwipeGestureEventData, SwipeDirection } from "tns-core-modules/ui/gestures/gestures";
+import * as enums from "tns-core-modules/ui/enums/enums";
 import { ModalDialogService, ModalDialogOptions } from "nativescript-angular/modal-dialog";
-import { OrderModalComponent } from "../ordermodal/ordermodal.component";
-import { DisplayOrderModalComponent } from "../displayordermodal/displayordermodal.component";
-import { OrderService } from "../services/order.service";
+import { OrderModalComponent } from "~/ordermodal/ordermodal.component";
+import { DisplayOrderModalComponent } from "~/displayordermodal/displayordermodal.component";
+import { OrderService } from "~/services/order.service";
 import * as camera from "nativescript-camera";
-import * as ImageSource from "image-source";
-import { Image, imageSourceProperty } from "ui/image";
-import * as fs from "tns-core-modules/file-system";
+import * as ImageSource from "tns-core-modules/image-source/image-source";
+import { Image, imageSourceProperty } from "tns-core-modules/ui/image/image";
+import * as fs from "tns-core-modules/file-system/file-system";
 
 @Component({
     selector: "app-neworder",
@@ -94,7 +94,7 @@ export class NeworderComponent implements OnInit {
         private orderService: OrderService,
         private routerExtensions: RouterExtensions
     ) {
-        this.actionBarStyle = "background-color: " + this.couchbaseService.getDocument("colors").colors[1].hex + ";";
+        //this.actionBarStyle = "background-color: " + this.couchbaseService.getDocument("colors").colors[1].hex + ";";
 
         this.orderForm = this.formBuilder.group({
             firstName: ["", Validators.required],

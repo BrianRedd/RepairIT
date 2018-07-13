@@ -1,15 +1,15 @@
 import { Component, Inject } from "@angular/core";
-import { CompanyVO } from "../shared/companyVO";
-import { CompanyService } from "../services/company.service";
-import { getString, setString, setNumber, setBoolean } from "application-settings";
-import { CouchbaseService } from "../services/couchbase.service";
-import { OrderService } from "../services/order.service";
+import { CompanyVO } from "~/shared/companyVO";
+import { CompanyService } from "~/services/company.service";
+import { getString, getNumber, setString, setNumber, setBoolean } from "tns-core-modules/application-settings/application-settings";
+import { CouchbaseService } from "~/services/couchbase.service";
+import { OrderService } from "~/services/order.service";
 import { RouterExtensions } from "nativescript-angular/router";
 import { TNSFontIconService } from "nativescript-ngx-fonticon";
 import { Validators, FormBuilder, FormGroup } from "@angular/forms";
-import { TextField } from "ui/text-field";
+import { TextField } from "tns-core-modules/ui/text-field/text-field";
 import { Toasty } from "nativescript-toasty";
-import { confirm } from "ui/dialogs";
+import { confirm } from "tns-core-modules/ui/dialogs/dialogs";
 
 @Component({
     selector: "app-setup",
@@ -19,7 +19,7 @@ import { confirm } from "ui/dialogs";
 })
 export class SetupComponent {
 
-    companies: CompanyVO[];
+    //companies: CompanyVO[];
     company: CompanyVO;
     message: string;
     setupForm: FormGroup;
@@ -74,70 +74,94 @@ export class SetupComponent {
     submit() {
         this.message = "";
         this.thinking = true;
-        this.companyService.getCompanies()
-            .subscribe(companies => {
+        this.companyService.setupCompany(this.setupForm.get("companyid").value)
+            .subscribe((company) => {
                 this.thinking = false;
-                this.companies = companies;
-                this.confirm();
-            }, errmess => this.message = "Unable to connect to server:\n [" + <any>errmess + "] ");
+                if (!company._id) {
+                    this.message = "Unable to find Company Code " + this.setupForm.get("companyid").value;
+                    const toast = new Toasty(this.message, "long", "center");
+                    toast.show();
+                } else {
+                    this.company = company;
+                    this.confirm();
+                }
+            }, errmess => this.message = "Unable to connect to server: " + <any>errmess);
     }
 
     confirm() {
-        //when forms submitted, compare entered company ID and password with available from JSON-server
-        for (let i: number = 0; i < this.companies.length; i++ ) {
-            if (this.setupForm.get("companyid").value !== this.companies[i].id ||
-                this.setupForm.get("companypw").value !== this.companies[i].password ) {
-                    this.message = "Company ID and/or Password Not Found!";
-                    const toast = new Toasty(this.message, "long", "center");
+        if (this.setupForm.get("companypw").value !== this.company.password) {
+            this.message = "Company Password Incorrect!";
+            const toast = new Toasty(this.message, "long", "center");
+            toast.show();
+        } else {
+            let options = {
+                title: "We found:\n" + this.company.name,
+                message: "Is this correct?",
+                okButtonText: "Yes",
+                cancelButtonText: "No"
+            };
+            confirm(options).then((result: boolean) => {
+                if (!result) {
+                    this.message = "Please try again";
+                    const toast = new Toasty(this.message, "short", "center");
                     toast.show();
-            } else {
-                this.company = this.companies[i];
-                let options = {
-                    title: "We found:\n" + this.company.name,
-                    message: "Is this correct?",
-                    okButtonText: "Yes",
-                    cancelButtonText: "No"
-                };
-                confirm(options).then((result: boolean) => {
-                    if (!result) {
-                        this.message = "Please try again";
-                        const toast = new Toasty(this.message, "short", "center");
-                        toast.show();
-                    } else {
-                        setString("Company", this.company.name); //Company name
-                        setString("CompanyID", this.company.id); //Compamy ID
-                        setString("CompanyPW", this.company.password); //Company access PW
-                        setString("Logo", this.company.logo); //URL to company logo
-                        setString("CompanyEmail", this.company.email); //Company email address (for receiving sent forms)
-                        setString("CompanyWebsite", this.company.website); //Company website (for About)
-                        setString("CompanyPhone", this.company.phone); //Company phone (for About)
-                        setString("CompanyDescription", this.company.description); //Company description (for About)
-                        setString("CompanyStreet", this.company.street); //Company Street (for About)
-                        setString("CompanyCity", this.company.city); //Company City (for about)
-                        setString("CompanyState", this.company.state); //Company State (for about)
-                        setString("CompanyZip", this.company.zip); //Company Zip (for about)
-                        setString("ProductType", this.company.productType); //product type
-                        this.couchbaseService.updateDocument("colors", {"colors": this.company.colors}); //Company colors (2; for app display)
-                        this.couchbaseService.updateDocument("issues", {"issues": this.company.issues}); //List of common repair types
-                        this.couchbaseService.updateDocument("locations", {"locations": this.company.locations});//List of company store locations
-                        this.couchbaseService.updateDocument("requiredPhotos", {"requiredPhotos": this.company.requiredPhotos});//list of required photos
-                        setString("defaultLoc", this.company.locations[0]);//default store location, starting with first in company list, updated when form is submitted
-                        setNumber("nextOrderNumber", this.company.initialOrderNumber); //next Order Number, increment with each order
-                        this.orderService.initializeOrders();//initialize empty "orders" document
-                        setBoolean("FirstUse", true);
-                        setNumber("numusers", 0); //number of users (0 to start)
-                        setString("users", "");//string of user ID (empty to start), delimited with "|"
-
-                        this.message = "RepairIT App Configured for " + this.company.name;
-                        const toast = new Toasty(this.message, "long", "center");
-                        toast.show();
-                        
-                        this.routerExtensions.navigate(["/newuser"], { clearHistory: true });
-                    }
-                });
-                escape;
-            } 
+                } else {
+                    this.companyService.getCompany(this.company._id)
+                        .subscribe((company) => {
+                            //console.log("\nCOMPANY DATA from SERVICE:\n", company)
+                            this.company = company;
+                            this.writeLocalData();
+                        }, errmess => this.message = "Unable to connect to server: " + <any>errmess);                        
+                }
+            });
         }
+    }
+
+    writeLocalData() {
+        //console.log("writeLocalData");
+        setString("Company", this.company.name); //Company name
+        //console.log("Company", getString("Company")); //Company name
+        setString("CompanyID", this.company.code); //Compamy ID
+        //console.log("CompanyID", getString("CompanyID")); //Compamy ID
+        setString("CompanyPW", this.company.password); //Company access PW
+        //console.log("CompanyPW", getString("CompanyPW")); //Company access PW
+        setString("Logo", this.company.logo); //URL to company logo
+        //console.log("Logo", getString("Logo")); //URL to company logo
+        setString("CompanyEmail", this.company.email); //Company email address (for receiving sent forms)
+        //console.log("CompanyEmail", getString("CompanyEmail")); //Company email address (for receiving sent forms)
+        setString("CompanyWebsite", this.company.website); //Company website (for About)
+        //console.log("CompanyWebsite", getString("CompanyWebsite")); //Company website (for About)
+        setString("CompanyPhone", this.company.phone); //Company phone (for About)
+        //console.log("CompanyPhone", getString("CompanyPhone")); //Company phone (for About)
+        setString("CompanyDescription", this.company.description); //Company description (for About)
+        //console.log("CompanyDescription", getString("CompanyDescription")); //Company description (for About)
+        setString("CompanyStreet", this.company.street); //Company Street (for About)
+        //console.log("CompanyStreet", getString("CompanyStreet")); //Company Street (for About)
+        setString("CompanyCity", this.company.city); //Company City (for about)
+        //console.log("CompanyCity", getString("CompanyCity")); //Company City (for about)
+        setString("CompanyState", this.company.state); //Company State (for about)
+        //console.log("CompanyState", getString("CompanyState")); //Company State (for about)
+        setString("CompanyZip", this.company.zip); //Company Zip (for about)
+        //console.log("CompanyZip", getString("CompanyZip")); //Company Zip (for about)
+        setString("ProductType", this.company.productType); //product type
+        //console.log("ProductType", getString("ProductType")); //product type
+        this.couchbaseService.updateDocument("colors", {"colors": this.company.colors}); //Company colors (2; for app display)
+        this.couchbaseService.updateDocument("issues", {"issues": this.company.issues}); //List of common repair types
+        this.couchbaseService.updateDocument("locations", {"locations": this.company.locations});//List of company store locations
+        this.couchbaseService.updateDocument("requiredPhotos", {"requiredPhotos": this.company.requiredPhotos});//list of required photos
+        setString("defaultLoc", this.company.locations[0]);//default store location, starting with first in company list, updated when form is submitted
+        setNumber("nextOrderNumber", this.company.initialOrderNumber); //next Order Number, increment with each order
+        setBoolean("FirstUse", true);
+        setNumber("numusers", 0); //number of users (0 to start)
+        setString("users", "");//string of user ID (empty to start), delimited with "|"
+
+        this.message = "RepairIT App Configured for " + this.company.name;
+        const toast = new Toasty(this.message, "long", "center");
+        toast.show();
+
+        this.orderService.initializeOrders();//initialize empty "orders" document
+        
+        this.routerExtensions.navigate(["/newuser"]);   
     }
 
     contact() {

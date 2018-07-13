@@ -1,19 +1,19 @@
 import { Component, OnInit, Inject, ViewContainerRef } from "@angular/core";
-import { getString, setString, getBoolean, setBoolean } from "application-settings";
-import { CouchbaseService } from "../services/couchbase.service";
-import { OrderService } from "../services/order.service";
-import { UploadService } from "../services/upload.service";
+import { getString, setString, getBoolean, setBoolean } from "tns-core-modules/application-settings/application-settings";
+import { CouchbaseService } from "~/services/couchbase.service";
+import { OrderService } from "~/services/order.service";
+import { UploadService } from "~/services/upload.service";
 import { ModalDialogService, ModalDialogOptions } from "nativescript-angular/modal-dialog";
-import { DisplayOrderModalComponent } from "../displayordermodal/displayordermodal.component";
-import { OrderVO } from "../shared/orderVO";
+import { DisplayOrderModalComponent } from "~/displayordermodal/displayordermodal.component";
+import { OrderVO } from "~/shared/orderVO";
 import { RouterExtensions } from "nativescript-angular/router";
 import { TNSFontIconService } from "nativescript-ngx-fonticon";
 import { Toasty } from "nativescript-toasty";
-import { confirm } from "ui/dialogs";
-import { Page } from "ui/page";
-import { View } from "ui/core/view";
-import * as ImageSource from "image-source";
-import * as fs from "file-system";
+import { confirm } from "tns-core-modules/ui/dialogs/dialogs";
+import { Page } from "tns-core-modules/ui/page/page";
+import { View } from "tns-core-modules/ui/core/view/view";
+import * as ImageSource from "tns-core-modules/image-source/image-source";
+import * as fs from "tns-core-modules/file-system/file-system";
 
 @Component({
     selector: "app-active",
@@ -40,7 +40,7 @@ export class ActiveComponent implements OnInit {
         private orderService: OrderService,
         private routerExtensions: RouterExtensions
     ) {
-        this.actionBarStyle = "background-color: " + this.couchbaseService.getDocument("colors").colors[1].hex + ";";
+        //this.actionBarStyle = "background-color: " + this.couchbaseService.getDocument("colors").colors[1].hex + ";";
     }
 
     ngOnInit() {
