@@ -20,7 +20,7 @@ export class InfoComponent implements OnInit {
         private couchbaseService: CouchbaseService,
         private routerExtensions: RouterExtensions
     ){
-       // this.actionBarStyle = "background-color: " + this.couchbaseService.getDocument("colors").colors[0].hex + ";";
+        this.actionBarStyle = "background-color: " + this.couchbaseService.getDocument("colors").colors[0] + ";";
         this.company = new Array<CompanyVO>();
         this.company.name = getString("Company");
         this.company.id= getString("CompanyID");

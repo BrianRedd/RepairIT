@@ -3,6 +3,7 @@ import { isAndroid, isIOS, device, screen } from "platform";
 import * as connectivity from "connectivity";
 import { Observable } from "rxjs/Observable";
 import { setString } from "application-settings";
+import { Globals } from '../shared/globals';
 
 class DeviceInfo {
     constructor(
@@ -33,7 +34,9 @@ export class PlatformService {
     public screenInformation: ScreenInfo;
     public connectionType: string;
 
-    constructor() {
+    constructor(
+        private globals: Globals
+    ) {
         this.deviceInformation = new DeviceInfo(
             device.model,
             device.deviceType,
@@ -85,19 +88,20 @@ export class PlatformService {
                 switch(newConnectionType) {
                     case connectivity.connectionType.none:
                         this.connectionType = "None";
-                        observer.next('Connection type changed to none.');
+                        this.globals.isOffline = true;
                         break;
                     case connectivity.connectionType.wifi:
                         this.connectionType = "Wi-Fi";
-                        observer.next('Connection type changed to WiFi.');
+                        this.globals.isOffline = false;
                         break;
                     case connectivity.connectionType.mobile:
                         this.connectionType = "Mobile";
-                        observer.next('Connection type changed to mobile.');
+                        this.globals.isOffline = false;
                         break;
                     default:
                         break;
                 }
+                observer.next(this.connectionType);
             });
         });
     }
@@ -121,7 +125,7 @@ export class PlatformService {
     }
 
     public getConnectionType(): string {
-        console.log('Device is connected to ' + this.connectionType);
+        //console.log('Platform.Service > getConnectionType: ', this.connectionType);
         return this.connectionType;
     }
 }

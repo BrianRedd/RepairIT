@@ -6,17 +6,17 @@ import { ProcessHTTPMsgService } from "~/services/process-httpmsg.service";
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/delay';
 import 'rxjs/add/operator/catch';
-import { UserVO } from "../shared/userVO";
+import { AssociateVO } from "../shared/associateVO";
 
 @Injectable()
-export class UserService {
+export class AssociateService {
     constructor(
         public http: HttpClient,
         private processHTTPMsgService: ProcessHTTPMsgService
     ) {}
 
-    getUsers(): Observable<UserVO[]> {
-        return this.http.get(BaseURL + "users")
+    getAssociates(): Observable<AssociateVO[]> {
+        return this.http.get(BaseURL + "associates")
             /*.map((res) => {
                 return this.processHTTPMsgService.extractData(res);
             })
@@ -25,8 +25,8 @@ export class UserService {
             });
     }
 
-    getUser(username: string): Observable<UserVO> {
-        return this.http.get(BaseURL + "users?associateID=" + username)
+    getAssociate(associate: string): Observable<AssociateVO> {
+        return this.http.get(BaseURL + "associates?associateID=" + associate)
             /*.map(res => {
                 return this.processHTTPMsgService.extractData(res);
             })*/
@@ -35,8 +35,8 @@ export class UserService {
             });
     }
 
-    newUser(user: UserVO): Observable<UserVO> {
-        return this.http.post(BaseURL + "users", user)
+    newAssociate(associate: AssociateVO): Observable<AssociateVO> {
+        return this.http.post(BaseURL + "associates", associate)
             .catch((error) => {
                 return this.processHTTPMsgService.handleError(error);
             });

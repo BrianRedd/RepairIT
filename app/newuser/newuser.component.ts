@@ -5,6 +5,7 @@ import { RouterExtensions } from "nativescript-angular/router";
 import { TNSFontIconService } from "nativescript-ngx-fonticon";
 import { Validators, FormBuilder, FormGroup } from "@angular/forms";
 import { TextField } from "tns-core-modules/ui/text-field/text-field";
+import { Switch } from "tns-core-modules/ui/switch/switch";
 import { Toasty } from "nativescript-toasty";
 import { confirm } from "tns-core-modules/ui/dialogs/dialogs";
 
@@ -20,6 +21,7 @@ export class NewuserComponent implements OnInit {
     newuserForm: FormGroup;
     users: string;
     numusers: number;
+    new_associate: boolean = true;
     userid_first: string = "";
     userid_last: string = "";
     actionBarStyle: string = "background-color: #006A5C;";
@@ -32,7 +34,6 @@ export class NewuserComponent implements OnInit {
         private routerExtensions: RouterExtensions
     ) {
         let colors = this.couchbaseService.getDocument("colors").colors;
-        console.log("colors", JSON.stringify(colors));
         if (colors[0]) {
             this.actionBarStyle = "background-color: " + colors[0] + ";";
         }
@@ -75,6 +76,16 @@ export class NewuserComponent implements OnInit {
         let textField = <TextField>args.object;
         this.newuserForm.patchValue({associateid: textField.text.toUpperCase()});
     };
+
+    onNewAssociateChange(args) {
+        let switchState = <Switch>args.object;
+        console.log('switchState.checked', switchState.checked);
+        if (switchState.checked) {
+            this.new_associate = true;
+        } else {
+            this.new_associate = false;
+        }
+    }
 
     submit() {
         this.message = "";

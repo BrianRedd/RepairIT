@@ -1,15 +1,17 @@
 import { Component, Inject } from "@angular/core";
 import { CompanyVO } from "~/shared/companyVO";
 import { CompanyService } from "~/services/company.service";
-import { getString, getNumber, setString, setNumber, setBoolean } from "tns-core-modules/application-settings/application-settings";
+import { getString, getNumber, setString, setNumber, setBoolean, getBoolean } from "tns-core-modules/application-settings/application-settings";
 import { CouchbaseService } from "~/services/couchbase.service";
 import { OrderService } from "~/services/order.service";
+import { PlatformService } from "~/services/platform.service";
 import { RouterExtensions } from "nativescript-angular/router";
 import { TNSFontIconService } from "nativescript-ngx-fonticon";
 import { Validators, FormBuilder, FormGroup } from "@angular/forms";
 import { TextField } from "tns-core-modules/ui/text-field/text-field";
 import { Toasty } from "nativescript-toasty";
 import { confirm } from "tns-core-modules/ui/dialogs/dialogs";
+import { Globals } from '../shared/globals';
 
 @Component({
     selector: "app-setup",
@@ -32,8 +34,10 @@ export class SetupComponent {
         private companyService: CompanyService,
         private couchbaseService: CouchbaseService,
         private orderService: OrderService,
+        private platformService: PlatformService,
         private fonticon: TNSFontIconService,
-        private routerExtensions: RouterExtensions
+        private routerExtensions: RouterExtensions,
+        private globals: Globals
     ) {
         this.message = "";
         this.setupForm = this.formBuilder.group({
@@ -59,6 +63,11 @@ export class SetupComponent {
     }
 
     ngOnInit() {
+        if (this.platformService.getConnectionType() === "None") {
+            this.globals.isOffline = true;
+        }
+        //console.log('Setup.Component > OnInit: this.offline, globals.isOffline? ', this.offline, this.globals.isOffline);
+        this.checkConnectivity();
     }
 
     onCompanyIDBlur(args) {
@@ -69,6 +78,15 @@ export class SetupComponent {
     onFieldChange(field, args) {
         let textField = <TextField>args.object;
         this.setupForm.patchValue({ [field]: textField.text })
+    }
+
+    checkConnectivity() {
+        //console.log('Setup.Component > checkConnectivity: this.offline? ', this.offline);
+        if (this.globals.isOffline) {
+            this.message = "Device is Offline! Please connect to Internet to Initialize App";
+            const toast = new Toasty(this.message, "long", "center");
+            toast.show();
+        }
     }
 
     submit() {

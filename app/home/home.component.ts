@@ -37,6 +37,8 @@ export class HomeComponent implements OnInit {
     ngOnInit() {
         if (getString("Company", "") === "") {
             this.routerExtensions.navigate(["/setup"], { clearHistory: true });
+        } else if (getString("userid_0", "") === "") {
+            this.routerExtensions.navigate(["/newuser"], { clearHistory: true });
         } else {
             this.company = new Array<CompanyVO>();
             this.company.name = getString("Company");
@@ -54,12 +56,12 @@ export class HomeComponent implements OnInit {
             this.company.colors = this.couchbaseService.getDocument("colors").colors;
             this.company.issues = this.couchbaseService.getDocument("issues").issues;
             this.company.locations = this.couchbaseService.getDocument("locations").locations;
-            //this.actionBarStyle = "background-color: " + this.company.colors[0].hex + ";";
+            this.actionBarStyle = "background-color: " + this.company.colors[0] + ";";
             this.userLoggedIn();
-            //this.newBtnStyle += "background-color: " + this.company.colors[1].hex + ";";
-            //this.pendBtnStyle += "background-color: " + this.company.colors[0].hex + ";";
-            //this.actvBtnStyle += "background-color: " + this.company.colors[1].hex + ";";
-            //this.archBtnStyle += "background-color: " + this.company.colors[0].hex + ";";
+            this.newBtnStyle += "background-color: " + this.company.colors[1] + ";";
+            this.pendBtnStyle += "background-color: " + this.company.colors[0] + ";";
+            this.actvBtnStyle += "background-color: " + this.company.colors[1] + ";";
+            this.archBtnStyle += "background-color: " + this.company.colors[0] + ";";
         }
         this.isPending();
         this.FirstUse = getBoolean("FirstUse");

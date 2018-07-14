@@ -25,9 +25,10 @@ import { CouchbaseService } from "~/services/couchbase.service";
 import { ProcessHTTPMsgService } from "~/services/process-httpmsg.service";
 import { OrderService } from "~/services/order.service";
 import { UploadService } from "~/services/upload.service";
-import { UserService } from "~/services/user.service";
+import { AssociateService } from "~/services/associate.service";
 import { PlatformService } from "~/services/platform.service";
 import { BaseURL } from "~/shared/baseurl";
+import { Globals } from '~/shared/globals';
 
 @NgModule({
     bootstrap: [
@@ -64,12 +65,13 @@ import { BaseURL } from "~/shared/baseurl";
     ],
     providers: [
         {provide: 'BaseURL', useValue: BaseURL},
+        Globals,
         ProcessHTTPMsgService,
         CompanyService,
         CouchbaseService,
         OrderService,
         UploadService,
-        UserService,
+        AssociateService,
         PlatformService
     ],
     schemas: [
