@@ -1,24 +1,35 @@
 <ActionBar class="action-bar" [style]="actionBarStyle">
     <Label [text]="('fa-user' | fonticon) + ' New Associate'" class="h2 fa" [style]="actionBarTextStyle"></Label>
 </ActionBar>
+
 <StackLayout class="page m-15">
     <StackLayout orientation="horizontal" horizontalAlignment="center" *ngIf="message">
         <Label [text]="message"></Label>
     </StackLayout>
-    <GridLayout class="m-5" rows="auto auto auto auto auto auto auto" columns="*, *" [formGroup]="newuserForm">
-        <Label row="0" col="0" colSpan="2" class="h3 m-15" [visibility]="(new_associate === true) ? 'visible' : 'collapsed'" text="New Associates: Please enter First and Last Name; an Associate ID will be generated for you, but can be edited as necessary." textWrap="true"></Label>
-        <Label row="0" col="0" colSpan="2" class="h3 m-15" [visibility]="(new_associate === false) ? 'visible' : 'collapsed'" text="Registered Associates: Please enter your Associate ID and Password (if applicable)" textWrap="true"></Label>
-        <Label row="1" col="0" text="New Associate?" textWrap="true" class="h3 m-15" [visibility]="(new_associate === true) ? 'visible' : 'collapsed'"></Label>
-        <Label row="1" col="0" text="Registered Associate?" textWrap="true" class="h3 m-15" [visibility]="(new_associate === false) ? 'visible' : 'collapsed'"></Label>
-        <Switch row="1" col="1" checked="true" (checkedChange)="onNewAssociateChange($event)"></Switch>
-        <Label row="2" col="0" class="h3 m-15" text="First Name" [visibility]="(new_associate === true) ? 'visible' : 'collapsed'"></Label>
-        <TextField row="2" col="1" class="input input-border" formControlName="firstname" id="firstname" hint="First Name" [text]="" (textChange)="onFirstNameChange($event)" [visibility]="(new_associate === true) ? 'visible' : 'collapsed'"></TextField>
-        <Label row="3" col="0" class="h3 m-15" text="Last Name" [visibility]="(new_associate === true) ? 'visible' : 'collapsed'"></Label>
-        <TextField row="3" col="1" class="input input-border" formControlName="lastname" id="lastname" hint="Last Name" [text]="" (textChange)="onLastNameChange($event)" [visibility]="(new_associate === true) ? 'visible' : 'collapsed'"></TextField>
-        <Label row="4" col="0" class="h3 m-15" text="Associate ID"></Label>
-        <TextField row="4" col="1" class="input input-border" formControlName="associateid" id="associateid" hint="Associate ID" [text]="" (textChange)="onIdChange($event)" (blur)="onIdChange($event)"></TextField>
-        <Label row="5" col="0" class="h3 m-15" text="Password (optional)"></Label>
-        <TextField row="5" col="1" class="input input-border" formControlName="associatepw" id="associatepw" hint="Password" [text]="" secure="true" (textChange)="onFieldChange('associatepw', $event)"></TextField>
-        <Button row="6" col="1" class="btn btn-primary btn-active m-15" text="Submit" (tap)="submit()" [isEnabled]="newuserForm.valid"></Button>
-    </GridLayout>
+    <TabView [(ngModel)]="tabSelectedIndex">
+        <StackLayout *tabItem="{title: 'New Associate'}">
+            <GridLayout class="m-5" rows="auto auto auto auto auto auto" columns="*, *" [formGroup]="newAssociateForm">
+                <Label row="0" col="0" colSpan="2" class="h3 m-15" text="Please enter First and Last Name; an Associate ID will be generated for you, but can be edited as necessary." textWrap="true"></Label>
+                <Label row="1" col="0" class="h3 m-15" text="First Name"></Label>
+                <TextField row="1" col="1" class="input input-border" formControlName="firstname" id="firstname" hint="First Name" [text]="" (textChange)="onFirstNameChange($event)"></TextField>
+                <Label row="2" col="0" class="h3 m-15" text="Last Name"></Label>
+                <TextField row="2" col="1" class="input input-border" formControlName="lastname" id="lastname" hint="Last Name" [text]="" (textChange)="onLastNameChange($event)"></TextField>
+                <Label row="3" col="0" class="h3 m-15" text="Associate ID"></Label>
+                <TextField row="3" col="1" class="input input-border" formControlName="associateid" id="associateid" hint="Associate ID" [text]="" (textChange)="onIdChange($event)" (blur)="onIdChange($event)"></TextField>
+                <Label row="4" col="0" class="h3 m-15" text="Password (optional)"></Label>
+                <TextField row="4" col="1" class="input input-border" formControlName="associatepw" id="associatepw" hint="Password" [text]="" secure="true" (textChange)="onFieldChange('associatepw', $event)"></TextField>
+                <Button row="5" col="1" class="btn btn-primary btn-active m-15" text="Submit" (tap)="newSubmit()" [isEnabled]="newAssociateForm.valid"></Button>
+            </GridLayout>
+        </StackLayout>
+        <StackLayout *tabItem="{title: 'Existing Associate'}">
+            <GridLayout class="m-5" rows="auto auto auto auto" columns="*, *" [formGroup]="existingAssociateForm">
+                <Label row="0" col="0" colSpan="2" class="h3 m-15" text="Please enter your Associate ID and Password (if applicable)" textWrap="true"></Label>
+                <Label row="1" col="0" class="h3 m-15" text="Associate ID"></Label>
+                <TextField row="1" col="1" class="input input-border" formControlName="associateid" id="associateid" hint="Associate ID" [text]="" (blur)="onIdChange($event)"></TextField>
+                <Label row="2" col="0" class="h3 m-15" text="Password (optional)"></Label>
+                <TextField row="2" col="1" class="input input-border" formControlName="associatepw" id="associatepw" hint="Password" [text]="" secure="true" (textChange)="onFieldChange('associatepw', $event)"></TextField>
+                <Button row="3" col="1" class="btn btn-primary btn-active m-15" text="Submit" (tap)="existingSubmit()" [isEnabled]="existingAssociateForm.valid"></Button>
+            </GridLayout>
+        </StackLayout>
+    </TabView>
 </StackLayout>

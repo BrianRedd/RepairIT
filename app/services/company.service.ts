@@ -1,9 +1,9 @@
 import { Injectable } from "@angular/core";
-import { CompanyVO } from "~/shared/companyVO";
+import { CompanyVO } from "../shared/companyVO";
 import { Observable } from "rxjs/Observable";
 import { HttpClient } from "@angular/common/http";
-import { BaseURL } from "~/shared/baseurl";
-import { ProcessHTTPMsgService } from "~/services/process-httpmsg.service";
+import { BaseURL } from "../shared/baseurl";
+import { ProcessHTTPMsgService } from "../services/process-httpmsg.service";
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/delay';
 import 'rxjs/add/operator/catch';
@@ -26,11 +26,17 @@ export class CompanyService {
     }
 
     getCompany(id: string): Observable<CompanyVO> {
-        //console.log("getCompany", id);
         return this.http.get(BaseURL + "companies/" + id)
             /*.map(res => {
                 return this.processHTTPMsgService.extractData(res);
             })*/
+            .catch((error) => {
+                return this.processHTTPMsgService.handleError(error);
+            });
+    }
+
+    updateCompanyDevices(id: string, data: any): Observable<any> {
+        return this.http.post(BaseURL + "companies/" + id + "/devices", data)
             .catch((error) => {
                 return this.processHTTPMsgService.handleError(error);
             });

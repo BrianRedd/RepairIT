@@ -25,9 +25,10 @@ export class AppComponent implements OnInit, OnDestroy {
                 } else {
                     this.globals.isOffline = false;
                 }
-                //console.log('App.Component: connection, isOffline? ', connection, this.globals.isOffline);
-                let toast = new Toasty('Connection type changed to ' + connection, "short", "top");
-                toast.show();
+                let message = 'Connection type changed to ' + connection;
+                console.log(message);
+                //let toast = new Toasty(message, "short", "top");
+                //toast.show();
             });
         if (getBoolean("pendingOrders") === undefined) {
             setBoolean("pendingOrders", false);

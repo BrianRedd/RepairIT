@@ -1,6 +1,8 @@
 export interface AssociateVO {
-    username: string,
+    associateID: string,
     password: string,
     firstname: string,
-    lastname: string
+    lastname: string,
+    company: string,
+    devices: Array<string>
 }

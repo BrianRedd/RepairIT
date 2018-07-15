@@ -1,10 +1,10 @@
 import { Component, Inject } from "@angular/core";
-import { CompanyVO } from "~/shared/companyVO";
-import { CompanyService } from "~/services/company.service";
+import { CompanyVO } from "../shared/companyVO";
+import { CompanyService } from "../services/company.service";
 import { getString, getNumber, setString, setNumber, setBoolean, getBoolean } from "tns-core-modules/application-settings/application-settings";
-import { CouchbaseService } from "~/services/couchbase.service";
-import { OrderService } from "~/services/order.service";
-import { PlatformService } from "~/services/platform.service";
+import { CouchbaseService } from "../services/couchbase.service";
+import { OrderService } from "../services/order.service";
+import { PlatformService } from "../services/platform.service";
 import { RouterExtensions } from "nativescript-angular/router";
 import { TNSFontIconService } from "nativescript-ngx-fonticon";
 import { Validators, FormBuilder, FormGroup } from "@angular/forms";
@@ -63,6 +63,7 @@ export class SetupComponent {
     }
 
     ngOnInit() {
+        this.platformService.updatePlatformInfo();
         if (this.platformService.getConnectionType() === "None") {
             this.globals.isOffline = true;
         }
@@ -90,6 +91,7 @@ export class SetupComponent {
     }
 
     submit() {
+        this.setupForm.patchValue({companyid: this.setupForm.get('companyid').value.toUpperCase()});
         this.message = "";
         this.thinking = true;
         this.companyService.setupCompany(this.setupForm.get("companyid").value)
@@ -126,9 +128,19 @@ export class SetupComponent {
                 } else {
                     this.companyService.getCompany(this.company._id)
                         .subscribe((company) => {
-                            //console.log("\nCOMPANY DATA from SERVICE:\n", company)
                             this.company = company;
-                            this.writeLocalData();
+                            let deviceInfo = {
+                                'deviceModel': getString('deviceModel'),
+                                'deviceOS': getString('deviceOS'),
+                                'deviceType': getString('deviceType'),
+                                'deviceUUID': getString('deviceUUID'),
+                                'deviceScreen': getString('deviceScreen')
+                            };
+                            this.companyService.updateCompanyDevices(company._id, deviceInfo)
+                                .subscribe((device) => {
+                                    setString('DeviceID', device._id);
+                                    this.writeLocalData();
+                                }, errmess => this.message = "Error updating server: " + <any>errmess);
                         }, errmess => this.message = "Unable to connect to server: " + <any>errmess);                        
                 }
             });
@@ -136,42 +148,31 @@ export class SetupComponent {
     }
 
     writeLocalData() {
-        //console.log("writeLocalData");
         setString("Company", this.company.name); //Company name
-        //console.log("Company", getString("Company")); //Company name
-        setString("CompanyID", this.company.code); //Compamy ID
-        //console.log("CompanyID", getString("CompanyID")); //Compamy ID
+        setString("CompanyID", this.company._id); //Company ID
+        setString("CompanyCode", this.company.code); //Compamy Code
         setString("CompanyPW", this.company.password); //Company access PW
-        //console.log("CompanyPW", getString("CompanyPW")); //Company access PW
         setString("Logo", this.company.logo); //URL to company logo
-        //console.log("Logo", getString("Logo")); //URL to company logo
         setString("CompanyEmail", this.company.email); //Company email address (for receiving sent forms)
-        //console.log("CompanyEmail", getString("CompanyEmail")); //Company email address (for receiving sent forms)
         setString("CompanyWebsite", this.company.website); //Company website (for About)
-        //console.log("CompanyWebsite", getString("CompanyWebsite")); //Company website (for About)
         setString("CompanyPhone", this.company.phone); //Company phone (for About)
-        //console.log("CompanyPhone", getString("CompanyPhone")); //Company phone (for About)
         setString("CompanyDescription", this.company.description); //Company description (for About)
-        //console.log("CompanyDescription", getString("CompanyDescription")); //Company description (for About)
         setString("CompanyStreet", this.company.street); //Company Street (for About)
-        //console.log("CompanyStreet", getString("CompanyStreet")); //Company Street (for About)
         setString("CompanyCity", this.company.city); //Company City (for about)
-        //console.log("CompanyCity", getString("CompanyCity")); //Company City (for about)
         setString("CompanyState", this.company.state); //Company State (for about)
-        //console.log("CompanyState", getString("CompanyState")); //Company State (for about)
         setString("CompanyZip", this.company.zip); //Company Zip (for about)
-        //console.log("CompanyZip", getString("CompanyZip")); //Company Zip (for about)
         setString("ProductType", this.company.productType); //product type
-        //console.log("ProductType", getString("ProductType")); //product type
+        setNumber("nextOrderNumber", this.company.initialOrderNumber); //next Order Number, increment with each order
         this.couchbaseService.updateDocument("colors", {"colors": this.company.colors}); //Company colors (2; for app display)
         this.couchbaseService.updateDocument("issues", {"issues": this.company.issues}); //List of common repair types
         this.couchbaseService.updateDocument("locations", {"locations": this.company.locations});//List of company store locations
         this.couchbaseService.updateDocument("requiredPhotos", {"requiredPhotos": this.company.requiredPhotos});//list of required photos
         setString("defaultLoc", this.company.locations[0]);//default store location, starting with first in company list, updated when form is submitted
-        setNumber("nextOrderNumber", this.company.initialOrderNumber); //next Order Number, increment with each order
-        setBoolean("FirstUse", true);
+        setBoolean("FirstUse", true); /*Necessary?*/
         setNumber("numusers", 0); //number of users (0 to start)
         setString("users", "");//string of user ID (empty to start), delimited with "|"
+        setString("currentAssociateID", ""); //current associate ID (empty to start)
+        setString("currentAssociateName", ""); //current associate Name (empty to start)
 
         this.message = "RepairIT App Configured for " + this.company.name;
         const toast = new Toasty(this.message, "long", "center");

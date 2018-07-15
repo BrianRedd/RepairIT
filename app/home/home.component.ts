@@ -37,8 +37,10 @@ export class HomeComponent implements OnInit {
     ngOnInit() {
         if (getString("Company", "") === "") {
             this.routerExtensions.navigate(["/setup"], { clearHistory: true });
-        } else if (getString("userid_0", "") === "") {
+        } else if (getString("users") === "") {
             this.routerExtensions.navigate(["/newuser"], { clearHistory: true });
+        //} else if (getString("currentAssociateID") === "") {
+        //    this.routerExtensions.navigate(["/login"], { clearHistory: true });
         } else {
             this.company = new Array<CompanyVO>();
             this.company.name = getString("Company");

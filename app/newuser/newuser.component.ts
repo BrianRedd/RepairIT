@@ -1,6 +1,6 @@
 import { Component, Inject, OnInit } from "@angular/core";
-import { getString, setString, getNumber, setNumber, clear } from "tns-core-modules/application-settings/application-settings";
-import { CouchbaseService } from "~/services/couchbase.service";
+import { getString, setString, getNumber, setNumber, clear, getBoolean } from "tns-core-modules/application-settings/application-settings";
+import { CouchbaseService } from "../services/couchbase.service";
 import { RouterExtensions } from "nativescript-angular/router";
 import { TNSFontIconService } from "nativescript-ngx-fonticon";
 import { Validators, FormBuilder, FormGroup } from "@angular/forms";
@@ -8,6 +8,8 @@ import { TextField } from "tns-core-modules/ui/text-field/text-field";
 import { Switch } from "tns-core-modules/ui/switch/switch";
 import { Toasty } from "nativescript-toasty";
 import { confirm } from "tns-core-modules/ui/dialogs/dialogs";
+import { AssociateService } from "../services/associate.service";
+import { Md5 } from "ts-md5/dist/md5";
 
 @Component({
     selector: "app-newuser",
@@ -18,104 +20,164 @@ import { confirm } from "tns-core-modules/ui/dialogs/dialogs";
 export class NewuserComponent implements OnInit {
 
     message: string;
-    newuserForm: FormGroup;
-    users: string;
-    numusers: number;
-    new_associate: boolean = true;
+    newAssociateForm: FormGroup;
+    existingAssociateForm: FormGroup;
+    users: string = getString('users');
+    numusers: number = getNumber('numusers');
     userid_first: string = "";
     userid_last: string = "";
+    currentAssociateID: string;
+    currentAssociateName: string;
     actionBarStyle: string = "background-color: #006A5C;";
     actionBarTextStyle: string = "color: #FFFFFF";
+    tabSelectedIndex: number = 0;
 
     constructor(
         private formBuilder: FormBuilder,
         private couchbaseService: CouchbaseService,
         private fonticon: TNSFontIconService,
-        private routerExtensions: RouterExtensions
+        private routerExtensions: RouterExtensions,
+        private associateService: AssociateService
     ) {
         let colors = this.couchbaseService.getDocument("colors").colors;
         if (colors[0]) {
             this.actionBarStyle = "background-color: " + colors[0] + ";";
         }
-        this.users = getString("users", "");
-        this.numusers = getNumber("numusers");
         if (this.numusers === 0) {
-            this.message = "No existing associates defined"
+            this.message = "No local Associates defined"
         } else {
             this.message = "Existing associates: " + this.users;
         }
-        this.newuserForm = this.formBuilder.group({
+        this.newAssociateForm = this.formBuilder.group({
             firstname: ["", Validators.required],
             lastname: ["", Validators.required],
+            associateid: ["", Validators.required],
+            associatepw: [""]
+        });
+        this.existingAssociateForm = this.formBuilder.group({
             associateid: ["", Validators.required],
             associatepw: [""]
         });
     }
 
     ngOnInit() {
+        if (getString('DeviceID') === null) {
+            this.routerExtensions.navigate(["/setup"], { clearHistory: true });
+        }
     }
 
     onFieldChange(field, args) {
         let textField = <TextField>args.object;
-        this.newuserForm.patchValue({ [field]: textField.text })
+        this.newAssociateForm.patchValue({ [field]: textField.text });
+        this.existingAssociateForm.patchValue({ [field]: textField.text });
     }
 
     onFirstNameChange(args) {
         let textField = <TextField>args.object;
         this.userid_first = textField.text.substring(0,2); //write first two letters to ID
-        this.newuserForm.patchValue({associateid: this.userid_first + this.userid_last});
+        this.newAssociateForm.patchValue({associateid: this.userid_first + this.userid_last});
+        this.existingAssociateForm.patchValue({associateid: this.userid_first + this.userid_last});
     };
 
     onLastNameChange(args) {
         let textField = <TextField>args.object;
         this.userid_last = textField.text.substring(0,2); //write first two letters to ID
-        this.newuserForm.patchValue({associateid: this.userid_first + this.userid_last});
+        this.newAssociateForm.patchValue({associateid: this.userid_first + this.userid_last});
+        this.existingAssociateForm.patchValue({associateid: this.userid_first + this.userid_last});
     };
 
     onIdChange(args) { //User ID defaults to first two letters of first and last name, toUpperCase
         let textField = <TextField>args.object;
-        this.newuserForm.patchValue({associateid: textField.text.toUpperCase()});
+        this.newAssociateForm.patchValue({associateid: textField.text.toUpperCase()});
+        this.existingAssociateForm.patchValue({associateid: textField.text.toUpperCase()});
     };
 
-    onNewAssociateChange(args) {
-        let switchState = <Switch>args.object;
-        console.log('switchState.checked', switchState.checked);
-        if (switchState.checked) {
-            this.new_associate = true;
-        } else {
-            this.new_associate = false;
-        }
+    newSubmit() {
+        this.message = "";
+        this.associateService.getAssociateIDs(getString('CompanyID'))
+            .subscribe((ids) => {
+                if (ids.indexOf(this.newAssociateForm.get('associateid').value) !== -1) {
+                    this.message = this.newAssociateForm.get('associateid').value + " is not unique! Please try again!";
+                    let toast = new Toasty(this.message, "short", "center");
+                    toast.show();
+                } else {
+                    this.currentAssociateID = this.newAssociateForm.get('associateid').value;
+                    this.currentAssociateName = this.newAssociateForm.get("firstname").value + " " + this.newAssociateForm.get("lastname").value; 
+                    if (this.numusers > 0) {
+                        this.users += "|";
+                    }
+                    this.users += this.currentAssociateID;
+                    this.numusers ++;
+                    setString('users', this.users);
+                    setNumber('numusers', this.numusers);
+                    setString('currentAssociateID', this.currentAssociateID);
+                    setString('currentAssociateName', this.currentAssociateName);
+                    var password = this.newAssociateForm.get('associatepw').value;
+                    //console.log(password);
+                    if (password !== "") {
+                        password = Md5.hashStr(this.newAssociateForm.get('associatepw').value).toString();
+                    } 
+                    var newAssociate = {
+                        'associateID': this.currentAssociateID,
+                        'password': password,
+                        'firstname': this.newAssociateForm.get('firstname').value, 
+                        'lastname': this.newAssociateForm.get('lastname').value,
+                        'company': getString('CompanyID'),
+                        'devices': [getString('DeviceID')]
+                    };
+                    this.associateService.newAssociate(newAssociate)
+                        .subscribe((associate) => {
+                            this.message = this.currentAssociateName + " created and configured!";
+                            let toast = new Toasty(this.message, "short", "center");
+                            toast.show();
+                            this.routerExtensions.navigate(["/home"], { clearHistory: true });
+                        }, errmess => this.message = "Error: " + <any>errmess);
+                }
+            }, errmess => this.message = "Error: " + <any>errmess);
     }
 
-    submit() {
+    existingSubmit() {
+        let existingAssociateId = this.existingAssociateForm.get('associateid').value.toUpperCase();
+        this.existingAssociateForm.patchValue({associateid: existingAssociateId});
         this.message = "";
-        if (this.users.indexOf(this.newuserForm.get("associateid").value) !== - 1) {
-            this.message = this.newuserForm.get("associateid").value + ' is not unique! Please edit!';
-            let toast = new Toasty(this.message, "short", "center");
-            toast.show();
-            return;
-        } else {
-            if (this.numusers > 0) {
-                this.users += "|";
-            }
-            this.users += this.newuserForm.get("associateid").value; //create updated list of associates
-            setString("users", this.users); //write list of associates
-            this.numusers += 1; //update number of associates
-            setNumber("numusers", this.numusers); //write number of associates
-            let num_x: string = this.numusers.toString();
-            let userid_x: string = "userid_" + num_x;
-            let userpw_x: string = "userpw_" + num_x;
-            let username_x: string = "username_" + num_x;
-            let username: string = this.newuserForm.get("firstname").value + " " + this.newuserForm.get("lastname").value; //user name (one field)
-            setString(userid_x, this.newuserForm.get("associateid").value); //write user # user Id
-            setString(userpw_x, this.newuserForm.get("associatepw").value); //write user # password
-            setString(username_x, username); //write user # username
-            setString("currentuserid", this.newuserForm.get("associateid").value); //set current User Id
-            setString("currentusername", username); //set current User Name
-            this.message = username + "  added as Associate";
-            let toast = new Toasty(this.message, "short", "center");
-            toast.show();
-            this.routerExtensions.navigate(["/home"], { clearHistory: true });
-        }
+        this.associateService.getAssociateIDs(getString('CompanyID'))
+            .subscribe((ids) => {
+                if (ids.indexOf(existingAssociateId) === -1) {
+                    this.message = "Unable to find " + existingAssociateId + " on server! Please try again!";
+                    let toast = new Toasty(this.message, "short", "center");
+                    toast.show();
+                } else {
+                    this.associateService.getAssociate(getString('CompanyID'), existingAssociateId)
+                        .subscribe((associate) => {
+                            if (associate.password !== "" && Md5.hashStr(this.existingAssociateForm.get('associatepw').value) !== associate.password) {
+                                this.message = "Password Mismatch! Please try again!";
+                                let toast = new Toasty(this.message, "short", "center");
+                                toast.show();
+                                return;
+                            } else {
+                                this.currentAssociateID = existingAssociateId;
+                                this.currentAssociateName = associate.firstname + " " + associate.lastname;
+                                if (this.numusers > 0) {
+                                    this.users += "|";
+                                }
+                                this.users += this.currentAssociateID;
+                                this.numusers ++;
+                                setString('users', this.users);
+                                setNumber('numusers', this.numusers);
+                                setString('currentAssociateID', this.currentAssociateID);
+                                setString('currentAssociateName', this.currentAssociateName);                                
+                                this.associateService.updateAssociate(getString('CompanyID'), this.currentAssociateID, {
+                                    "device" : getString('DeviceID')
+                                })
+                                    .subscribe((associate) => {
+                                        this.message = this.currentAssociateName + " added to this device!";
+                                        let toast = new Toasty(this.message, "short", "center");
+                                        toast.show();
+                                        this.routerExtensions.navigate(["/home"], { clearHistory: true });
+                                    }, errmess => this.message = "Error: " + <any>errmess);
+                            }
+                        }, errmess => this.message = "Error: " + <any>errmess);
+                }
+            }, errmess => this.message = "Error: " + <any>errmess);
     }
 }

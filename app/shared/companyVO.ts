@@ -21,5 +21,6 @@ export interface CompanyVO {
     zip: string,    
     productType: string,
     createdAt: string,
-    updatedAt: string
+    updatedAt: string,
+    devices: Array<string>
 }

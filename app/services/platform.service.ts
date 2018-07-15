@@ -110,18 +110,17 @@ export class PlatformService {
         connectivity.stopMonitoring();
     }
 
-    public printPlatformInfo() {
+    public updatePlatformInfo() {
         let deviceModel: string = this.deviceInformation.model;
         let deviceOS: string = this.deviceInformation.os + ' ' + this.deviceInformation.osVersion + ' (SDK: ' + this.deviceInformation.sdkVersion + ')';
         let deviceType: string = this.deviceInformation.deviceType;
         let deviceUUID: string = this.deviceInformation.uuid;
-        let deviceScreen: string = 'Device screen size is ' + this.screenInformation.widthPixels + ' X ' + this.screenInformation.heightPixels + ' pixels';
+        let deviceScreen: string = this.screenInformation.widthPixels + ' X ' + this.screenInformation.heightPixels + ' pixels';
         setString("deviceModel", deviceModel);
         setString("deviceOS", deviceOS);
         setString("deviceType", deviceType);
         setString("deviceUUID", deviceUUID);
         setString("deviceScreen", deviceScreen);
-        this.getConnectionType();
     }
 
     public getConnectionType(): string {
