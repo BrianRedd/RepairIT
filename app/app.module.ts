@@ -24,7 +24,7 @@ import { CompanyService } from "./services/company.service";
 import { CouchbaseService } from "./services/couchbase.service";
 import { ProcessHTTPMsgService } from "./services/process-httpmsg.service";
 import { OrderService } from "./services/order.service";
-import { UploadService } from "./services/upload.service";
+import { EmailService } from "./services/email.service";
 import { AssociateService } from "./services/associate.service";
 import { PlatformService } from "./services/platform.service";
 import { BaseURL } from "./shared/baseurl";
@@ -70,7 +70,7 @@ import { Globals } from './shared/globals';
         CompanyService,
         CouchbaseService,
         OrderService,
-        UploadService,
+        EmailService,
         AssociateService,
         PlatformService
     ],

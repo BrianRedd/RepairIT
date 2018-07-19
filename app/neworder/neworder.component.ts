@@ -36,7 +36,7 @@ export class NeworderComponent implements OnInit {
     orders: any;
     blankPicture: string = "res://blank_picture";
     newOrder: OrderVO = {
-        id: "",
+        orderId: "",
         firstName: "",
         lastName: "",
         addressStreet: "",
@@ -94,7 +94,7 @@ export class NeworderComponent implements OnInit {
         private orderService: OrderService,
         private routerExtensions: RouterExtensions
     ) {
-        //this.actionBarStyle = "background-color: " + this.couchbaseService.getDocument("colors").colors[1].hex + ";";
+        this.actionBarStyle = "background-color: " + this.couchbaseService.getDocument("colors").colors[1] + ";";
 
         this.orderForm = this.formBuilder.group({
             firstName: ["", Validators.required],
@@ -119,8 +119,8 @@ export class NeworderComponent implements OnInit {
         let photos = this.couchbaseService.getDocument("requiredPhotos").requiredPhotos;
         for (var i: number = 0; i < photos.length; i++ ) {
             this.newOrder.images[i] = {
-                "id": i,
-                "asset": this.blankPicture,
+                "imageid": i,
+                "assetpath": this.blankPicture,
                 "caption": photos[i],
                 "valid": (i === 0) ? true : false
             };
@@ -129,7 +129,7 @@ export class NeworderComponent implements OnInit {
 
     ngOnInit() {
         this.nextOrderNumber = getNumber("nextOrderNumber");
-        this.orderID = getString("currentuserid") + (this.nextOrderNumber).toString();
+        this.orderID = getString("currentAssociateID") + (this.nextOrderNumber).toString();
     }
 
     validate(field, args) {
@@ -328,6 +328,7 @@ export class NeworderComponent implements OnInit {
     }
 
     takePicture(id: number) {
+        console.log("takePicture ", id);
         let isAvail = camera.isAvailable();
         if (isAvail) {
             camera.requestPermissions();
@@ -351,15 +352,16 @@ export class NeworderComponent implements OnInit {
                     } else {
                         let newPicture: ImageVO;
                         newPicture = {
-                            id: id,
-                            asset: path,
+                            imageid: id,
+                            assetpath: path,
                             caption: "Additional",
                             valid: true
                         };
+                        console.log(newPicture);
                         this.newOrder.images.push(newPicture);
                     }
                     imgsrc.saveToFile(path, "png");
-                    this.newOrder.images[id].asset = path;
+                    this.newOrder.images[id].assetpath = path;
                 });              
             }).catch((error) => {
                 console.log("Error taking picture: " + error);
@@ -384,7 +386,7 @@ export class NeworderComponent implements OnInit {
             setBoolean("FirstUse", false);
         }
         let curDate = new Date().toDateString();
-        this.newOrder.id = this.orderID;
+        this.newOrder.orderId = this.orderID;
         this.newOrder.firstName = this.orderForm.get("firstName").value;
         this.newOrder.lastName = this.orderForm.get("lastName").value;
         this.newOrder.addressStreet = this.orderForm.get("addressStreet").value;

@@ -2,7 +2,7 @@ import { Component, OnInit, Inject, ViewContainerRef } from "@angular/core";
 import { getString, setString, getBoolean, setBoolean } from "tns-core-modules/application-settings/application-settings";
 import { CouchbaseService } from "~/services/couchbase.service";
 import { OrderService } from "~/services/order.service";
-import { UploadService } from "~/services/upload.service";
+import { EmailService } from "~/services/email.service";
 import { ModalDialogService, ModalDialogOptions } from "nativescript-angular/modal-dialog";
 import { DisplayOrderModalComponent } from "~/displayordermodal/displayordermodal.component";
 import { OrderVO } from "~/shared/orderVO";
@@ -32,7 +32,7 @@ export class PendingComponent implements OnInit {
 
     constructor(
         private couchbaseService: CouchbaseService,
-        private uploadService: UploadService,
+        private emailService: EmailService,
         private fonticon: TNSFontIconService,
         private page: Page,
         private modalService: ModalDialogService,
@@ -99,7 +99,7 @@ export class PendingComponent implements OnInit {
         //TODO: UPLOAD ORDER
         //let toast = new Toasty("Uploaded Order " + this.orders[idx].id + " (Coming Soon!)", "short", "top");
         //toast.show();
-        this.uploadService.sendEmail(idx, "pending");
+        this.emailService.sendEmail(idx, "pending");
         this.orders = this.orderService.getOrders();
         this.orders[idx].uploaded = true;
         this.orders[idx].uploadedDateTime = curDate;

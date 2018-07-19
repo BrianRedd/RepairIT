@@ -1,7 +1,7 @@
 import { ImageVO } from "~/shared/imageVO";
 
 export interface OrderVO {
-    id: string,
+    orderId: string,
     firstName: string,
     lastName: string,
     addressStreet: string,

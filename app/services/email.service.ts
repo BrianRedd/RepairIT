@@ -6,7 +6,7 @@ import { Toasty } from "nativescript-toasty";
 import * as Email from "nativescript-email";
 
 @Injectable()
-export class UploadService {
+export class EmailService {
 
     constructor(
         private orderService: OrderService,
@@ -17,22 +17,22 @@ export class UploadService {
         console.log("Upload Service > sendEmail(" + id + ", " + sourcepage + ")");
         let orders = this.orderService.getOrders();
         let order = orders[id];
-        let hasAttachments: boolean = false;
+        //let hasAttachments: boolean = false;
         let attachments = [];
         if (order.images.length > 0) {
-            hasAttachments = true;
+            //hasAttachments = true;
             for (var i: number = 0; i < order.images.length; i++) {
                 attachments.push({
-                    fileName: order.id + "_" + i + "_" + order.images[i].caption + ".png",
-                    path: order.images[i].asset, 
+                    fileName: order.orderId + "_" + i + "_" + order.images[i].caption + ".png",
+                    path: order.images[i].assetpath, 
                     mimeType: 'image/png'
                 });
             }
         }
-        let body = "<p>Order #: " + order.id + "</p>";
+        let body = "<p>Order #: " + order.orderId + "</p>";
         body += "<p>Date Order Accepted: " + order.acceptedDateTime + "</p>";
         body += "<p>Record Last Updated: " + order.editedDateTime + "</p>";
-        body += "<p>Submitted by: " + getString("currentusername") + " [" + getString("currentuserid") + "]</p>";
+        body += "<p>Submitted by: " + getString("currentAssociateName") + " [" + getString("currentAssociateID") + "]</p>";
         body += "<p>CLIENT DETAILS</p>";
         body += "<p>Name: " + order.firstName + " " + order.lastName + "</p>";
         body += "<p>Address: <br/>" + order.addressStreet + "<br/>" + order.addressCity + "<br/>" + order.addressState + ", " + order.addressZip + "</p>";
@@ -62,20 +62,20 @@ export class UploadService {
         Email.available()
           .then((avail: boolean) => {
             if (avail) {
-                if (hasAttachments) {
+                //if (hasAttachments) {
+                Email.compose({
+                    to: [getString('CompanyEmail')],
+                    subject: 'Repair Order ' + order.orderId + " (from " + sourcepage + ")",
+                    attachments: attachments,
+                    body: body
+                });
+                /*} else {
                     Email.compose({
                         to: [getString('CompanyEmail')],
-                        subject: 'Repair Order ' + order.id + " (from " + sourcepage + ")",
-                        attachments: attachments,
+                        subject: 'Repair Order ' + order.orderId,
                         body: body
                     });
-                } else {
-                    Email.compose({
-                        to: [getString('CompanyEmail')],
-                        subject: 'Repair Order ' + order.id,
-                        body: body
-                    });
-                }
+                }*/
             } else {
                 console.log("No Email Configured");
                 let toast = new Toasty ("No Email Configured", "long", "center");

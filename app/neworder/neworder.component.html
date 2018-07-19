@@ -44,8 +44,8 @@
             <StackLayout row="4" col="0" colSpan="3" horizontalAlignment="center">
                 <ScrollView>
                     <WrapLayout orientation="horizontal">
-                        <StackLayout orientation="vertical" width="120" *ngFor="let image of newOrder.images" [class]="'photo_' + (image.valid ? 'valid' : 'invalid')" (tap)="takePicture(image.id)">
-                            <Image [id]="'image_' + image.id" [src]="image.asset" height="100" width="100" class="btn-img"></Image>
+                        <StackLayout orientation="vertical" width="120" *ngFor="let image of newOrder.images" [class]="'photo_' + (image.valid ? 'valid' : 'invalid')" (tap)="takePicture(image.imageid)">
+                            <Image [id]="'image_' + image.imageid" [src]="image.assetpath" height="100" width="100" class="btn-img"></Image>
                             <Label [text]="('fa-camera' | fonticon) + ' ' + image.caption + '*'" class="m-10 fa text-center"></Label>
                         </StackLayout>
                     </WrapLayout>
@@ -66,14 +66,20 @@
             <TextField row="1" col="1" colSpan="2" formControlName="shopLoc" id="shopLoc" hint="Shop Location" [text]="" class="input input-border" (tap)="createModalView('shopLoc')"></TextField>
             <Label row="2" col="0" text="Repair Location*" textWrap="true" class="label font-weight-bold m-15 p-2"></Label>
             <TextField row="2" col="1" colSpan="2" formControlName="repairLoc" id="repairLoc" hint="Repair Location" [text]="" class="input input-border" (tap)="createModalView('repairLoc')" (blur)="validate('repairLoc', $event)"></TextField>
-            <Label row="3" col="0" text="Repair Cost/ Paid?" textWrap="true" class="label font-weight-bold m-15 p-2"></Label>
+            <Label row="3" col="0" text="Repair Cost?" textWrap="true" class="label font-weight-bold m-15 p-2"></Label>
             <TextField row="3" col="1" formControlName="repairCost" id="repairCost" hint="Repair Cost" [text]="" class="input input-border"></TextField>
-            <Switch row="3" col="2" checked="false" formControlName="repairPaid" text="Paid" class=""></Switch>
+            <GridLayout row="3" col="2" rows="auto" columns="*,*" verticalAlignment="center">
+                <Label row="0" col="0" text="Paid?" textWrap="true" class="label text-center"></Label>
+                <Switch row="0" col="1" checked="false" formControlName="repairPaid" text="Paid"></Switch>
+            </GridLayout>
             <Label row="4" col="0" [text]="'Estimated Repair ' + (sameDayRepair ? 'Time*' : 'Date*')" textWrap="true" class="label font-weight-bold m-15 p-2"></Label>
             <TextField row="4" col="1" colSpan="2" formControlName="estRepair" id="estRepair" [hint]="'Estimated Repair ' + (sameDayRepair ? 'Time' : 'Date')" [text]="" class="input input-border" (tap)="estimateRepair()"></TextField>
-            <Label row="5" col="0" text="Shipping Cost/ Paid?" textWrap="true" class="label font-weight-bold m-15 p-2"></Label>
+            <Label row="5" col="0" text="Shipping Cost?" textWrap="true" class="label font-weight-bold m-15 p-2"></Label>
             <TextField row="5" col="1" formControlName="shipCost" id="shipCost" hint="Shipping Cost" [text]="" class="input input-border"></TextField>
-            <Switch row="5" col="2" checked="false" formControlName="shipPaid" class=""></Switch>
+            <GridLayout row="5" col="2" rows="auto" columns="*,*" verticalAlignment="center">
+                <Label row="0" col="0" text="Paid?" textWrap="true" class="label text-center"></Label>
+                <Switch row="0" col="1" checked="false" formControlName="shipPaid"></Switch>
+            </GridLayout>
             <GridLayout row="6" col="0" colSpan="3" orientation="horizontal" rows="auto" columns="*, *, *, *, *, *">
                 <Button row="0" col="0" [text]="('fa-chevron-circle-left' | fonticon)" (tap)="prevSlide()" class="fa btn-outline"></Button>
                 <Button row="0" col="1" colSpan="2" text="Cancel" (tap)="cancel()" class="btn"></Button>

@@ -66,7 +66,7 @@ export class DisplayOrderModalComponent implements OnInit {
     renderDisplay() {
         let html: string = "<table>"
         if (this.displayType !== "confirm") {
-            html += "<tr><td width='33%'>Order #:</td><td width='67%' class='border'>" + this.order.id + "</td></tr>";
+            html += "<tr><td width='33%'>Order #:</td><td width='67%' class='border'>" + this.order.orderId + "</td></tr>";
             html += "<tr><td width='33%'>Last Modified:</td><td width='67%' class='border'>" + this.order.editedDateTime + "</td></tr>";
         }
         html += "<tr><td colspan='2'><span class='underline'>Client Details:</span></td></tr>";
@@ -125,7 +125,7 @@ export class DisplayOrderModalComponent implements OnInit {
     updatePhotos() {
         if (this.order.images.length > 0) {
             for (var i: number = 0; i < this.order.images.length; i ++ ) {
-                this.path = fs.path.join(this.folder.path, this.order.id + "_" + this.order.images[i].id + ".png");
+                this.path = fs.path.join(this.folder.path, this.order.orderId + "_" + this.order.images[i].imageid + ".png");
                 this.PhotoSource[i] = ImageSource.fromFile(this.path);
             }
         }
@@ -182,7 +182,7 @@ export class DisplayOrderModalComponent implements OnInit {
     confirmChange(origin: string) {
         let options = {
             title: "Save Changes",
-            message: "Do you wish to save changes made to order " + this.order.id + "?",
+            message: "Do you wish to save changes made to order " + this.order.orderId + "?",
             okButtonText: "Yes",
             cancelButtonText: "No"
         };
@@ -208,7 +208,7 @@ export class DisplayOrderModalComponent implements OnInit {
     saveChanges() {
         let curDate: string = new Date().toDateString();
         let orders = this.orderService.getOrders();
-        let idx = orders.findIndex(res => res.id === this.order.id );
+        let idx = orders.findIndex(res => res.id === this.order.orderId );
         orders[idx].editedDateTime = curDate;
         orders[idx].uploaded = false;
         setBoolean("pendingOrders", true);

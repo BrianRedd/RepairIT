@@ -1,6 +1,6 @@
 export interface ImageVO {
-    id: number,
-    asset: any,
+    imageid: number,
+    assetpath: any,
     caption: string,
     valid: boolean
 }
