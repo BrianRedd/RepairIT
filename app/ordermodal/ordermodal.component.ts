@@ -1,7 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 import { ModalDialogParams } from "nativescript-angular/modal-dialog";
 import { DatePicker } from 'tns-core-modules/ui/date-picker/date-picker';
-import { TimePicker } from 'tns-core-modules/ui/time-picker/time-picker';
 import { ListPicker } from 'tns-core-modules/ui/list-picker/list-picker';
 import { Page } from 'tns-core-modules/ui/page/page';
 import { CouchbaseService } from "~/services/couchbase.service";
@@ -16,7 +15,8 @@ export class OrderModalComponent implements OnInit {
     issueArray: Array<string>;
     repairLocArray = ["Onsite: Same Day", "Onsite: Later Date", "Offsite"];
     shopLocArray: Array<string>;
-    activeModal: string;
+    contactMethodArray = ["Text Message", "Phone Call", "Email Only"];
+    activeModal: string;    
 
     constructor(
         private params: ModalDialogParams,
@@ -32,36 +32,27 @@ export class OrderModalComponent implements OnInit {
         this.shopLocArray = this.couchbaseService.getDocument("locations").locations;
         this.shopLocArray.push("Other");
         let currentdate: Date = new Date();
-        switch(this.activeModal) {
-            case "estRepair_t":
-            case "estRepair_d":
-                let timePicker: TimePicker = <TimePicker>this.page.getViewById<TimePicker>('timePicker');
-                timePicker.hour = currentdate.getHours();
-                timePicker.minute = currentdate.getMinutes();
-                let datePicker: DatePicker = <DatePicker>this.page.getViewById<DatePicker>('datePicker');
-                datePicker.year = currentdate.getFullYear();
-                datePicker.month = currentdate.getMonth() + 1;
-                datePicker.day = currentdate.getDate();
-                datePicker.minDate = currentdate;
-                datePicker.maxDate = new Date(datePicker.year + 1, 12, 31);
-                break;
-            default: 
-                break;
-        }
-
+        let datePicker: DatePicker = <DatePicker>this.page.getViewById<DatePicker>('datePicker');
+        datePicker.year = currentdate.getFullYear();
+        datePicker.month = currentdate.getMonth() + 1;
+        datePicker.day = currentdate.getDate();
+        datePicker.minDate = currentdate;
+        datePicker.maxDate = new Date(datePicker.year + 1, 12, 31);
     }
 
     public submit() {
         let response: any;
         let picker: any;
-        let timePicker: TimePicker;
         let datePicker: DatePicker;
         let selDate: any;
-        let selTime: any;
         switch(this.activeModal) {
             case "addressState":
                 picker = <ListPicker>this.page.getViewById<ListPicker>('statePicker');
                 response = this.stateArray[picker.selectedIndex];
+                break;
+            case "contactMethod":
+                picker = <ListPicker>this.page.getViewById<ListPicker>('contactMethod');
+                response = this.contactMethodArray[picker.selectedIndex];
                 break;
             case "issue":
                 picker = <ListPicker>this.page.getViewById<ListPicker>('issuePicker');
@@ -75,28 +66,13 @@ export class OrderModalComponent implements OnInit {
                 picker = <ListPicker>this.page.getViewById<ListPicker>('shopLocPicker');
                 response = this.shopLocArray[picker.selectedIndex];
                 break;
-            case "estRepair_t":
-                timePicker = <TimePicker>this.page.getViewById<TimePicker>('timePicker');
+            case "estRepair":
                 datePicker = <DatePicker>this.page.getViewById<DatePicker>('datePicker');
                 selDate = datePicker.date;
-                selTime = timePicker.time;
                 response = new Date(selDate.getFullYear(),
                                     selDate.getMonth(),
-                                    selDate.getDate(),
-                                    selTime.getHours(),
-                                    selTime.getMinutes());
-                response = response.toDateString() + " " + response.toTimeString();
-                break;
-            case "estRepair_d":
-                timePicker = <TimePicker>this.page.getViewById<TimePicker>('timePicker');
-                datePicker = <DatePicker>this.page.getViewById<DatePicker>('datePicker');
-                selDate = datePicker.date;
-                selTime = timePicker.time;
-                response = new Date(selDate.getFullYear(),
-                                    selDate.getMonth(),
-                                    selDate.getDate(),
-                                    selTime.getHours(),
-                                    selTime.getMinutes());
+                                    selDate.getDate()
+                                );
                 response = response.toDateString();
                 break;
             default:

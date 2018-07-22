@@ -34,7 +34,7 @@ export class NeworderComponent implements OnInit {
 
     orderForm: FormGroup;
     orders: any;
-    blankPicture: string = "res://blank_picture";
+    //blankPicture: string = "res://blank_picture";
     newOrder: OrderVO = {
         orderId: "",
         firstName: "",
@@ -45,6 +45,7 @@ export class NeworderComponent implements OnInit {
         addressZip: "",
         email: "",
         phone: "",
+        contactMethod: "",
         images: [],
         issue: "",
         issueDetail: "",
@@ -70,19 +71,23 @@ export class NeworderComponent implements OnInit {
     };
     message: string;
     formBlock: boolean = false;
-    activeslide: number = 0;
     numslides: number = 4;
+    /*activeslide: number = 0;
     slide_0: View;
     slide_1: View;
     slide_2: View;
-    slide_3: View;
+    slide_3: View;*/
     actionBarStyle: string = "background-color: #006A5C;";
     actionBarTextStyle: string = "color: #FFFFFF";
     nextOrderNumber: number;
     orderID: string;
     issuesMore: boolean = false;
-    sameDayRepair: boolean = true;
+    //sameDayRepair: boolean = true;
     required_photos_taken: boolean = false;
+    curDate: Date = new Date();
+    today: string = new Date(this.curDate.getFullYear(), this.curDate.getMonth(), this.curDate.getDate()).toDateString();
+    tabSelectedIndex: number = 0;
+    productType: string = getString('ProductType');
     
     constructor(
         private formBuilder: FormBuilder,
@@ -105,10 +110,11 @@ export class NeworderComponent implements OnInit {
             addressZip: ["", Validators.required],
             email: ["", Validators.required],
             phone: ["", Validators.required],
+            contactMethod: ["Text Message", Validators.required],
             issue: ["", Validators.required],
             issueDetail: [""],
             repairLoc: ["Onsite: Same Day", Validators.required],
-            estRepair: ["", Validators.required],
+            estRepair: [this.today, Validators.required],
             repairCost: 0,
             repairPaid: false,
             shipCost: 0,
@@ -120,7 +126,8 @@ export class NeworderComponent implements OnInit {
         for (var i: number = 0; i < photos.length; i++ ) {
             this.newOrder.images[i] = {
                 "imageid": i,
-                "assetpath": this.blankPicture,
+                "localpath": "res:/",
+                "filename": "blank_picture",
                 "caption": photos[i],
                 "valid": (i === 0) ? true : false
             };
@@ -132,7 +139,7 @@ export class NeworderComponent implements OnInit {
         this.orderID = getString("currentAssociateID") + (this.nextOrderNumber).toString();
     }
 
-    validate(field, args) {
+    validate(field: string, args: any) {
         let textField = <TextField>args.object;
         let text = textField.text;
         if (!text || text === undefined) {
@@ -194,23 +201,24 @@ export class NeworderComponent implements OnInit {
                 }
                 break;
             case "repairLoc":
-                if (text.indexOf('Same Day') === -1) {
-                    this.sameDayRepair = false;
-                } else {
-                    this.sameDayRepair = true;
-                }
+                this.validateRepairLoc();
                 break;
             default:
                 break;
         }
     }
 
-    estimateRepair() {
-        if (this.sameDayRepair) {
-            this.createModalView('estRepair_t');
+    validateRepairLoc() {
+        let text = this.orderForm.get('repairLoc').value;
+        if (text.indexOf('Same Day') !== -1) {
+            this.orderForm.patchValue({ estRepair: this.today });
         } else {
-            this.createModalView('estRepair_d');
+            this.orderForm.patchValue({ estRepair: "" });
         }
+    }
+
+    estimateRepair() {
+        this.createModalView('estRepair');
     }
 
     onSwipe(args: SwipeGestureEventData) {
@@ -236,11 +244,14 @@ export class NeworderComponent implements OnInit {
                     case "issue":
                         this.orderForm.patchValue({ issue: result });
                         break;
+                    case "contactMethod":
+                        this.orderForm.patchValue({ contactMethod: result });
+                        break;
                     case "repairLoc":
                         this.orderForm.patchValue({ repairLoc: result });
+                        this.validateRepairLoc();
                         break;
-                    case "estRepair_t":
-                    case "estRepair_d":
+                    case "estRepair":
                         this.orderForm.patchValue({ estRepair: result });
                         break;
                     case "shopLoc":
@@ -282,53 +293,14 @@ export class NeworderComponent implements OnInit {
     }
 
     nextSlide() {
-        let leftCard = this.page.getViewById<View>('slide_' + (this.activeslide + (this.numslides - 1)) % this.numslides);
-        let middleCard = this.page.getViewById<View>('slide_' + this.activeslide);
-        let rightCard = this.page.getViewById<View>('slide_' + (this.activeslide + (this.numslides + 1)) % this.numslides);
-
-        rightCard.animate({
-            translate: {x: 2000, y: 0}
-        }).then(() => {
-            middleCard.animate({
-                translate: { x: -2000, y: 0},
-                duration: 500,
-                curve: enums.AnimationCurve.easeInOut
-            }).then(() => {
-                this.activeslide = (this.activeslide + (this.numslides + 1)) % this.numslides;
-                rightCard.animate({
-                    translate: {x: 0, y: 0},
-                    duration: 500,
-                    curve: enums.AnimationCurve.easeInOut
-                });
-            });
-        });
+        this.tabSelectedIndex = (this.tabSelectedIndex + (this.numslides + 1)) % this.numslides;
     }
 
     prevSlide() {
-        let leftCard = this.page.getViewById<View>('slide_' + (this.activeslide + (this.numslides - 1)) % this.numslides);
-        let middleCard = this.page.getViewById<View>('slide_' + this.activeslide);
-        let rightCard = this.page.getViewById<View>('slide_' + (this.activeslide + (this.numslides + 1)) % this.numslides);
-
-        leftCard.animate({
-            translate: {x: -2000, y: 0}
-        }).then(() => {
-            middleCard.animate({
-                translate: { x: 2000, y: 0},
-                duration: 500,
-                curve: enums.AnimationCurve.easeInOut
-            }).then(() => {
-                this.activeslide = (this.activeslide + (this.numslides - 1)) % this.numslides;
-                leftCard.animate({
-                    translate: {x: 0, y: 0},
-                    duration: 500,
-                    curve: enums.AnimationCurve.easeInOut
-                });
-            });
-        });
+        this.tabSelectedIndex = (this.tabSelectedIndex + (this.numslides - 1)) % this.numslides;
     }
 
     takePicture(id: number) {
-        console.log("takePicture ", id);
         let isAvail = camera.isAvailable();
         if (isAvail) {
             camera.requestPermissions();
@@ -341,7 +313,7 @@ export class NeworderComponent implements OnInit {
             let image = <Image>this.page.getViewById<Image>('image_' + id);
             camera.takePicture(options).then(imageAsset => {  
                 let documents = fs.knownFolders.currentApp();
-                let path = fs.path.join(documents.path, this.orderID + "_" + id + ".png");
+                let filename = this.orderID + "_" + id + ".png";
                 ImageSource.fromAsset(imageAsset).then((imgsrc) => {
                     if (id < this.newOrder.images.length - 1) {
                         this.newOrder.images[id + 1].valid = true;
@@ -353,15 +325,16 @@ export class NeworderComponent implements OnInit {
                         let newPicture: ImageVO;
                         newPicture = {
                             imageid: id,
-                            assetpath: path,
+                            localpath: documents.path,
+                            filename: this.orderID + "_" + id + ".png",
                             caption: "Additional",
                             valid: true
                         };
-                        console.log(newPicture);
                         this.newOrder.images.push(newPicture);
                     }
-                    imgsrc.saveToFile(path, "png");
-                    this.newOrder.images[id].assetpath = path;
+                    imgsrc.saveToFile(documents.path + '/' + filename, "png");
+                    this.newOrder.images[id].localpath = documents.path;
+                    this.newOrder.images[id].filename = filename;
                 });              
             }).catch((error) => {
                 console.log("Error taking picture: " + error);
@@ -395,6 +368,7 @@ export class NeworderComponent implements OnInit {
         this.newOrder.addressZip = this.orderForm.get("addressZip").value;
         this.newOrder.email = this.orderForm.get("email").value;
         this.newOrder.phone = this.orderForm.get("phone").value;
+        this.newOrder.contactMethod = this.orderForm.get("contactMethod").value;
         this.newOrder.issue = this.orderForm.get("issue").value;
         this.newOrder.issueDetail = this.orderForm.get("issueDetail").value;
         this.newOrder.repairLoc = this.orderForm.get("repairLoc").value;

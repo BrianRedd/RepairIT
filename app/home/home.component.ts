@@ -3,10 +3,12 @@ import { CompanyVO } from "~/shared/companyVO";
 import { CompanyService } from "~/services/company.service";
 import { getString, setString, getBoolean, setBoolean } from "tns-core-modules/application-settings/application-settings";
 import { CouchbaseService } from "~/services/couchbase.service";
+import { PlatformService } from "../services/platform.service";
 import { RouterExtensions } from "nativescript-angular/router";
 import { TNSFontIconService } from "nativescript-ngx-fonticon";
 import { Toasty } from "nativescript-toasty";
 import * as LocalNotifications from "nativescript-local-notifications";
+import { Globals } from '../shared/globals';
 
 @Component({
     selector: "app-home",
@@ -30,7 +32,9 @@ export class HomeComponent implements OnInit {
         private companyService: CompanyService,
         private couchbaseService: CouchbaseService,
         private fonticon: TNSFontIconService,
-        private routerExtensions: RouterExtensions
+        private routerExtensions: RouterExtensions,
+        private platformService: PlatformService,
+        private globals: Globals
     ) {
     }
 
@@ -67,6 +71,9 @@ export class HomeComponent implements OnInit {
         }
         this.isPending();
         this.FirstUse = getBoolean("FirstUse");
+        if (this.platformService.getConnectionType() === "None") {
+            this.globals.isOffline = true;
+        }
     }
 
     isPending() {
@@ -106,6 +113,18 @@ export class HomeComponent implements OnInit {
             /*this.message = getString('currentusername') + " [" + getString('currentuserid') + "] signed in";
             let toast = new Toasty(this.message, "short", "middle");
             toast.show();*/
+        }
+    }
+
+    syncWithServer() {
+        if (this.globals.isOffline) {
+            this.message = "Sync with Server Unavailable While Offline!";
+            let toast = new Toasty(this.message, "short", "center");
+            toast.show();
+        } else {
+            this.message = "Sync with Server Feature Coming Soon!";
+            let toast = new Toasty(this.message, "short", "center");
+            toast.show();
         }
     }
 

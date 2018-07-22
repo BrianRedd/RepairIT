@@ -1,5 +1,5 @@
-import { Component, Inject, OnInit } from "@angular/core";
-import { getString, setString, getNumber, setNumber, clear, getBoolean } from "tns-core-modules/application-settings/application-settings";
+import { Component, OnInit } from "@angular/core";
+import { getString, setString, getNumber, setNumber } from "tns-core-modules/application-settings/application-settings";
 import { CouchbaseService } from "../services/couchbase.service";
 import { RouterExtensions } from "nativescript-angular/router";
 import { TNSFontIconService } from "nativescript-ngx-fonticon";

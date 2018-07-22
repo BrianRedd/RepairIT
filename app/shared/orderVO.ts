@@ -10,6 +10,7 @@ export interface OrderVO {
     addressZip: string,
     email: string,
     phone: string,
+    contactMethod: string,
     images: ImageVO[],
     issue: string,
     issueDetail: string,

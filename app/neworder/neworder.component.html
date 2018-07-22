@@ -5,98 +5,115 @@
     <StackLayout orientation="horizontal" horizontalAlignment="center" [visibility]="message ? 'visible' : 'collapsed'">
         <Label [text]="message"></Label>
     </StackLayout>
-    <StackLayout horizontalAlignment="center" orientation="horizontal">
+    <!--StackLayout horizontalAlignment="center" orientation="horizontal">
         <Label class="fa" [text]="(activeslide === 0 ? 'fa-circle' : 'fa-circle-o') | fonticon"></Label>
         <Label class="m-l-15 fa" [text]="(activeslide === 1 ? 'fa-circle' : 'fa-circle-o') | fonticon"></Label>
         <Label class="m-l-15 fa" [text]="(activeslide === 2 ? 'fa-circle' : 'fa-circle-o') | fonticon"></Label>
         <Label class="m-l-15 fa" [text]="(activeslide === 3 ? 'fa-circle' : 'fa-circle-o') | fonticon"></Label>
-    </StackLayout>
-    <StackLayout class="form" orientation="vertical" [formGroup]="orderForm" (swipe)="onSwipe($event)">
-        <GridLayout id="slide_0" [visibility]="activeslide === 0 ? 'visible' : 'collapsed'" class="m-5" rows="auto, auto, auto, auto, auto, auto, auto, *" columns="*, *, *">
-            <Label row="0" col="0" colSpan="3" [text]="'[' + orderID + ']: Customer Information'" class="h3 text-uppercase m-b-15"></Label>
-            <Label row="1" col="0" text="Name*" textWrap="true" class="label font-weight-bold m-15 p-2"></Label>
-            <TextField row="1" col="1" formControlName="firstName" id="firstName" hint="First" [text]="" class="input input-border"></TextField>
-            <TextField row="1" col="2" formControlName="lastName" id="lastName" hint="Last" [text]="" class="input input-border"></TextField>
-            <Label row="2" col="0" text="Address*" textWrap="true" class="label font-weight-bold m-15 p-2"></Label>
-            <TextField row="2" col="1" colSpan="2" formControlName="addressStreet" id="addressStreet" hint="Number and Street" [text]="" class="input input-border"></TextField>
-            <TextField row="3" col="1" colSpan="2" formControlName="addressCity" id="addressCity" hint="City" [text]="" class="input input-border"></TextField>
-            <TextField row="4" col="1" formControlName="addressState" id="addressState" hint="State" [text]="" class="input input-border" (tap)="createModalView('addressState')"></TextField>
-            <TextField row="4" col="2" formControlName="addressZip" id="addressZip" hint="Zip" [text]="" class="input input-border" (blur)="validate('addressZip', $event)"></TextField>
-            <Label row="5" col="0" text="Email*" textWrap="true" class="label font-weight-bold m-15 p-2"></Label>
-            <TextField row="5" col="1" colSpan="2" formControlName="email" id="email" hint="Email" [text]="" class="input input-border" (blur)="validate('email',$event)"></TextField>
-            <Label row="6" col="0" text="Phone*" textWrap="true" class="label font-weight-bold m-15 p-2"></Label>
-            <TextField row="6" col="1" colspan="2" formControlName="phone" id="phone" hint="Phone Number" [text]="" class="input input-border" (blur)="validate('phone',$event)"></TextField>
-            <GridLayout row="7" col="0" colSpan="3" orientation="horizontal" rows="auto" columns="*, *, *, *, *, *">
-                <Button row="0" col="0" [text]="('fa-chevron-circle-left' | fonticon)" (tap)="prevSlide()" class="fa btn-outline"></Button>
-                <Button row="0" col="1" colSpan="2" text="Cancel" (tap)="cancel()" class="btn"></Button>
-                <Button row="0" col="3" colspan="2" text="Submit" (tap)="submit()" [isEnabled]="orderForm.valid && !formBlock && required_photos_taken" class="btn btn-primary"></Button>
-                <Button row="0" col="5" [text]="('fa-chevron-circle-right' | fonticon)" (tap)="nextSlide()" class="fa btn-outline"></Button>
-            </GridLayout>
-        </GridLayout>
-
-        <GridLayout id="slide_1" [visibility]="activeslide === 1 ? 'visible' : 'collapsed'" class="m-5" rows="auto, auto, auto, auto, 180, *" columns="*, *, *">
-            <Label row="0" col="0" colSpan="3" [text]="'[' + orderID + ']: Product Information'" class="h3 text-uppercase m-b-15"></Label>
-            <Label row="1" col="0" text="Type of Repair*" textWrap="true" class="label font-weight-bold m-15 p-2"></Label>
-            <TextField row="1" col="1" colSpan="2" formControlName="issue" id="issue" hint="Type of Repair" [text]="" class="input input-border" (tap)="createModalView('issue')" (textChange)="validate('issue', $event)"></TextField>
-            <Label row="2" col="0" [text]="'Details' + (issuesMore ? '*' : '')" textWrap="true" class="label font-weight-bold m-15 p-2"></Label>
-            <TextField row="2" col="1" colSpan="2" formControlName="issueDetail" id="issueDetail" hint="Details" [text]="" class="input input-border" (blur)="validate('issueDetail', $event)"></TextField>
-            <Label row="3" col="0" colSpan="3" text="Pictures:*" textWrap="true" class="label font-weight-bold m-t-15 m-l-15 p-2"></Label>
-            <StackLayout row="4" col="0" colSpan="3" horizontalAlignment="center">
+    </StackLayout-->
+    <StackLayout class="form" orientation="vertical">
+        <TabView [(ngModel)]="tabSelectedIndex" androidOffscreenTabLimit="1">
+            <StackLayout *tabItem="{title: 'Customer'}">
                 <ScrollView>
-                    <WrapLayout orientation="horizontal">
-                        <StackLayout orientation="vertical" width="120" *ngFor="let image of newOrder.images" [class]="'photo_' + (image.valid ? 'valid' : 'invalid')" (tap)="takePicture(image.imageid)">
-                            <Image [id]="'image_' + image.imageid" [src]="image.assetpath" height="100" width="100" class="btn-img"></Image>
-                            <Label [text]="('fa-camera' | fonticon) + ' ' + image.caption + '*'" class="m-10 fa text-center"></Label>
-                        </StackLayout>
-                    </WrapLayout>
+                    <GridLayout [formGroup]="orderForm" class="m-3" rows="auto, auto, auto, auto, auto, auto, auto, auto, *" columns="*, *, *">
+                        <Label row="0" col="0" colSpan="3" [text]="'[' + orderID + ']: Customer Information'" class="h3 text-uppercase m-10"></Label>
+                        <Label row="1" col="0" text="Name*" textWrap="true" class="label font-weight-bold p-10" verticalAlignment="center"></Label>
+                        <TextField row="1" col="1" formControlName="firstName" id="firstName" hint="First" [text]="" class="input input-border"></TextField>
+                        <TextField row="1" col="2" formControlName="lastName" id="lastName" hint="Last" [text]="" class="input input-border"></TextField>
+                        <Label row="2" col="0" text="Address*" textWrap="true" class="label font-weight-bold p-10" verticalAlignment="center"></Label>
+                        <TextField row="2" col="1" colSpan="2" formControlName="addressStreet" id="addressStreet" hint="Number and Street" [text]="" class="input input-border"></TextField>
+                        <TextField row="3" col="1" colSpan="2" formControlName="addressCity" id="addressCity" hint="City" [text]="" class="input input-border"></TextField>
+                        <TextField row="4" col="1" formControlName="addressState" id="addressState" hint="State" [text]="" class="input input-border" (tap)="createModalView('addressState')"></TextField>
+                        <TextField row="4" col="2" formControlName="addressZip" id="addressZip" hint="Zip" [text]="" class="input input-border" (blur)="validate('addressZip', $event)"></TextField>
+                        <Label row="5" col="0" text="Email*" textWrap="true" class="label font-weight-bold p-10" verticalAlignment="center"></Label>
+                        <TextField row="5" col="1" colSpan="2" formControlName="email" id="email" hint="Email" [text]="" class="input input-border" (blur)="validate('email',$event)"></TextField>
+                        <Label row="6" col="0" text="Phone*" textWrap="true" class="label font-weight-bold p-10" verticalAlignment="center"></Label>
+                        <TextField row="6" col="1" colspan="2" formControlName="phone" id="phone" hint="Phone Number" [text]="" class="input input-border" (blur)="validate('phone',$event)"></TextField>
+                        <Label row="7" col="0" text="Preferred Contact Method*" textWrap="true" class="label font-weight-bold p-10" verticalAlignment="center"></Label>
+                        <TextField row="7" col="1" colSpan="2" formControlName="contactMethod" id="contactMethod" hint="Contact Method" [text]="" class="input input-border" (tap)="createModalView('contactMethod')"></TextField>
+                        <GridLayout row="8" col="0" colSpan="3" orientation="horizontal" rows="auto" columns="*, *, *, *, *, *">
+                            <Button row="0" col="0" [text]="('fa-chevron-circle-left' | fonticon)" (tap)="prevSlide()" class="fa btn-outline"></Button>
+                            <Button row="0" col="1" colSpan="2" text="Cancel" (tap)="cancel()" class="btn"></Button>
+                            <Button row="0" col="3" colspan="2" text="Submit" (tap)="submit()" [isEnabled]="orderForm.valid && !formBlock && required_photos_taken" class="btn btn-primary"></Button>
+                            <Button row="0" col="5" [text]="('fa-chevron-circle-right' | fonticon)" (tap)="nextSlide()" class="fa btn-outline"></Button>
+                        </GridLayout>
+                    </GridLayout>
                 </ScrollView>
-                <Button [visibility]="required_photos_taken ? 'visible' : 'collapsed'" [text]="('fa-camera' | fonticon) + ' Additional Photo'" (tap)="takeAdditionalPicture()" class="fa btn-outline"></Button>
             </StackLayout>
-            <GridLayout row="5" col="0" colSpan="3" orientation="horizontal" rows="auto" columns="*, *, *, *, *, *">
-                <Button row="0" col="0" [text]="('fa-chevron-circle-left' | fonticon)" (tap)="prevSlide()" class="fa btn-outline"></Button>
-                <Button row="0" col="1" colSpan="2" text="Cancel" (tap)="cancel()" class="btn"></Button>
-                <Button row="0" col="3" colspan="2" text="Submit" (tap)="submit()" [isEnabled]="orderForm.valid && !formBlock && required_photos_taken" class="btn btn-primary"></Button>
-                <Button row="0" col="5" [text]="('fa-chevron-circle-right' | fonticon)" (tap)="nextSlide()" class="fa btn-outline"></Button>
-            </GridLayout>
-        </GridLayout>
-
-        <GridLayout id="slide_2" [visibility]="activeslide === 2 ? 'visible' : 'collapsed'" class="m-5" rows="auto, auto, auto, auto, auto, auto, *" columns="*, *, *">
-            <Label row="0" col="0" colSpan="3" [text]="'[' + orderID + ']: Repair Details'" class="h3 text-uppercase m-b-15"></Label>
-            <Label row="1" col="0" text="Shop Location*" textWrap="true" class="label font-weight-bold m-15 p-2"></Label>
-            <TextField row="1" col="1" colSpan="2" formControlName="shopLoc" id="shopLoc" hint="Shop Location" [text]="" class="input input-border" (tap)="createModalView('shopLoc')"></TextField>
-            <Label row="2" col="0" text="Repair Location*" textWrap="true" class="label font-weight-bold m-15 p-2"></Label>
-            <TextField row="2" col="1" colSpan="2" formControlName="repairLoc" id="repairLoc" hint="Repair Location" [text]="" class="input input-border" (tap)="createModalView('repairLoc')" (blur)="validate('repairLoc', $event)"></TextField>
-            <Label row="3" col="0" text="Repair Cost?" textWrap="true" class="label font-weight-bold m-15 p-2"></Label>
-            <TextField row="3" col="1" formControlName="repairCost" id="repairCost" hint="Repair Cost" [text]="" class="input input-border"></TextField>
-            <GridLayout row="3" col="2" rows="auto" columns="*,*" verticalAlignment="center">
-                <Label row="0" col="0" text="Paid?" textWrap="true" class="label text-center"></Label>
-                <Switch row="0" col="1" checked="false" formControlName="repairPaid" text="Paid"></Switch>
-            </GridLayout>
-            <Label row="4" col="0" [text]="'Estimated Repair ' + (sameDayRepair ? 'Time*' : 'Date*')" textWrap="true" class="label font-weight-bold m-15 p-2"></Label>
-            <TextField row="4" col="1" colSpan="2" formControlName="estRepair" id="estRepair" [hint]="'Estimated Repair ' + (sameDayRepair ? 'Time' : 'Date')" [text]="" class="input input-border" (tap)="estimateRepair()"></TextField>
-            <Label row="5" col="0" text="Shipping Cost?" textWrap="true" class="label font-weight-bold m-15 p-2"></Label>
-            <TextField row="5" col="1" formControlName="shipCost" id="shipCost" hint="Shipping Cost" [text]="" class="input input-border"></TextField>
-            <GridLayout row="5" col="2" rows="auto" columns="*,*" verticalAlignment="center">
-                <Label row="0" col="0" text="Paid?" textWrap="true" class="label text-center"></Label>
-                <Switch row="0" col="1" checked="false" formControlName="shipPaid"></Switch>
-            </GridLayout>
-            <GridLayout row="6" col="0" colSpan="3" orientation="horizontal" rows="auto" columns="*, *, *, *, *, *">
-                <Button row="0" col="0" [text]="('fa-chevron-circle-left' | fonticon)" (tap)="prevSlide()" class="fa btn-outline"></Button>
-                <Button row="0" col="1" colSpan="2" text="Cancel" (tap)="cancel()" class="btn"></Button>
-                <Button row="0" col="3" colspan="2" text="Submit" (tap)="submit()" [isEnabled]="orderForm.valid && !formBlock && required_photos_taken" class="btn btn-primary"></Button>
-                <Button row="0" col="5" [text]="('fa-chevron-circle-right' | fonticon)" (tap)="nextSlide()" class="fa btn-outline"></Button>
-            </GridLayout>
-        </GridLayout>
-
-        <GridLayout id="slide_3" [visibility]="activeslide === 3 ? 'visible' : 'collapsed'" class="m-5" rows="auto, *, auto" columns="*">
-            <Label row="0" col="0" [text]="'[' + orderID + ']: Additional Notes'" class="h3 text-uppercase m-b-15"></Label>
-            <TextView row="1" col="0" formControlName="notes" id="notes" [text]="" class="input input-border"></TextView>
-            <GridLayout row="6" col="0" orientation="horizontal" rows="auto" columns="*, *, *, *, *, *">
-                <Button row="0" col="0" [text]="('fa-chevron-circle-left' | fonticon)" (tap)="prevSlide()" class="fa btn-outline"></Button>
-                <Button row="0" col="1" colSpan="2" text="Cancel" (tap)="cancel()" class="btn"></Button>
-                <Button row="0" col="3" colspan="2" text="Submit" (tap)="submit()" [isEnabled]="orderForm.valid && !formBlock && required_photos_taken" class="btn btn-primary"></Button>
-                <Button row="0" col="5" [text]="('fa-chevron-circle-right' | fonticon)" (tap)="nextSlide()" class="fa btn-outline"></Button>
-            </GridLayout>
-        </GridLayout>
+            <StackLayout *tabItem="{title: productType}">
+                <ScrollView>
+                    <GridLayout [formGroup]="orderForm" class="m-3" rows="auto, auto, auto, auto, 180, *" columns="*, *, *">
+                        <Label row="0" col="0" colSpan="3" [text]="'[' + orderID + ']: Product Information'" class="h3 text-uppercase m-10"></Label>
+                        <Label row="1" col="0" text="Type of Repair*" textWrap="true" class="label font-weight-bold p-10" verticalAlignment="center"></Label>
+                        <TextField row="1" col="1" colSpan="2" formControlName="issue" id="issue" hint="Type of Repair" [text]="" class="input input-border" (tap)="createModalView('issue')" (textChange)="validate('issue', $event)"></TextField>
+                        <Label row="2" col="0" [text]="'Details' + (issuesMore ? '*' : '')" textWrap="true" class="label font-weight-bold p-10" verticalAlignment="center"></Label>
+                        <TextField row="2" col="1" colSpan="2" formControlName="issueDetail" id="issueDetail" hint="Details" [text]="" class="input input-border" (blur)="validate('issueDetail', $event)"></TextField>
+                        <Label row="3" col="0" colSpan="3" text="Pictures:*" textWrap="true" class="label font-weight-bold p-10"></Label>
+                        <StackLayout row="4" col="0" colSpan="3" horizontalAlignment="center">
+                            <ScrollView>
+                                <WrapLayout orientation="horizontal">
+                                    <StackLayout orientation="vertical" width="120" *ngFor="let image of newOrder.images" [class]="'photo_' + (image.valid ? 'valid' : 'invalid')" (tap)="takePicture(image.imageid)">
+                                        <Image [id]="'image_' + image.imageid" [src]="image.localpath + '/' + image.filename" height="100" width="100" class="btn-img"></Image>
+                                        <Label [text]="('fa-camera' | fonticon) + ' ' + image.caption + '*'" class="m-10 fa text-center"></Label>
+                                    </StackLayout>
+                                </WrapLayout>
+                            </ScrollView>
+                            <Button [visibility]="required_photos_taken ? 'visible' : 'collapsed'" [text]="('fa-camera' | fonticon) + ' Additional Photo'" (tap)="takeAdditionalPicture()" class="fa btn-outline"></Button>
+                        </StackLayout>
+                        <GridLayout row="5" col="0" colSpan="3" orientation="horizontal" rows="auto" columns="*, *, *, *, *, *">
+                            <Button row="0" col="0" [text]="('fa-chevron-circle-left' | fonticon)" (tap)="prevSlide()" class="fa btn-outline"></Button>
+                            <Button row="0" col="1" colSpan="2" text="Cancel" (tap)="cancel()" class="btn"></Button>
+                            <Button row="0" col="3" colspan="2" text="Submit" (tap)="submit()" [isEnabled]="orderForm.valid && !formBlock && required_photos_taken" class="btn btn-primary"></Button>
+                            <Button row="0" col="5" [text]="('fa-chevron-circle-right' | fonticon)" (tap)="nextSlide()" class="fa btn-outline"></Button>
+                        </GridLayout>
+                    </GridLayout>
+                </ScrollView>
+            </StackLayout>
+            <StackLayout *tabItem="{title: 'Location'}">
+                <ScrollView>
+                    <GridLayout [formGroup]="orderForm" class="m-3" rows="auto, auto, auto, auto, auto, auto, *" columns="*, *, *">
+                        <Label row="0" col="0" colSpan="3" [text]="'[' + orderID + ']: Repair Details'" class="h3 text-uppercase m-10"></Label>
+                        <Label row="1" col="0" text="Shop Location*" textWrap="true" class="label font-weight-bold p-10" verticalAlignment="center"></Label>
+                        <TextField row="1" col="1" colSpan="2" formControlName="shopLoc" id="shopLoc" hint="Shop Location" [text]="" class="input input-border" (tap)="createModalView('shopLoc')"></TextField>
+                        <Label row="2" col="0" text="Repair Location*" textWrap="true" class="label font-weight-bold p-10" verticalAlignment="center"></Label>
+                        <TextField row="2" col="1" colSpan="2" formControlName="repairLoc" id="repairLoc" hint="Repair Location" [text]="" class="input input-border" (tap)="createModalView('repairLoc')" (blur)="validate('repairLoc', $event)"></TextField>
+                        <Label row="3" col="0" text="Repair Cost" textWrap="true" class="label font-weight-bold p-10" verticalAlignment="center"></Label>
+                        <TextField row="3" col="1" formControlName="repairCost" id="repairCost" hint="Repair Cost" [text]="" class="input input-border"></TextField>
+                        <GridLayout row="3" col="2" rows="auto" columns="*,*" verticalAlignment="center">
+                            <Label row="0" col="0" text="Paid?" textWrap="true" class="label text-center"></Label>
+                            <Switch row="0" col="1" checked="false" formControlName="repairPaid" text="Paid"></Switch>
+                        </GridLayout>
+                        <Label row="4" col="0" text="Estimated Repair Date*" textWrap="true" class="label font-weight-bold p-10" verticalAlignment="center"></Label>
+                        <TextField row="4" col="1" colSpan="2" formControlName="estRepair" id="estRepair" [hint]="'Estimated Repair ' + (sameDayRepair ? 'Time' : 'Date')" [text]="" class="input input-border" (tap)="estimateRepair()"></TextField>
+                        <Label row="5" col="0" text="Shipping Cost" textWrap="true" class="label font-weight-bold p-10" verticalAlignment="center"></Label>
+                        <TextField row="5" col="1" formControlName="shipCost" id="shipCost" hint="Shipping Cost" [text]="" class="input input-border"></TextField>
+                        <GridLayout row="5" col="2" rows="auto" columns="*,*" verticalAlignment="center">
+                            <Label row="0" col="0" text="Paid?" textWrap="true" class="label text-center"></Label>
+                            <Switch row="0" col="1" checked="false" formControlName="shipPaid"></Switch>
+                        </GridLayout>
+                        <GridLayout row="6" col="0" colSpan="3" orientation="horizontal" rows="auto" columns="*, *, *, *, *, *">
+                            <Button row="0" col="0" [text]="('fa-chevron-circle-left' | fonticon)" (tap)="prevSlide()" class="fa btn-outline"></Button>
+                            <Button row="0" col="1" colSpan="2" text="Cancel" (tap)="cancel()" class="btn"></Button>
+                            <Button row="0" col="3" colspan="2" text="Submit" (tap)="submit()" [isEnabled]="orderForm.valid && !formBlock && required_photos_taken" class="btn btn-primary"></Button>
+                            <Button row="0" col="5" [text]="('fa-chevron-circle-right' | fonticon)" (tap)="nextSlide()" class="fa btn-outline"></Button>
+                        </GridLayout>
+                    </GridLayout>
+                </ScrollView>
+            </StackLayout>
+            <StackLayout *tabItem="{title: 'Notes'}">
+                <ScrollView>
+                    <GridLayout [formGroup]="orderForm" class="m-3" rows="auto, *, auto" columns="*">
+                        <Label row="0" col="0" [text]="'[' + orderID + ']: Additional Notes'" class="h3 text-uppercase m-10"></Label>
+                        <TextView row="1" col="0" formControlName="notes" id="notes" [text]="" class="input input-border"></TextView>
+                        <GridLayout row="6" col="0" orientation="horizontal" rows="auto" columns="*, *, *, *, *, *">
+                            <Button row="0" col="0" [text]="('fa-chevron-circle-left' | fonticon)" (tap)="prevSlide()" class="fa btn-outline"></Button>
+                            <Button row="0" col="1" colSpan="2" text="Cancel" (tap)="cancel()" class="btn"></Button>
+                            <Button row="0" col="3" colspan="2" text="Submit" (tap)="submit()" [isEnabled]="orderForm.valid && !formBlock && required_photos_taken" class="btn btn-primary"></Button>
+                            <Button row="0" col="5" [text]="('fa-chevron-circle-right' | fonticon)" (tap)="nextSlide()" class="fa btn-outline"></Button>
+                        </GridLayout>
+                    </GridLayout>
+                </ScrollView>
+            </StackLayout>
+        </TabView>
     </StackLayout>
 </StackLayout>

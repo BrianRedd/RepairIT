@@ -151,6 +151,10 @@ export class DisplayOrderModalComponent implements OnInit {
         }
     }
 
+    email() {
+        
+    }
+
     accept() {
         this.params.closeCallback('accept');
     }
