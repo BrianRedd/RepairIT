@@ -11,12 +11,13 @@
         <ListView [items]="aorders" class="list-group" *ngIf="aorders && !loading">
             <ng-template let-order="item">
                 <StackLayout orientation="horizontal" class="list-group-item" (tap)="displayOrder(order)">
-                    <GridLayout class="list-group-item" rows="*" columns="auto, auto, auto, *, auto">
-                        <Image row="0" col="0" [visibility]="(order.images.length > 0) ? 'visible' : 'collapsed'" [src]="folder.path + '/' + order.orderId + '_0.png'" class="m-r-5" height="50" width="50"></Image>
-                        <Label row="0" col="1" [text]="order.orderId" class="list-group-item-text" textAlignment="left"></Label>
-                        <Label row="0" col="2" [text]="('fa-upload' | fonticon)" [visibility]="order.uploaded ? 'visible' : 'collapsed'" class="list-group-item-text fa m-l-5" textAlignment="center"></Label>
-                        <Label row="0" col="3" [text]="order.issue" class="list-group-item-text m-l-15" textWrap="true" textAlignment="left"></Label>
-                        <Label row="0" col="4" [text]="order.acceptedDateTime" class="list-group-item-text" textAlignment="right"></Label>
+                    <GridLayout class="list-group-item" rows="auto, auto" columns="auto, auto, *, auto">
+                        <Label row="0" col="0" [text]="order.orderId" class="list-group-item-text" textAlignment="left"></Label>
+                        <Label row="0" col="1" [text]="('fa-envelope-open' | fonticon)" [visibility]="order.emailed ? 'visible' : 'collapsed'" class="list-group-item-text fa m-l-5" textAlignment="left"></Label>
+                        <Label row="0" col="2" [text]="('fa-upload' | fonticon)" [visibility]="order.uploaded ? 'visible' : 'collapsed'" class="list-group-item-text fa m-l-5" textAlignment="left"></Label>
+                        <Image row="1" col="0" [src]="folder.path + '/' + order.orderId + '_0.png'" class="m-r-5" height="50" width="50"></Image>
+                        <Label row="1" col="1" [text]="order.issue" class="list-group-item-text m-l-15" textWrap="true" textAlignment="left"></Label>
+                        <Label row="1" col="3" [text]="order.acceptedDateTime" class="list-group-item-text" textAlignment="right"></Label>
                     </GridLayout>
                 </StackLayout>
             </ng-template>

@@ -28,6 +28,7 @@ export class PendingComponent implements OnInit {
     orders: any; //orders
     porders: OrderVO[]; //pending orders only
     loading: boolean;
+    curAssociate: string = getString('currentAssociateID');
     folder = fs.knownFolders.currentApp();
 
     constructor(
@@ -46,15 +47,17 @@ export class PendingComponent implements OnInit {
     ngOnInit() {
         this.refreshOrders();
     }
-
+    // TODO: Remember to only grab orders by current user, even if other orders are available 
+    // Perhaps as a setting - some companies may want all associates to have access to all device orders
     refreshOrders() {
+        console.log("Pending > refreshOrders()");
         this.loading = true;
         this.porders = [];
         this.orders = this.orderService.getOrders();
         this.porders = this.orders.filter((res) => {
             //add only orders that have NOT been uploaded
             this.loading = false;
-            return !res.uploaded;
+            return (!res.uploaded && (res.orderId.indexOf(this.curAssociate) !== -1));
         });
         if (this.porders.length === 0) {
             setBoolean("pendingOrders", false);
@@ -78,23 +81,27 @@ export class PendingComponent implements OnInit {
         }
         this.modalService.showModal(DisplayOrderModalComponent, options)
             .then((result: any) => {
-                if(result === "accept" || result === "close") {
+                /*if (result === "accept" || result === "close") {
                     //just close
                 } else if (result === "reload") {
                     this.refreshOrders();
                 } else {
-                    let idx = this.orders.findIndex(res => res.id === result.id );
+                    let idx = this.orders.findIndex((res) => {
+                        res.orderId === result.orderId;
+                    });
                     this.uploadOrder(idx);
-                }
-            });
+                }*/
+                this.refreshOrders();
+            })
+            .catch((err) => { console.log("Error: "+ err); });
     }
 
     displayOrder(order) {
         this.createDisplayOrderModal(["pending", order]);
-        this.refreshOrders();
+        //this.refreshOrders();
     };
 
-    uploadOrder(idx: number) {
+    /*uploadOrder(idx: number) {
         let curDate: string = new Date().toDateString();
         //TODO: UPLOAD ORDER
         //let toast = new Toasty("Uploaded Order " + this.orders[idx].id + " (Coming Soon!)", "short", "top");
@@ -105,8 +112,6 @@ export class PendingComponent implements OnInit {
         this.orders[idx].uploadedDateTime = curDate;
         this.orderService.updateOrders(this.orders);
         this.refreshOrders();
-    }
-
-    sendAll() {};
+    }*/
 
 }

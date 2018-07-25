@@ -17,24 +17,23 @@ export class OrderService {
         private couchbaseService: CouchbaseService
     ) {}
 
-    initializeOrders() {
+    public initializeOrders() {
         //local
         console.log("Initializing Orders DB Document");
         this.couchbaseService.createDocument({"orders": []}, "orders");
     }; 
 
-    getOrders() {
+    public getOrders() {
         //local
         return this.couchbaseService.getDocument("orders").orders;
     }
 
-    updateOrders(data) {
+    public updateOrders(data) {
         //local
-        console.log(data);
         return (this.couchbaseService.updateDocument("orders", {"orders": data}));
     }
 
-    updateOrdersServer(data) {
+    public updateOrdersServer(data) {
         //server
         
     }

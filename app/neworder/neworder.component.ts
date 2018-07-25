@@ -57,6 +57,7 @@ export class NeworderComponent implements OnInit {
         estRepair: "",
         shopLoc: "",
         notes: "",
+        emailed: false,
         uploaded: false,
         uploadedDateTime: "",
         accepted: false,
@@ -70,7 +71,7 @@ export class NeworderComponent implements OnInit {
         editedDateTime: ""
     };
     message: string;
-    formBlock: boolean = false;
+    formBlock: boolean = false; //additional contextual requirements
     numslides: number = 4;
     /*activeslide: number = 0;
     slide_0: View;
@@ -188,9 +189,11 @@ export class NeworderComponent implements OnInit {
                     this.message = "";
                     this.issuesMore = false;
                 }
+                console.log("this.issuesMore", this.issuesMore);
                 break;
-            case "issuedetail":
+            case "issueDetail":
                 if (this.issuesMore) {
+                    console.log("issuesMore TRUE; text: ", text);
                     if (text === "") {
                         this.message = "Issue Details Required!";
                         this.formBlock = true;
@@ -199,6 +202,7 @@ export class NeworderComponent implements OnInit {
                         this.formBlock = false;
                     }
                 }
+                console.log("this.formBlock", this.formBlock);
                 break;
             case "repairLoc":
                 this.validateRepairLoc();
@@ -400,6 +404,6 @@ export class NeworderComponent implements OnInit {
         if (this.orderForm.get("shopLoc").value) {
             setString("defaultLoc", this.orderForm.get("shopLoc").value);
         }
-        this.createFormDisplayModal(["confirm", this.newOrder]);
+        this.createFormDisplayModal(["neworder", this.newOrder]);
     }
 }

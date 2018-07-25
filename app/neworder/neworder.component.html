@@ -2,7 +2,7 @@
     <Label [text]="('fa-ambulance' | fonticon) + ' New Order'" class="h2 fa" [style]="actionBarTextStyle"></Label>
 </ActionBar>
 <StackLayout class="page m-5">
-    <StackLayout orientation="horizontal" horizontalAlignment="center" [visibility]="message ? 'visible' : 'collapsed'">
+    <StackLayout horizontalAlignment="center" [visibility]="message ? 'visible' : 'collapsed'">
         <Label [text]="message"></Label>
     </StackLayout>
     <!--StackLayout horizontalAlignment="center" orientation="horizontal">
@@ -69,7 +69,7 @@
                     </GridLayout>
                 </ScrollView>
             </StackLayout>
-            <StackLayout *tabItem="{title: 'Location'}">
+            <StackLayout *tabItem="{title: 'Repair'}">
                 <ScrollView>
                     <GridLayout [formGroup]="orderForm" class="m-3" rows="auto, auto, auto, auto, auto, auto, *" columns="*, *, *">
                         <Label row="0" col="0" colSpan="3" [text]="'[' + orderID + ']: Repair Details'" class="h3 text-uppercase m-10"></Label>

@@ -22,6 +22,7 @@ export interface OrderVO {
     estRepair: string,
     shopLoc: string,
     notes: string,
+    emailed: boolean,
     uploaded: boolean,
     uploadedDateTime: string,
     accepted: boolean,

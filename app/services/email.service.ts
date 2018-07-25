@@ -13,21 +13,16 @@ export class EmailService {
         private couchbaseService: CouchbaseService
     ) {}
 
-    sendEmail(id: number, sourcepage: string) {
-        console.log("Upload Service > sendEmail(" + id + ", " + sourcepage + ")");
-        let orders = this.orderService.getOrders();
-        let order = orders[id];
-        //let hasAttachments: boolean = false;
+    sendEmail(order: any, sourcepage: string) {
+        console.log("Upload Service > sendEmail(" + order.orderId + ", " + sourcepage + ")");
+        let success: boolean = false;
         let attachments = [];
-        if (order.images.length > 0) {
-            //hasAttachments = true;
-            for (var i: number = 0; i < order.images.length; i++) {
-                attachments.push({
-                    fileName: order.orderId + "_" + i + "_" + order.images[i].caption + ".png",
-                    path: order.images[i].assetpath, 
-                    mimeType: 'image/png'
-                });
-            }
+        for (var i: number = 0; i < order.images.length; i++) {
+            attachments.push({
+                fileName: order.orderId + "_" + i + "_" + order.images[i].caption + ".png",
+                path: order.images[i].localpath + "/" + order.images[i].filename, 
+                mimeType: 'image/png'
+            });
         }
         let body = "<p>Order #: " + order.orderId + "</p>";
         body += "<p>Date Order Accepted: " + order.acceptedDateTime + "</p>";
@@ -60,22 +55,14 @@ export class EmailService {
         body += "<p>Order Delivered to Customer: " + (order.delivered ? 'YES' : 'NO') + "</p>";
         body += "<p>Order Delivery Date: " + order.deliveredDateTime + "</p>";
         Email.available()
-          .then((avail: boolean) => {
+            .then((avail: boolean) => {
             if (avail) {
-                //if (hasAttachments) {
                 Email.compose({
                     to: [getString('CompanyEmail')],
                     subject: 'Repair Order ' + order.orderId + " (from " + sourcepage + ")",
                     attachments: attachments,
                     body: body
                 });
-                /*} else {
-                    Email.compose({
-                        to: [getString('CompanyEmail')],
-                        subject: 'Repair Order ' + order.orderId,
-                        body: body
-                    });
-                }*/
             } else {
                 console.log("No Email Configured");
                 let toast = new Toasty ("No Email Configured", "long", "center");

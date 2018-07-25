@@ -28,6 +28,7 @@ export class ActiveComponent implements OnInit {
     orders: any; //orders
     aorders: OrderVO[]; //active orders only
     loading: boolean;
+    curAssociate: string = getString('currentAssociateID');
     folder = fs.knownFolders.currentApp();
 
     constructor(
@@ -53,8 +54,8 @@ export class ActiveComponent implements OnInit {
         this.orders = this.orderService.getOrders();
         this.aorders = this.orders.filter((res) => {
             //add only orders that have NOT been completed
-            this.loading = false;
-            return !res.delivered;                
+            this.loading = false;            
+            return (!res.delivered && (res.orderId.indexOf(this.curAssociate) !== -1));
         });
     }
 
@@ -69,16 +70,20 @@ export class ActiveComponent implements OnInit {
             fullscreen: true
         }
         this.modalService.showModal(DisplayOrderModalComponent, options)
-            .then((result: any) => {
-                if(result === "accept" || result === "close") {
+            .then((res) => {
+                /*if (result === "accept" || result === "close") {
                     //just close
                 } else if (result === "reload") {
                     this.refreshOrders();
                 } else {
-                    let idx = this.orders.findIndex(res => res.id === result.id );
+                    let idx = this.orders.findIndex((res) => {
+                        return res.orderId === result.orderId;
+                    });
                     this.uploadOrder(idx);
-                }
-            });
+                }*/
+                this.refreshOrders();
+            })
+            .catch((err) => { console.log("Error: "+ err); });
     }
 
     displayOrder(order) {
@@ -86,9 +91,8 @@ export class ActiveComponent implements OnInit {
         this.refreshOrders();
     };
 
-    uploadOrder(idx: number) {
+    /*uploadOrder(idx: number) {
         let curDate: string = new Date().toDateString();
-        //TODO: UPLOAD ORDER
         //let toast = new Toasty("Uploaded Order " + this.orders[idx].orderId + " (Coming Soon!)", "short", "top");
         //toast.show();
         this.emailService.sendEmail(idx, "active");
@@ -97,6 +101,6 @@ export class ActiveComponent implements OnInit {
         this.orders[idx].uploadedDateTime = curDate;
         this.orderService.updateOrders(this.orders);
         this.refreshOrders();
-    }
+    }*/
 
 }

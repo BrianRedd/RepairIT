@@ -12,6 +12,7 @@ import { OrderService } from "~/services/order.service";
 import * as ImageSource from "tns-core-modules/image-source/image-source";
 import * as fs from "tns-core-modules/file-system/file-system";
 import { Image, imageSourceProperty } from "tns-core-modules/ui/image/image";
+import { EmailService } from "~/services/email.service";
 
 @Component({
     moduleId: module.id,
@@ -20,9 +21,9 @@ import { Image, imageSourceProperty } from "tns-core-modules/ui/image/image";
 export class DisplayOrderModalComponent implements OnInit {
 
     displayType: string;
-    order: OrderVO;
-    orderFormHead: string = "<html><head><style>.border{border:1px solid #CCCCCC;}.underline{text-decoration:underline;}.status{color:red;}.true{color:blue;}</style></head><body>";
-    orderFormBody: string;
+    order: any;
+    orderFormHead: string = "<html><head><style>.border{border:1px solid #CCCCCC;}.underline{text-decoration:underline;}.status{color:red;}.true{color:blue;}.center{text-align:center;}</style></head><body>";
+    orderFormBody: string = "";
     orderFormFoot: string = "</body></html>"
     displayForm: FormGroup;
     showRepair: boolean;
@@ -39,6 +40,7 @@ export class DisplayOrderModalComponent implements OnInit {
         private formBuilder: FormBuilder,
         private params: ModalDialogParams,
         private orderService: OrderService,
+        private emailService: EmailService,
         private page: Page
     ) {
         this.displayType = params.context[0];
@@ -64,10 +66,13 @@ export class DisplayOrderModalComponent implements OnInit {
     }
 
     renderDisplay() {
-        let html: string = "<table>"
-        if (this.displayType !== "confirm") {
+        console.log("this.order:\n", this.order);
+        let html: string = "<table width='100%'>"
+        if (this.displayType !== "neworder") {
             html += "<tr><td width='33%'>Order #:</td><td width='67%' class='border'>" + this.order.orderId + "</td></tr>";
             html += "<tr><td width='33%'>Last Modified:</td><td width='67%' class='border'>" + this.order.editedDateTime + "</td></tr>";
+            html += "<tr><td colspan='2'><table width='100%'><tr><td width='33%' class='center'>Emailed:</td><td width='17%' class='border'><span class='status " + this.order.emailed + "'>" + this.order.emailed + "</span></td>";
+            html += "<td width='33%' class='center'>Uploaded:</td><td width='17%' class='border'><span class='status " + this.order.uploaded + "'>" + this.order.uploaded + "</span></td></tr></table></td></tr>";
         }
         html += "<tr><td colspan='2'><span class='underline'>Client Details:</span></td></tr>";
         html += "<tr><td width='33%'>Name:</td><td width='67%' class='border'>" + this.order.firstName + " " + this.order.lastName + "</td></tr>";
@@ -97,7 +102,7 @@ export class DisplayOrderModalComponent implements OnInit {
             html += "</td></tr>";
         }
         html += "</table>";
-        if (this.displayType !== "confirm") {
+        if (this.displayType !== "neworder") {
             html += "<table width='100%'>"
             html += "<tr><td width='33%'>Accepted:</td><td width='17%' class='border'>" + this.order.accepted + "</td>";
             html += "<td width='15%' style='text-align:center;'>Date:</td><td width='35%' class='border'>" + this.order.acceptedDateTime + "</td></tr>";
@@ -116,43 +121,47 @@ export class DisplayOrderModalComponent implements OnInit {
             if (this.order.delivered) {
                 html += "<tr><td width='33%'>Delivered:</td><td width='17%' class='border'>" + this.order.delivered + "</td>";
                 html += "<td width='15%' style='text-align:center;'>Date:</td><td width='35%' class='border'>" + this.order.deliveredDateTime + "</td></tr>";
-           }
+            }
             html += "</table>";
         }
         this.orderFormBody = html;
     }
 
     updatePhotos() {
-        if (this.order.images.length > 0) {
-            for (var i: number = 0; i < this.order.images.length; i ++ ) {
-                this.path = fs.path.join(this.folder.path, this.order.orderId + "_" + this.order.images[i].imageid + ".png");
-                this.PhotoSource[i] = ImageSource.fromFile(this.path);
-            }
+        for (var i: number = 0; i < this.order.images.length; i ++ ) {
+            this.path = fs.path.join(this.folder.path, this.order.orderId + "_" + this.order.images[i].imageid + ".png");
+            this.PhotoSource[i] = ImageSource.fromFile(this.path);
         }
     }
 
     close() {
+        //"close" or "cancel" button (same button) pressed
+        console.log("DisplayOrderModal > close()");
         if (this.dataChanged) {
             this.confirmChange('close');
         } else {
-            this.params.closeCallback('close');
+            this.params.closeCallback();
         }
     }
 
-    closeAndReload() {
-        this.params.closeCallback("reload");
-    }
-
     upload() {
+        console.log("DisplayOrderModal > upload()");
         if (this.dataChanged) {
             this.confirmChange('upload');
         } else {
+            //this.uploadOrder(this.order.orderId);
             this.params.closeCallback(this.order);
         }
     }
 
     email() {
-        
+        console.log("DisplayOrderModal > email()");
+        if (this.dataChanged) {
+            this.confirmChange('email');
+        } else {
+            this.emailOrder();            
+            //this.params.closeCallback("email");
+        }
     }
 
     accept() {
@@ -194,16 +203,20 @@ export class DisplayOrderModalComponent implements OnInit {
             this.dataChanged = false;
             if (result) {
                 this.saveChanges();
-                if (origin === "close") {
-                    this.closeAndReload();
+                if (origin === "email") {
+                    this.email();
                 } else if (origin === "upload") {
                     this.upload();
+                } else {
+                    this.close();
                 }
             } else {
-                if (origin === "close") {
-                    this.close();
+                if (origin === "email") {
+                    this.email();
                 } else if (origin === "upload") {
                     this.upload();
+                } else {
+                    this.close();
                 }
             }
         });
@@ -212,10 +225,16 @@ export class DisplayOrderModalComponent implements OnInit {
     saveChanges() {
         let curDate: string = new Date().toDateString();
         let orders = this.orderService.getOrders();
-        let idx = orders.findIndex(res => res.id === this.order.orderId );
+        let idx = orders.findIndex((res) => res.orderId === this.order.orderId);
         orders[idx].editedDateTime = curDate;
-        orders[idx].uploaded = false;
-        setBoolean("pendingOrders", true);
+        if (this.order.emailed === orders[idx].emailed) {
+            this.order.uploaded = false;
+            orders[idx].uploaded = this.order.uploaded;
+            setBoolean("pendingOrders", true);
+        } else {
+            this.order.emailed = true;
+            orders[idx].emailed = this.order.emailed;
+        }
         if (this.order.repairPaid !== orders[idx].repairPaid) {
             orders[idx].repairPaid = this.order.repairPaid;
         }
@@ -234,6 +253,28 @@ export class DisplayOrderModalComponent implements OnInit {
             orders[idx].delivered = this.order.delivered;
             orders[idx].deliveredDateTime = this.order.deliveredDateTime;
         }
+        if (this.order.uploaded !== orders[idx].uploaded) {
+        }
         this.orderService.updateOrders(orders);
+    }    
+
+    emailOrder() {
+        this.emailService.sendEmail(this.order, "pending");
+        this.order.emailed = true;
+        this.saveChanges();
+        this.params.closeCallback();
+    }
+
+    uploadOrder(orderid: string) {
+        let curDate: string = new Date().toDateString();
+        //TODO: UPLOAD ORDER
+        //let toast = new Toasty("Uploaded Order " + this.order.orderId + " (Coming Soon!)", "short", "top");
+        //toast.show();
+        //this.emailService.sendEmail(idx, "pending");
+        /*this.orders = this.orderService.getOrders();
+        this.orders[idx].uploaded = true;
+        this.orders[idx].uploadedDateTime = curDate;
+        this.orderService.updateOrders(this.orders);
+        this.refreshOrders();*/
     }
 }

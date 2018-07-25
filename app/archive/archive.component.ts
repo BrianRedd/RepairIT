@@ -28,6 +28,7 @@ export class ArchiveComponent implements OnInit {
     orders: any; //orders
     corders: OrderVO[]; //completed orders only
     loading: boolean;
+    curAssociate: string = getString('currentAssociateID');
     folder = fs.knownFolders.currentApp();
 
     constructor(
@@ -54,7 +55,7 @@ export class ArchiveComponent implements OnInit {
         this.corders = this.orders.filter((res) => {
             //add only orders that HAVE been completed
             this.loading = false;
-            return res.delivered;
+            return (res.delivered && (res.orderId.indexOf(this.curAssociate) !== -1));
         });
     }
 
