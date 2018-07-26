@@ -8,9 +8,13 @@ import { CouchbaseService } from "~/services/couchbase.service";
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/delay';
 import 'rxjs/add/operator/catch';
+import { getString } from "tns-core-modules/application-settings/application-settings";
 
 @Injectable()
 export class OrderService {
+
+    companyID: any = getString("CompanyID");
+
     constructor(
         public http: HttpClient,
         private processHTTPMsgService: ProcessHTTPMsgService,
@@ -33,8 +37,46 @@ export class OrderService {
         return (this.couchbaseService.updateDocument("orders", {"orders": data}));
     }
 
-    public updateOrdersServer(data) {
+    public getOrdersFromServer(): Observable<OrderVO[]> {
         //server
-        
+        return this.http.get(BaseURL + 'orders/' + this.companyID)
+            .catch(error => {
+                return this.processHTTPMsgService.handleError(error);
+            });
+    }
+
+    public getOrderIDsFromServer(): Observable<String[] | any> {
+        //server
+        return this.getOrdersFromServer()
+            .map(orders => {
+                return orders.map(order => order.orderId);
+            })
+            .catch(error => {
+                return error;
+            });
+    }
+
+    public getOrderFromServer(orderId: string) {
+        //server
+        return this.http.get(BaseURL + 'orders/' + this.companyID + '/' + orderId)
+            .catch(error => {
+                return this.processHTTPMsgService.handleError(error);
+            });
+    }
+
+    public postOrderOnServer(data: any) {
+        //server
+        return this.http.post(BaseURL + 'orders/' + this.companyID, data)
+            .catch(error => {
+                return this.processHTTPMsgService.handleError(error);
+            });
+    }
+
+    public updateOrderOnServer(orderId: string, data: any) {
+        //server
+        return this.http.put(BaseURL + 'orders/' + this.companyID + '/' + orderId, data)
+            .catch(error => {
+                return this.processHTTPMsgService.handleError(error);
+            });   
     }
 }

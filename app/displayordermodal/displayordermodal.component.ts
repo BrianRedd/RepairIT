@@ -71,8 +71,8 @@ export class DisplayOrderModalComponent implements OnInit {
         if (this.displayType !== "neworder") {
             html += "<tr><td width='33%'>Order #:</td><td width='67%' class='border'>" + this.order.orderId + "</td></tr>";
             html += "<tr><td width='33%'>Last Modified:</td><td width='67%' class='border'>" + this.order.editedDateTime + "</td></tr>";
-            html += "<tr><td colspan='2'><table width='100%'><tr><td width='33%' class='center'>Emailed:</td><td width='17%' class='border'><span class='status " + this.order.emailed + "'>" + this.order.emailed + "</span></td>";
-            html += "<td width='33%' class='center'>Uploaded:</td><td width='17%' class='border'><span class='status " + this.order.uploaded + "'>" + this.order.uploaded + "</span></td></tr></table></td></tr>";
+            /*html += "<tr><td colspan='2'><table width='100%'><tr><td width='33%' class='center'>Emailed:</td><td width='17%' class='border'><span class='status " + this.order.emailed + "'>" + this.order.emailed + "</span></td>";
+            html += "<td width='33%' class='center'>Uploaded:</td><td width='17%' class='border'><span class='status " + this.order.uploaded + "'>" + this.order.uploaded + "</span></td></tr></table></td></tr>";*/
         }
         html += "<tr><td colspan='2'><span class='underline'>Client Details:</span></td></tr>";
         html += "<tr><td width='33%'>Name:</td><td width='67%' class='border'>" + this.order.firstName + " " + this.order.lastName + "</td></tr>";
@@ -106,8 +106,12 @@ export class DisplayOrderModalComponent implements OnInit {
             html += "<table width='100%'>"
             html += "<tr><td width='33%'>Accepted:</td><td width='17%' class='border'>" + this.order.accepted + "</td>";
             html += "<td width='15%' style='text-align:center;'>Date:</td><td width='35%' class='border'>" + this.order.acceptedDateTime + "</td></tr>";
+            if (this.order.emailed) {
+                html += "<tr><td width='33%'>Latest Emailed:</td><td width='17%' class='border'>" + this.order.emailed + "</td>";
+                html += "<td width='15%' style='text-align:center;'>Date:</td><td width='35%' class='border'>" + this.order.emailedDateTime + "</td></tr>";
+            }
             if (this.order.uploaded) {
-                html += "<tr><td width='33%'>Uploaded:</td><td width='17%' class='border'>" + this.order.uploaded + "</td>";
+                html += "<tr><td width='33%'>Latest Uploaded:</td><td width='17%' class='border'>" + this.order.uploaded + "</td>";
                 html += "<td width='15%' style='text-align:center;'>Date:</td><td width='35%' class='border'>" + this.order.uploadedDateTime + "</td></tr>";
             }
             if (this.order.repairLoc === "Offsite" && this.order.shippedOffsite) {
@@ -149,8 +153,8 @@ export class DisplayOrderModalComponent implements OnInit {
         if (this.dataChanged) {
             this.confirmChange('upload');
         } else {
-            //this.uploadOrder(this.order.orderId);
-            this.params.closeCallback(this.order);
+            this.uploadOrder();
+            //this.params.closeCallback(this.order);
         }
     }
 
@@ -222,19 +226,31 @@ export class DisplayOrderModalComponent implements OnInit {
         });
     }
 
-    saveChanges() {
-        let curDate: string = new Date().toDateString();
+    saveChanges(flag?: string) {
+        let curDate: string = new Date().toDateString(); //***NEEDS TO BE DATE*TIME*, not just DATE***
         let orders = this.orderService.getOrders();
         let idx = orders.findIndex((res) => res.orderId === this.order.orderId);
         orders[idx].editedDateTime = curDate;
-        if (this.order.emailed === orders[idx].emailed) {
-            this.order.uploaded = false;
-            orders[idx].uploaded = this.order.uploaded;
-            setBoolean("pendingOrders", true);
-        } else {
+        //flag
+        if (flag === "email") {
+            //if saved from email function, update emailed flag
             this.order.emailed = true;
-            orders[idx].emailed = this.order.emailed;
+            this.order.emailedDateTime = curDate;
+            orders[idx].emailed = true;
+            orders[idx].emailedDateTime = curDate;
+        } else if (flag === "upload") {
+            //if saved from upload function, update uploaded flag and datetime
+            orders[idx].uploaded = true;
+            orders[idx].uploadedDateTime = curDate;
+        } else {
+            //otherwise, assume save is due to change of date; reset order to "pending"
+            this.order.emailed = false;
+            orders[idx].emailed = false;
+            this.order.uploaded = false;
+            orders[idx].uploaded = false;
+            setBoolean("pendingOrders", true);
         }
+        //changed data
         if (this.order.repairPaid !== orders[idx].repairPaid) {
             orders[idx].repairPaid = this.order.repairPaid;
         }
@@ -253,28 +269,48 @@ export class DisplayOrderModalComponent implements OnInit {
             orders[idx].delivered = this.order.delivered;
             orders[idx].deliveredDateTime = this.order.deliveredDateTime;
         }
-        if (this.order.uploaded !== orders[idx].uploaded) {
-        }
         this.orderService.updateOrders(orders);
     }    
 
     emailOrder() {
         this.emailService.sendEmail(this.order, "pending");
-        this.order.emailed = true;
-        this.saveChanges();
+        this.saveChanges('email');
         this.params.closeCallback();
     }
 
-    uploadOrder(orderid: string) {
-        let curDate: string = new Date().toDateString();
-        //TODO: UPLOAD ORDER
-        //let toast = new Toasty("Uploaded Order " + this.order.orderId + " (Coming Soon!)", "short", "top");
-        //toast.show();
-        //this.emailService.sendEmail(idx, "pending");
-        /*this.orders = this.orderService.getOrders();
-        this.orders[idx].uploaded = true;
-        this.orders[idx].uploadedDateTime = curDate;
-        this.orderService.updateOrders(this.orders);
-        this.refreshOrders();*/
+    uploadOrder() {
+        //order already on server?
+        this.orderService.getOrderIDsFromServer()
+            .subscribe((ids) => {
+                if (ids.indexOf(this.order.orderId) !== -1) {
+                    //TODO: order already exists
+                    let toast = new Toasty("Order Already Exists!", "short", "center");
+                    toast.show();
+                    return;
+                } else {
+                    //post order on server
+                    this.orderService.postOrderOnServer(this.order)
+                        .subscribe((order) => {
+                            this.order = order;
+                            this.saveChanges('upload');
+                            let toast = new Toasty("Order " + this.order.orderId + " uploaded to server!", "short", "center");
+                            toast.show();
+                            //email?
+                            let options = {
+                                title: "Email Order",
+                                message: "Do you wish to also email order " + this.order.orderId + "?",
+                                okButtonText: "Yes",
+                                cancelButtonText: "No"
+                            };
+                            confirm(options).then((result: boolean) => {
+                                if (result) {
+                                    this.emailOrder();
+                                } else {
+                                    this.params.closeCallback();
+                                }
+                            });
+                        });
+                }
+            });
     }
 }
