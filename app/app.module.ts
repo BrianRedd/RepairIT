@@ -27,6 +27,7 @@ import { OrderService } from "./services/order.service";
 import { EmailService } from "./services/email.service";
 import { AssociateService } from "./services/associate.service";
 import { PlatformService } from "./services/platform.service";
+import { ImageService } from "./services/image.service";
 import { BaseURL } from "./shared/baseurl";
 import { Globals } from './shared/globals';
 
@@ -72,7 +73,8 @@ import { Globals } from './shared/globals';
         OrderService,
         EmailService,
         AssociateService,
-        PlatformService
+        PlatformService,
+        ImageService
     ],
     schemas: [
         NO_ERRORS_SCHEMA

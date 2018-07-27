@@ -13,8 +13,8 @@ export class EmailService {
         private couchbaseService: CouchbaseService
     ) {}
 
-    sendEmail(order: any, sourcepage: string) {
-        console.log("Upload Service > sendEmail(" + order.orderId + ", " + sourcepage + ")");
+    sendEmail(order: any) {
+        console.log("Upload Service > sendEmail(" + order.orderId + ")");
         let success: boolean = false;
         let attachments = [];
         for (var i: number = 0; i < order.images.length; i++) {
@@ -59,7 +59,7 @@ export class EmailService {
             if (avail) {
                 Email.compose({
                     to: [getString('CompanyEmail')],
-                    subject: 'Repair Order ' + order.orderId + " (from " + sourcepage + ")",
+                    subject: 'Repair Order ' + order.orderId,
                     attachments: attachments,
                     body: body
                 });

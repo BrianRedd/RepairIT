@@ -56,7 +56,7 @@ export class OrderService {
             });
     }
 
-    public getOrderFromServer(orderId: string) {
+    public getOrderFromServer(orderId: string): Observable<OrderVO> {
         //server
         return this.http.get(BaseURL + 'orders/' + this.companyID + '/' + orderId)
             .catch(error => {
@@ -64,7 +64,7 @@ export class OrderService {
             });
     }
 
-    public postOrderOnServer(data: any) {
+    public postOrderOnServer(data: any): Observable<any> {
         //server
         return this.http.post(BaseURL + 'orders/' + this.companyID, data)
             .catch(error => {
@@ -72,7 +72,7 @@ export class OrderService {
             });
     }
 
-    public updateOrderOnServer(orderId: string, data: any) {
+    public updateOrderOnServer(orderId: string, data: any): Observable<any> {
         //server
         return this.http.put(BaseURL + 'orders/' + this.companyID + '/' + orderId, data)
             .catch(error => {

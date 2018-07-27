@@ -34,7 +34,6 @@ export class NeworderComponent implements OnInit {
 
     orderForm: FormGroup;
     orders: any;
-    //blankPicture: string = "res://blank_picture";
     newOrder: OrderVO = {
         orderId: "",
         firstName: "",
@@ -68,25 +67,19 @@ export class NeworderComponent implements OnInit {
         completedDateTime: "",
         delivered: false,
         deliveredDateTime: "",
-        editedDateTime: ""
+        editedDateTime: "",
+        serverId: ""
     };
     message: string;
-    formBlock: boolean = false; //additional contextual requirements
+    formBlock: boolean = false; //is form blocked due to additional contextual requirements
     numslides: number = 4;
-    /*activeslide: number = 0;
-    slide_0: View;
-    slide_1: View;
-    slide_2: View;
-    slide_3: View;*/
     actionBarStyle: string = "background-color: #006A5C;";
     actionBarTextStyle: string = "color: #FFFFFF";
     nextOrderNumber: number;
     orderID: string;
     issuesMore: boolean = false;
-    //sameDayRepair: boolean = true;
     required_photos_taken: boolean = false;
     curDate: Date = new Date();
-    today: string = new Date(this.curDate.getFullYear(), this.curDate.getMonth(), this.curDate.getDate()).toDateString();
     tabSelectedIndex: number = 0;
     productType: string = getString('ProductType');
     
@@ -115,7 +108,7 @@ export class NeworderComponent implements OnInit {
             issue: ["", Validators.required],
             issueDetail: [""],
             repairLoc: ["Onsite: Same Day", Validators.required],
-            estRepair: [this.today, Validators.required],
+            estRepair: [this.curDate.toDateString(), Validators.required],
             repairCost: 0,
             repairPaid: false,
             shipCost: 0,
@@ -215,7 +208,7 @@ export class NeworderComponent implements OnInit {
     validateRepairLoc() {
         let text = this.orderForm.get('repairLoc').value;
         if (text.indexOf('Same Day') !== -1) {
-            this.orderForm.patchValue({ estRepair: this.today });
+            this.orderForm.patchValue({ estRepair: this.curDate.toISOString() });
         } else {
             this.orderForm.patchValue({ estRepair: "" });
         }
@@ -277,7 +270,7 @@ export class NeworderComponent implements OnInit {
             .then((result: any) => {
                 if (result === "accept") {
                     this.newOrder.accepted = true;
-                    this.newOrder.acceptedDateTime = new Date().toDateString();
+                    this.newOrder.acceptedDateTime = this.curDate.toISOString();
                     this.orders = this.orderService.getOrders();
                     this.orders.push(this.newOrder);
                     this.orderService.updateOrders(this.orders);
@@ -362,7 +355,6 @@ export class NeworderComponent implements OnInit {
         if (getBoolean("FirstUse")) {
             setBoolean("FirstUse", false);
         }
-        let curDate = new Date().toDateString();
         this.newOrder.orderId = this.orderID;
         this.newOrder.firstName = this.orderForm.get("firstName").value;
         this.newOrder.lastName = this.orderForm.get("lastName").value;
@@ -398,8 +390,7 @@ export class NeworderComponent implements OnInit {
         this.newOrder.completedDateTime = "";
         this.newOrder.delivered = false;
         this.newOrder.deliveredDateTime = "";
-        this.newOrder.editedDateTime = curDate;
-        //console.log(JSON.stringify(this.newOrder));
+        this.newOrder.editedDateTime = this.curDate.toISOString();
         setBoolean("pendingOrders", true);
         if (this.orderForm.get("shopLoc").value) {
             setString("defaultLoc", this.orderForm.get("shopLoc").value);

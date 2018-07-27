@@ -2,7 +2,6 @@ import { Component, OnInit, Inject, ViewContainerRef } from "@angular/core";
 import { getString, setString, getBoolean, setBoolean } from "tns-core-modules/application-settings/application-settings";
 import { CouchbaseService } from "~/services/couchbase.service";
 import { OrderService } from "~/services/order.service";
-import { EmailService } from "~/services/email.service";
 import { ModalDialogService, ModalDialogOptions } from "nativescript-angular/modal-dialog";
 import { DisplayOrderModalComponent } from "~/displayordermodal/displayordermodal.component";
 import { OrderVO } from "~/shared/orderVO";
@@ -33,7 +32,6 @@ export class ArchiveComponent implements OnInit {
 
     constructor(
         private couchbaseService: CouchbaseService,
-        private emailService: EmailService,
         private fonticon: TNSFontIconService,
         private page: Page,
         private modalService: ModalDialogService,
@@ -47,8 +45,10 @@ export class ArchiveComponent implements OnInit {
     ngOnInit() {
         this.refreshOrders();
     }
-
+    // TODO: Remember to only grab orders by current user, even if other orders are available 
+    // Perhaps as a setting - some companies may want all associates to have access to all device orders
     refreshOrders() {
+        console.log("Archive > refreshOrders()");
         this.loading = true;
         this.corders = [];
         this.orders = this.orderService.getOrders();
@@ -71,33 +71,14 @@ export class ArchiveComponent implements OnInit {
         }
         this.modalService.showModal(DisplayOrderModalComponent, options)
             .then((result: any) => {
-                if(result === "accept" || result === "close") {
-                    //just close
-                } else if (result === "reload") {
-                    this.refreshOrders();
-                } else {
-                    let idx = this.orders.findIndex(res => res.id === result.id );
-                    this.uploadOrder(idx);
-                }
-            });
+                this.refreshOrders();
+            })
+            .catch((err) => { console.log("Error: "+ err); });
     }
 
     displayOrder(order) {
-        this.createDisplayOrderModal(["active", order]);
+        this.createDisplayOrderModal(["archive", order]);
         this.refreshOrders();
     };
-
-    uploadOrder(idx: number) {
-        let curDate: string = new Date().toDateString();
-        //TODO: UPLOAD ORDER
-        //let toast = new Toasty("Uploaded Order " + this.orders[idx].id + " (Coming Soon!)", "short", "top");
-        //toast.show();
-        this.emailService.sendEmail(idx, "archive");
-        this.orders = this.orderService.getOrders();
-        this.orders[idx].uploaded = true;
-        this.orders[idx].uploadedDateTime = curDate;
-        //this.orderService.updateOrders(this.orders);
-        this.refreshOrders();
-    }
 
 }

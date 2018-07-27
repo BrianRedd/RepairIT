@@ -5,10 +5,10 @@ import { setBoolean } from "tns-core-modules/application-settings/application-se
 import { FormBuilder, FormGroup } from "@angular/forms";
 import { Switch } from "tns-core-modules/ui/switch/switch";
 import { confirm } from "tns-core-modules/ui/dialogs/dialogs";
-import { Page } from 'tns-core-modules/ui/page/page';
+import { Page, borderTopRightRadiusProperty } from 'tns-core-modules/ui/page/page';
 import { OrderVO } from "~/shared/orderVO";
-//import { Order } from "tns-core-modules/ui/layouts/flexbox-layout/flexbox-layout";
 import { OrderService } from "~/services/order.service";
+import { ImageService } from "~/services/image.service";
 import * as ImageSource from "tns-core-modules/image-source/image-source";
 import * as fs from "tns-core-modules/file-system/file-system";
 import { Image, imageSourceProperty } from "tns-core-modules/ui/image/image";
@@ -40,6 +40,7 @@ export class DisplayOrderModalComponent implements OnInit {
         private formBuilder: FormBuilder,
         private params: ModalDialogParams,
         private orderService: OrderService,
+        private imageService: ImageService,
         private emailService: EmailService,
         private page: Page
     ) {
@@ -65,14 +66,17 @@ export class DisplayOrderModalComponent implements OnInit {
         this.renderDisplay();
     }
 
+    convertISOtoDate(isodate: string) {
+        let newDate = new Date(isodate);
+        return newDate.toDateString();
+    }
+
     renderDisplay() {
         console.log("this.order:\n", this.order);
         let html: string = "<table width='100%'>"
         if (this.displayType !== "neworder") {
             html += "<tr><td width='33%'>Order #:</td><td width='67%' class='border'>" + this.order.orderId + "</td></tr>";
-            html += "<tr><td width='33%'>Last Modified:</td><td width='67%' class='border'>" + this.order.editedDateTime + "</td></tr>";
-            /*html += "<tr><td colspan='2'><table width='100%'><tr><td width='33%' class='center'>Emailed:</td><td width='17%' class='border'><span class='status " + this.order.emailed + "'>" + this.order.emailed + "</span></td>";
-            html += "<td width='33%' class='center'>Uploaded:</td><td width='17%' class='border'><span class='status " + this.order.uploaded + "'>" + this.order.uploaded + "</span></td></tr></table></td></tr>";*/
+            html += "<tr><td width='33%'>Last Modified:</td><td width='67%' class='border'>" + this.convertISOtoDate(this.order.editedDateTime) + "</td></tr>";
         }
         html += "<tr><td colspan='2'><span class='underline'>Client Details:</span></td></tr>";
         html += "<tr><td width='33%'>Name:</td><td width='67%' class='border'>" + this.order.firstName + " " + this.order.lastName + "</td></tr>";
@@ -87,7 +91,7 @@ export class DisplayOrderModalComponent implements OnInit {
         html += "</td></tr>";
         html += "<tr><td width='33%'>Shop Location:</td><td width='67%' class='border'>" + this.order.shopLoc + "</td></tr>";
         html += "<tr><td width='33%'>Repair Location:</td><td width='67%' class='border'>" + this.order.repairLoc + "</td></tr>";
-        html += "<tr><td width='33%'>Estimated Repair Completion:</td><td width='67%' class='border'>" + this.order.estRepair + "</td></tr>";
+        html += "<tr><td width='33%'>Estimated Repair Completion:</td><td width='67%' class='border'>" + this.convertISOtoDate(this.order.estRepair) + "</td></tr>";
         if (this.order.notes) {
             html += "<tr><td width='33%'>Additional Notes:</td><td width='67%' class='border'>" + this.order.notes + "</td></tr>";
         }
@@ -105,26 +109,26 @@ export class DisplayOrderModalComponent implements OnInit {
         if (this.displayType !== "neworder") {
             html += "<table width='100%'>"
             html += "<tr><td width='33%'>Accepted:</td><td width='17%' class='border'>" + this.order.accepted + "</td>";
-            html += "<td width='15%' style='text-align:center;'>Date:</td><td width='35%' class='border'>" + this.order.acceptedDateTime + "</td></tr>";
+            html += "<td width='15%' style='text-align:center;'>Date:</td><td width='35%' class='border'>" + this.convertISOtoDate(this.order.acceptedDateTime) + "</td></tr>";
             if (this.order.emailed) {
                 html += "<tr><td width='33%'>Latest Emailed:</td><td width='17%' class='border'>" + this.order.emailed + "</td>";
-                html += "<td width='15%' style='text-align:center;'>Date:</td><td width='35%' class='border'>" + this.order.emailedDateTime + "</td></tr>";
+                html += "<td width='15%' style='text-align:center;'>Date:</td><td width='35%' class='border'>" + this.convertISOtoDate(this.order.emailedDateTime) + "</td></tr>";
             }
             if (this.order.uploaded) {
                 html += "<tr><td width='33%'>Latest Uploaded:</td><td width='17%' class='border'>" + this.order.uploaded + "</td>";
-                html += "<td width='15%' style='text-align:center;'>Date:</td><td width='35%' class='border'>" + this.order.uploadedDateTime + "</td></tr>";
+                html += "<td width='15%' style='text-align:center;'>Date:</td><td width='35%' class='border'>" + this.convertISOtoDate(this.order.uploadedDateTime) + "</td></tr>";
             }
             if (this.order.repairLoc === "Offsite" && this.order.shippedOffsite) {
                 html += "<tr><td width='33%'>Shipped Offsite:</td><td width='17%' class='border'>" + this.order.shippedOffsite + "</td>";
-                html += "<td width='15%' style='text-align:center;'>Date:</td><td width='35%' class='border'>" + this.order.shippedDateTime + "</td></tr>";
+                html += "<td width='15%' style='text-align:center;'>Date:</td><td width='35%' class='border'>" + this.convertISOtoDate(this.order.shippedDateTime) + "</td></tr>";
             }
             if (this.order.completed) {
                 html += "<tr><td width='33%'>Completed:</td><td width='17%' class='border'>" + this.order.completed + "</td>";
-                html += "<td width='15%' style='text-align:center;'>Date:</td><td width='35%' class='border'>" + this.order.completedDateTime + "</td></tr>";
+                html += "<td width='15%' style='text-align:center;'>Date:</td><td width='35%' class='border'>" + this.convertISOtoDate(this.order.completedDateTime) + "</td></tr>";
             }
             if (this.order.delivered) {
                 html += "<tr><td width='33%'>Delivered:</td><td width='17%' class='border'>" + this.order.delivered + "</td>";
-                html += "<td width='15%' style='text-align:center;'>Date:</td><td width='35%' class='border'>" + this.order.deliveredDateTime + "</td></tr>";
+                html += "<td width='15%' style='text-align:center;'>Date:</td><td width='35%' class='border'>" + this.convertISOtoDate(this.order.deliveredDateTime) + "</td></tr>";
             }
             html += "</table>";
         }
@@ -154,7 +158,6 @@ export class DisplayOrderModalComponent implements OnInit {
             this.confirmChange('upload');
         } else {
             this.uploadOrder();
-            //this.params.closeCallback(this.order);
         }
     }
 
@@ -163,17 +166,17 @@ export class DisplayOrderModalComponent implements OnInit {
         if (this.dataChanged) {
             this.confirmChange('email');
         } else {
-            this.emailOrder();            
-            //this.params.closeCallback("email");
+            this.emailOrder();
         }
     }
 
     accept() {
+        //"accept" button pressed
         this.params.closeCallback('accept');
     }
 
     formChange(field: string, args) {
-        let curDate: string = new Date().toDateString();
+        let curDate: string = new Date().toISOString();
         let switchChecked: any = <Switch>args.object.checked;
         if (switchChecked !== this.order[field]) {
             this.dataChanged = true;
@@ -227,22 +230,26 @@ export class DisplayOrderModalComponent implements OnInit {
     }
 
     saveChanges(flag?: string) {
-        let curDate: string = new Date().toDateString(); //***NEEDS TO BE DATE*TIME*, not just DATE***
+        let curDate: string = new Date().toISOString();
         let orders = this.orderService.getOrders();
         let idx = orders.findIndex((res) => res.orderId === this.order.orderId);
         orders[idx].editedDateTime = curDate;
         //flag
         if (flag === "email") {
             //if saved from email function, update emailed flag
-            this.order.emailed = true;
-            this.order.emailedDateTime = curDate;
-            orders[idx].emailed = true;
-            orders[idx].emailedDateTime = curDate;
+            orders[idx].emailed = this.order.emailed;
+            orders[idx].emailedDateTime = this.order.emailedDateTime;
         } else if (flag === "upload") {
             //if saved from upload function, update uploaded flag and datetime
-            orders[idx].uploaded = true;
-            orders[idx].uploadedDateTime = curDate;
-        } else {
+            orders[idx].uploaded = this.order.uploaded;
+            orders[idx].uploadedDateTime = this.order.uploadedDateTime;
+        } else if (flag === "both") {
+            //if saved from upload function with email enabled, update both emailed and uploaded flags and datetimes
+            orders[idx].emailed = this.order.emailed;
+            orders[idx].emailedDateTime = this.order.emailedDateTime;
+            orders[idx].uploaded = this.order.uploaded;
+            orders[idx].uploadedDateTime = this.order.uploadedDateTime;
+        }  else {
             //otherwise, assume save is due to change of date; reset order to "pending"
             this.order.emailed = false;
             orders[idx].emailed = false;
@@ -269,48 +276,97 @@ export class DisplayOrderModalComponent implements OnInit {
             orders[idx].delivered = this.order.delivered;
             orders[idx].deliveredDateTime = this.order.deliveredDateTime;
         }
+        if (this.order.serverId !== orders[idx].serverId) {
+            orders[idx].serverId = this.order.serverId;
+        }
         this.orderService.updateOrders(orders);
     }    
 
-    emailOrder() {
-        this.emailService.sendEmail(this.order, "pending");
-        this.saveChanges('email');
+    emailOrder(flag?: string) {
+        this.order.emailed = true;
+        this.order.emailedDateTime = new Date().toISOString();
+        this.emailService.sendEmail(this.order);
+        if (!flag) {
+            this.saveChanges('email');
+        }
         this.params.closeCallback();
     }
 
     uploadOrder() {
-        //order already on server?
-        this.orderService.getOrderIDsFromServer()
-            .subscribe((ids) => {
-                if (ids.indexOf(this.order.orderId) !== -1) {
-                    //TODO: order already exists
-                    let toast = new Toasty("Order Already Exists!", "short", "center");
-                    toast.show();
+        let curDate: string = new Date().toISOString();
+        let alsoEmail = false;
+        let options = {
+            title: "Uploading Order " + this.order.orderId,
+            message: "Email Order " + this.order.orderId + " as well?",
+            neutralButtonText: "Cancel",
+            okButtonText: "Yes",
+            cancelButtonText: "No"
+        };
+        confirm(options)
+            .then((result: boolean) => {
+                if (result === true) {
+                    alsoEmail = true;
+                } else if (result === undefined) {
                     return;
-                } else {
-                    //post order on server
-                    this.orderService.postOrderOnServer(this.order)
-                        .subscribe((order) => {
-                            this.order = order;
-                            this.saveChanges('upload');
-                            let toast = new Toasty("Order " + this.order.orderId + " uploaded to server!", "short", "center");
-                            toast.show();
-                            //email?
-                            let options = {
-                                title: "Email Order",
-                                message: "Do you wish to also email order " + this.order.orderId + "?",
-                                okButtonText: "Yes",
-                                cancelButtonText: "No"
-                            };
-                            confirm(options).then((result: boolean) => {
-                                if (result) {
-                                    this.emailOrder();
-                                } else {
-                                    this.params.closeCallback();
-                                }
-                            });
-                        });
                 }
+                console.log("Also Email?", alsoEmail);
+                //order already on server?
+                this.orderService.getOrderIDsFromServer()
+                    .subscribe((ids) => {
+                        if (ids.indexOf(this.order.orderId) !== -1) {
+                            //Order already exists on server
+                            let id;
+                            console.log("EXISTING ORDER: Order " + this.order.orderId + " already exists on server.");
+                            if (this.order.serverId) {
+                                console.log("Order has been uploaded previously");
+                                id = this.order.serverId;
+                            } else {
+                                //order is on server but local order does not have serverId
+                                //TODO: verify that local order and server order are the same
+                                console.log("Order has NOT been uploaded previously");
+                                return;
+                            }
+                            this.order.uploaded = true;
+                            this.order.uploadedDateTime = curDate;
+                            this.orderService.updateOrderOnServer(id, this.order)
+                                .subscribe((order) => {
+                                    this.order = order;
+                                    this.saveChanges('upload');
+                                    let toast = new Toasty("Order " + this.order.orderId + " updated on server!", "short", "center");
+                                    toast.show();
+                                });
+                        } else {
+                            //POST new order on server
+                            //TODO: Image uploads
+                            console.log("NEW ORDER: Order " + this.order.orderId + " not found on server.");
+                            //this.imageService.uploadImage(this.order.orderId, 1);
+                            this.order.uploaded = true;
+                            this.order.uploadedDateTime = curDate;
+                            if (alsoEmail) {
+                                this.order.emailed = true;
+                                this.order.emailedDateTime = curDate;
+                            }
+                            this.orderService.postOrderOnServer(this.order)
+                                .subscribe((order) => {
+                                    this.order = order;
+                                    this.order.serverId = order._id;
+                                    if (alsoEmail) {
+                                        this.saveChanges('both');
+                                    } else {
+                                        this.saveChanges('upload');
+                                    }
+                                    let toast = new Toasty("Order " + this.order.orderId + " uploaded to server!", "short", "center");
+                                    toast.show();
+                                    if (alsoEmail) {
+                                        this.emailOrder("upload");
+                                    } else {
+                                        this.params.closeCallback();
+                                    }
+                                    //TODO: Increment company next order number
+                                });
+                        }
+                    });
             });
+        
     }
 }
