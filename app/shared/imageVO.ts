@@ -3,5 +3,6 @@ export interface ImageVO {
     localpath: string,
     filename: string,
     caption: string,
-    valid: boolean
+    valid: boolean,
+    uploaded: boolean
 }

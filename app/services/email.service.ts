@@ -4,9 +4,12 @@ import { CouchbaseService } from "~/services/couchbase.service";
 import { getString } from "tns-core-modules/application-settings/application-settings";
 import { Toasty } from "nativescript-toasty";
 import * as Email from "nativescript-email";
+import * as fs from "tns-core-modules/file-system/file-system";
 
 @Injectable()
 export class EmailService {
+
+    folder = fs.knownFolders.currentApp();
 
     constructor(
         private orderService: OrderService,
@@ -14,13 +17,12 @@ export class EmailService {
     ) {}
 
     sendEmail(order: any) {
-        console.log("Upload Service > sendEmail(" + order.orderId + ")");
-        let success: boolean = false;
+        //console.log("Email Service > sendEmail(" + order.orderId + ")");
         let attachments = [];
         for (var i: number = 0; i < order.images.length; i++) {
             attachments.push({
                 fileName: order.orderId + "_" + i + "_" + order.images[i].caption + ".png",
-                path: order.images[i].localpath + "/" + order.images[i].filename, 
+                path: this.folder.path + "/" + order.images[i].filename, 
                 mimeType: 'image/png'
             });
         }

@@ -17,19 +17,13 @@ export class CompanyService {
 
     getCompanies(): Observable<CompanyVO[]> {
         return this.http.get(BaseURL + "companies")
-            /*.map((res) => {
-                return this.processHTTPMsgService.extractData(res);
-            })
-            */.catch((error) => {
+            .catch((error) => {
                 return this.processHTTPMsgService.handleError(error);
             });
     }
 
     getCompany(id: string): Observable<CompanyVO> {
         return this.http.get(BaseURL + "companies/" + id)
-            /*.map(res => {
-                return this.processHTTPMsgService.extractData(res);
-            })*/
             .catch((error) => {
                 return this.processHTTPMsgService.handleError(error);
             });

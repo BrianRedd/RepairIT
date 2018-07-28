@@ -54,6 +54,7 @@ export class DisplayOrderModalComponent implements OnInit {
             delivered: this.order.delivered
         });
         this.updatePhotos();
+        console.log(this.folder.path);
     }
 
     ngOnInit() {
@@ -138,13 +139,13 @@ export class DisplayOrderModalComponent implements OnInit {
     updatePhotos() {
         for (var i: number = 0; i < this.order.images.length; i ++ ) {
             this.path = fs.path.join(this.folder.path, this.order.orderId + "_" + this.order.images[i].imageid + ".png");
+            console.log("Photo " + i, this.path);
             this.PhotoSource[i] = ImageSource.fromFile(this.path);
         }
     }
 
     close() {
         //"close" or "cancel" button (same button) pressed
-        console.log("DisplayOrderModal > close()");
         if (this.dataChanged) {
             this.confirmChange('close');
         } else {
@@ -153,7 +154,6 @@ export class DisplayOrderModalComponent implements OnInit {
     }
 
     upload() {
-        console.log("DisplayOrderModal > upload()");
         if (this.dataChanged) {
             this.confirmChange('upload');
         } else {
@@ -162,7 +162,6 @@ export class DisplayOrderModalComponent implements OnInit {
     }
 
     email() {
-        console.log("DisplayOrderModal > email()");
         if (this.dataChanged) {
             this.confirmChange('email');
         } else {
@@ -200,6 +199,7 @@ export class DisplayOrderModalComponent implements OnInit {
     }
 
     confirmChange(origin: string) {
+        console.log("DISPLAY MODAL > confirmChanges");
         let options = {
             title: "Save Changes",
             message: "Do you wish to save changes made to order " + this.order.orderId + "?",
@@ -230,27 +230,29 @@ export class DisplayOrderModalComponent implements OnInit {
     }
 
     saveChanges(flag?: string) {
+        console.log("DISPLAY MODAL > saveChanges");
         let curDate: string = new Date().toISOString();
         let orders = this.orderService.getOrders();
+        console.log("orders:\n", orders);
+        console.log('this.order.orderId', this.order.orderId);
         let idx = orders.findIndex((res) => res.orderId === this.order.orderId);
+        console.log("idx", idx);
         orders[idx].editedDateTime = curDate;
         //flag
-        if (flag === "email") {
-            //if saved from email function, update emailed flag
-            orders[idx].emailed = this.order.emailed;
-            orders[idx].emailedDateTime = this.order.emailedDateTime;
-        } else if (flag === "upload") {
-            //if saved from upload function, update uploaded flag and datetime
-            orders[idx].uploaded = this.order.uploaded;
-            orders[idx].uploadedDateTime = this.order.uploadedDateTime;
-        } else if (flag === "both") {
-            //if saved from upload function with email enabled, update both emailed and uploaded flags and datetimes
-            orders[idx].emailed = this.order.emailed;
-            orders[idx].emailedDateTime = this.order.emailedDateTime;
-            orders[idx].uploaded = this.order.uploaded;
-            orders[idx].uploadedDateTime = this.order.uploadedDateTime;
-        }  else {
-            //otherwise, assume save is due to change of date; reset order to "pending"
+        console.log("flag", flag);
+        if (flag) {
+            if (flag === "email" || flag === "both") {
+                //if saved from email function, update emailed flag
+                orders[idx].emailed = this.order.emailed;
+                orders[idx].emailedDateTime = this.order.emailedDateTime;
+            } 
+            if (flag === "upload" || flag === "both") {
+                //if saved from upload function, update uploaded flag and datetime
+                orders[idx].uploaded = this.order.uploaded;
+                orders[idx].uploadedDateTime = this.order.uploadedDateTime;
+            }
+        } else {
+            //otherwise, assume save is due to change of data; reset order to "pending"
             this.order.emailed = false;
             orders[idx].emailed = false;
             this.order.uploaded = false;
@@ -276,13 +278,11 @@ export class DisplayOrderModalComponent implements OnInit {
             orders[idx].delivered = this.order.delivered;
             orders[idx].deliveredDateTime = this.order.deliveredDateTime;
         }
-        if (this.order.serverId !== orders[idx].serverId) {
-            orders[idx].serverId = this.order.serverId;
-        }
         this.orderService.updateOrders(orders);
     }    
 
     emailOrder(flag?: string) {
+        console.log("DISPLAY MODAL > emailOrder");
         this.order.emailed = true;
         this.order.emailedDateTime = new Date().toISOString();
         this.emailService.sendEmail(this.order);
@@ -309,64 +309,49 @@ export class DisplayOrderModalComponent implements OnInit {
                 } else if (result === undefined) {
                     return;
                 }
-                console.log("Also Email?", alsoEmail);
+                this.order.uploaded = true;
+                this.order.uploadedDateTime = curDate;
+                if (alsoEmail) {
+                    this.order.emailed = true;
+                    this.order.emailedDateTime = curDate;
+                }
                 //order already on server?
                 this.orderService.getOrderIDsFromServer()
                     .subscribe((ids) => {
                         if (ids.indexOf(this.order.orderId) !== -1) {
                             //Order already exists on server
-                            let id;
                             console.log("EXISTING ORDER: Order " + this.order.orderId + " already exists on server.");
-                            if (this.order.serverId) {
-                                console.log("Order has been uploaded previously");
-                                id = this.order.serverId;
-                            } else {
-                                //order is on server but local order does not have serverId
-                                //TODO: verify that local order and server order are the same
-                                console.log("Order has NOT been uploaded previously");
-                                return;
-                            }
-                            this.order.uploaded = true;
-                            this.order.uploadedDateTime = curDate;
-                            this.orderService.updateOrderOnServer(id, this.order)
+                            this.orderService.updateOrderOnServer(this.order.orderId, this.order)
                                 .subscribe((order) => {
-                                    this.order = order;
-                                    this.saveChanges('upload');
-                                    let toast = new Toasty("Order " + this.order.orderId + " updated on server!", "short", "center");
-                                    toast.show();
+                                    this.updateOrdersLocally(order, alsoEmail);
                                 });
                         } else {
                             //POST new order on server
                             //TODO: Image uploads
                             console.log("NEW ORDER: Order " + this.order.orderId + " not found on server.");
                             //this.imageService.uploadImage(this.order.orderId, 1);
-                            this.order.uploaded = true;
-                            this.order.uploadedDateTime = curDate;
-                            if (alsoEmail) {
-                                this.order.emailed = true;
-                                this.order.emailedDateTime = curDate;
-                            }
                             this.orderService.postOrderOnServer(this.order)
                                 .subscribe((order) => {
-                                    this.order = order;
-                                    this.order.serverId = order._id;
-                                    if (alsoEmail) {
-                                        this.saveChanges('both');
-                                    } else {
-                                        this.saveChanges('upload');
-                                    }
-                                    let toast = new Toasty("Order " + this.order.orderId + " uploaded to server!", "short", "center");
-                                    toast.show();
-                                    if (alsoEmail) {
-                                        this.emailOrder("upload");
-                                    } else {
-                                        this.params.closeCallback();
-                                    }
+                                    this.updateOrdersLocally(order, alsoEmail);
                                     //TODO: Increment company next order number
                                 });
                         }
                     });
-            });
-        
+            });        
     }
+
+    updateOrdersLocally(order: OrderVO, alsoEmail: boolean) {
+        console.log("DISPLAY MODAL > updateOrdersLocally");
+        this.order = order;
+        let toast = new Toasty("Order " + this.order.orderId + " uploaded to server!", "short", "center");
+        toast.show();
+        if (alsoEmail) {
+            this.saveChanges('both');
+            this.emailOrder("upload");
+        } else {
+            this.saveChanges('upload');
+            this.params.closeCallback();
+        }
+    }
+
 }

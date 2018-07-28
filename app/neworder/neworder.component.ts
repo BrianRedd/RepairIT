@@ -67,8 +67,7 @@ export class NeworderComponent implements OnInit {
         completedDateTime: "",
         delivered: false,
         deliveredDateTime: "",
-        editedDateTime: "",
-        serverId: ""
+        editedDateTime: ""
     };
     message: string;
     formBlock: boolean = false; //is form blocked due to additional contextual requirements
@@ -100,7 +99,7 @@ export class NeworderComponent implements OnInit {
             lastName: ["", Validators.required],
             addressStreet: ["", Validators.required],
             addressCity: ["", Validators.required],
-            addressState: ["", Validators.required],
+            addressState: [getString('defaultState'), Validators.required],
             addressZip: ["", Validators.required],
             email: ["", Validators.required],
             phone: ["", Validators.required],
@@ -113,7 +112,7 @@ export class NeworderComponent implements OnInit {
             repairPaid: false,
             shipCost: 0,
             shipPaid: false,
-            shopLoc: getString("defaultLoc"),
+            shopLoc: getString('defaultLoc'),
             notes: [""]
         });
         let photos = this.couchbaseService.getDocument("requiredPhotos").requiredPhotos;
@@ -123,7 +122,8 @@ export class NeworderComponent implements OnInit {
                 "localpath": "res:/",
                 "filename": "blank_picture",
                 "caption": photos[i],
-                "valid": (i === 0) ? true : false
+                "valid": (i === 0) ? true : false,
+                "uploaded": false
             };
         }
     }
@@ -182,11 +182,9 @@ export class NeworderComponent implements OnInit {
                     this.message = "";
                     this.issuesMore = false;
                 }
-                console.log("this.issuesMore", this.issuesMore);
                 break;
             case "issueDetail":
                 if (this.issuesMore) {
-                    console.log("issuesMore TRUE; text: ", text);
                     if (text === "") {
                         this.message = "Issue Details Required!";
                         this.formBlock = true;
@@ -195,7 +193,6 @@ export class NeworderComponent implements OnInit {
                         this.formBlock = false;
                     }
                 }
-                console.log("this.formBlock", this.formBlock);
                 break;
             case "repairLoc":
                 this.validateRepairLoc();
@@ -325,7 +322,8 @@ export class NeworderComponent implements OnInit {
                             localpath: documents.path,
                             filename: this.orderID + "_" + id + ".png",
                             caption: "Additional",
-                            valid: true
+                            valid: true,
+                            uploaded: false
                         };
                         this.newOrder.images.push(newPicture);
                     }
@@ -394,6 +392,9 @@ export class NeworderComponent implements OnInit {
         setBoolean("pendingOrders", true);
         if (this.orderForm.get("shopLoc").value) {
             setString("defaultLoc", this.orderForm.get("shopLoc").value);
+        }
+        if (this.orderForm.get("addressState").value) {
+            setString("defaultState", this.orderForm.get("addressState").value);
         }
         this.createFormDisplayModal(["neworder", this.newOrder]);
     }

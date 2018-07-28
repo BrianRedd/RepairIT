@@ -33,6 +33,5 @@ export interface OrderVO {
     completedDateTime: string
     delivered: boolean,
     deliveredDateTime: string,
-    editedDateTime: string,
-    serverId: string
+    editedDateTime: string
 }

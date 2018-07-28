@@ -21,7 +21,6 @@ import { Globals } from '../shared/globals';
 })
 export class SetupComponent {
 
-    //companies: CompanyVO[];
     company: CompanyVO;
     message: string;
     setupForm: FormGroup;
@@ -67,7 +66,6 @@ export class SetupComponent {
         if (this.platformService.getConnectionType() === "None") {
             this.globals.isOffline = true;
         }
-        //console.log('Setup.Component > OnInit: this.offline, globals.isOffline? ', this.offline, this.globals.isOffline);
         this.checkConnectivity();
     }
 
@@ -82,7 +80,6 @@ export class SetupComponent {
     }
 
     checkConnectivity() {
-        //console.log('Setup.Component > checkConnectivity: this.offline? ', this.offline);
         if (this.globals.isOffline) {
             this.message = "Device is Offline! Please connect to Internet to Initialize App";
             const toast = new Toasty(this.message, "long", "center");
@@ -168,6 +165,7 @@ export class SetupComponent {
         this.couchbaseService.updateDocument("locations", {"locations": this.company.locations});//List of company store locations
         this.couchbaseService.updateDocument("requiredPhotos", {"requiredPhotos": this.company.requiredPhotos});//list of required photos
         setString("defaultLoc", this.company.locations[0]);//default store location, starting with first in company list, updated when form is submitted
+        setString("defaultState", "AL");//default customer state (address), updates when form is submitted
         setBoolean("FirstUse", true);
         setNumber("numusers", 0); //number of users (0 to start)
         setString("users", "");//string of user ID (empty to start), delimited with "|"
