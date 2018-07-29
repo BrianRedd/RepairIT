@@ -39,7 +39,7 @@ export class OrderService {
 
     public getOrdersFromServer(): Observable<OrderVO[]> {
         //server: get all Orders from server
-        //console.log("ORDER SERVICE > getOrdersFromServer");
+        console.log("ORDER SERVICE > getOrdersFromServer");
         return this.http.get(BaseURL + 'orders/' + getString("CompanyID"))
             .catch(error => {
                 return this.processHTTPMsgService.handleError(error);
@@ -69,7 +69,7 @@ export class OrderService {
 
     public postOrderOnServer(data: any): Observable<any> {
         //server: Post new order to server
-        //console.log("***ORDER SERVICE > postOrderOnServer()");
+        console.log("***ORDER SERVICE > postOrderOnServer()");
         return this.http.post(BaseURL + 'orders/' + getString("CompanyID"), data)
             .catch(error => {
                 return this.processHTTPMsgService.handleError(error);

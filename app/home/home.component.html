@@ -8,7 +8,7 @@
         </StackLayout>
         <GridLayout rows="auto" columns="*, *, *" dock="bottom">
             <Button row="0" col="0" class="fa m-15 btn-rounded-lg btn-outline" [text]="('fa-cog' | fonticon)" [nsRouterLink]="['/settings']" clearHistory="true"></Button>
-            <Button row="0" col="1" class="fa m-15 btn-rounded-lg btn-outline" [text]="('fa-refresh' | fonticon)" [visibility]="globals.isOffline ? 'hidden' : 'visible'" (tap)="syncWithServer()"></Button>
+            <Button row="0" col="1" class="fa m-15 btn-rounded-lg btn-outline" [text]="('fa-refresh' | fonticon)" [visibility]="globals.isOffline ? 'hidden' : 'visible'" [nsRouterLink]="['/sync']" clearHistory="true"></Button>
             <Label row="0" col="1" class="fa m-15" [text]="('fa-exclamation-triangle' | fonticon) + ' Offline!'" horizontalAlignment="center" verticalAlignment="center" [visibility]="globals.isOffline ? 'visible' : 'hidden'"></Label>
             <Button row="0" col="2" class="fa m-15 btn-rounded-lg btn-outline" [text]="('fa-info-circle' | fonticon)" [nsRouterLink]="['/info']" clearHistory="true"></Button>
         </GridLayout>

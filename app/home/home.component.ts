@@ -116,16 +116,4 @@ export class HomeComponent implements OnInit {
         }
     }
 
-    syncWithServer() {
-        if (this.globals.isOffline) {
-            this.message = "Sync with Server Unavailable While Offline!";
-            let toast = new Toasty(this.message, "short", "center");
-            toast.show();
-        } else {
-            this.message = "Sync with Server Feature Coming Soon!";
-            let toast = new Toasty(this.message, "short", "center");
-            toast.show();
-        }
-    }
-
 }

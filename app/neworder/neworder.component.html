@@ -5,12 +5,6 @@
     <StackLayout horizontalAlignment="center" [visibility]="message ? 'visible' : 'collapsed'">
         <Label [text]="message"></Label>
     </StackLayout>
-    <!--StackLayout horizontalAlignment="center" orientation="horizontal">
-        <Label class="fa" [text]="(activeslide === 0 ? 'fa-circle' : 'fa-circle-o') | fonticon"></Label>
-        <Label class="m-l-15 fa" [text]="(activeslide === 1 ? 'fa-circle' : 'fa-circle-o') | fonticon"></Label>
-        <Label class="m-l-15 fa" [text]="(activeslide === 2 ? 'fa-circle' : 'fa-circle-o') | fonticon"></Label>
-        <Label class="m-l-15 fa" [text]="(activeslide === 3 ? 'fa-circle' : 'fa-circle-o') | fonticon"></Label>
-    </StackLayout-->
     <StackLayout class="form" orientation="vertical">
         <TabView [(ngModel)]="tabSelectedIndex" androidOffscreenTabLimit="1">
             <StackLayout *tabItem="{title: 'Customer'}">
@@ -107,8 +101,8 @@
                         <TextView row="1" col="0" formControlName="notes" id="notes" [text]="" class="input input-border"></TextView>
                         <GridLayout row="6" col="0" orientation="horizontal" rows="auto" columns="*, *, *, *, *, *">
                             <Button row="0" col="0" [text]="('fa-chevron-circle-left' | fonticon)" (tap)="prevSlide()" class="fa btn-outline"></Button>
-                            <Button row="0" col="1" colSpan="2" text="Cancel" (tap)="cancel()" class="btn"></Button>
-                            <Button row="0" col="3" colspan="2" text="Submit" (tap)="submit()" [isEnabled]="orderForm.valid && !formBlock && required_photos_taken" class="btn btn-primary"></Button>
+                            <Button row="0" col="1" colSpan="2" text="Cancel" (tap)="cancel()" class="btn" [style]="cancelBtnStyle"></Button>
+                            <Button row="0" col="3" colSpan="2" text="Submit" (tap)="submit()" [isEnabled]="orderForm.valid && !formBlock && required_photos_taken" class="btn btn-primary" [style]="submitBtnStyle"></Button>
                             <Button row="0" col="5" [text]="('fa-chevron-circle-right' | fonticon)" (tap)="nextSlide()" class="fa btn-outline"></Button>
                         </GridLayout>
                     </GridLayout>

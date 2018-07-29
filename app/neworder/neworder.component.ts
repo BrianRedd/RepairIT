@@ -74,6 +74,8 @@ export class NeworderComponent implements OnInit {
     numslides: number = 4;
     actionBarStyle: string = "background-color: #006A5C;";
     actionBarTextStyle: string = "color: #FFFFFF";
+    cancelBtnStyle: string;
+    submitBtnStyle: string;
     nextOrderNumber: number;
     orderID: string;
     issuesMore: boolean = false;
@@ -93,6 +95,8 @@ export class NeworderComponent implements OnInit {
         private routerExtensions: RouterExtensions
     ) {
         this.actionBarStyle = "background-color: " + this.couchbaseService.getDocument("colors").colors[1] + ";";
+        this.cancelBtnStyle = "background-color: " + this.couchbaseService.getDocument("colors").colors[1] + ";";
+        this.submitBtnStyle = "background-color: " + this.couchbaseService.getDocument("colors").colors[0] + ";";
 
         this.orderForm = this.formBuilder.group({
             firstName: ["", Validators.required],

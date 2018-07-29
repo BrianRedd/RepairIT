@@ -13,6 +13,7 @@ import * as ImageSource from "tns-core-modules/image-source/image-source";
 import * as fs from "tns-core-modules/file-system/file-system";
 import { Image, imageSourceProperty } from "tns-core-modules/ui/image/image";
 import { EmailService } from "~/services/email.service";
+import { Globals } from '../shared/globals';
 
 @Component({
     moduleId: module.id,
@@ -35,6 +36,7 @@ export class DisplayOrderModalComponent implements OnInit {
     PhotoSource: Array<any> = [];
     folder = fs.knownFolders.currentApp();
     path: any;
+    message: string = "";
 
     constructor(
         private formBuilder: FormBuilder,
@@ -42,6 +44,7 @@ export class DisplayOrderModalComponent implements OnInit {
         private orderService: OrderService,
         private imageService: ImageService,
         private emailService: EmailService,
+        private globals: Globals,
         private page: Page
     ) {
         this.displayType = params.context[0];
@@ -54,7 +57,6 @@ export class DisplayOrderModalComponent implements OnInit {
             delivered: this.order.delivered
         });
         this.updatePhotos();
-        console.log(this.folder.path);
     }
 
     ngOnInit() {
@@ -65,6 +67,7 @@ export class DisplayOrderModalComponent implements OnInit {
         this.showComplete = !this.order.completed;
         this.showDeliver = !this.order.delivered;
         this.renderDisplay();
+        console.log("Order opened:", this.order);
     }
 
     convertISOtoDate(isodate: string) {
@@ -73,7 +76,6 @@ export class DisplayOrderModalComponent implements OnInit {
     }
 
     renderDisplay() {
-        console.log("this.order:\n", this.order);
         let html: string = "<table width='100%'>"
         if (this.displayType !== "neworder") {
             html += "<tr><td width='33%'>Order #:</td><td width='67%' class='border'>" + this.order.orderId + "</td></tr>";
@@ -139,7 +141,6 @@ export class DisplayOrderModalComponent implements OnInit {
     updatePhotos() {
         for (var i: number = 0; i < this.order.images.length; i ++ ) {
             this.path = fs.path.join(this.folder.path, this.order.orderId + "_" + this.order.images[i].imageid + ".png");
-            console.log("Photo " + i, this.path);
             this.PhotoSource[i] = ImageSource.fromFile(this.path);
         }
     }
@@ -199,7 +200,7 @@ export class DisplayOrderModalComponent implements OnInit {
     }
 
     confirmChange(origin: string) {
-        console.log("DISPLAY MODAL > confirmChanges");
+        //console.log("DISPLAY MODAL > confirmChanges");
         let options = {
             title: "Save Changes",
             message: "Do you wish to save changes made to order " + this.order.orderId + "?",
@@ -230,16 +231,12 @@ export class DisplayOrderModalComponent implements OnInit {
     }
 
     saveChanges(flag?: string) {
-        console.log("DISPLAY MODAL > saveChanges");
+        //console.log("DISPLAY MODAL > saveChanges");
         let curDate: string = new Date().toISOString();
         let orders = this.orderService.getOrders();
-        console.log("orders:\n", orders);
-        console.log('this.order.orderId', this.order.orderId);
         let idx = orders.findIndex((res) => res.orderId === this.order.orderId);
-        console.log("idx", idx);
         orders[idx].editedDateTime = curDate;
         //flag
-        console.log("flag", flag);
         if (flag) {
             if (flag === "email" || flag === "both") {
                 //if saved from email function, update emailed flag
@@ -282,7 +279,7 @@ export class DisplayOrderModalComponent implements OnInit {
     }    
 
     emailOrder(flag?: string) {
-        console.log("DISPLAY MODAL > emailOrder");
+        //console.log("DISPLAY MODAL > emailOrder");
         this.order.emailed = true;
         this.order.emailedDateTime = new Date().toISOString();
         this.emailService.sendEmail(this.order);
@@ -293,57 +290,64 @@ export class DisplayOrderModalComponent implements OnInit {
     }
 
     uploadOrder() {
-        let curDate: string = new Date().toISOString();
-        let alsoEmail = false;
-        let options = {
-            title: "Uploading Order " + this.order.orderId,
-            message: "Email Order " + this.order.orderId + " as well?",
-            neutralButtonText: "Cancel",
-            okButtonText: "Yes",
-            cancelButtonText: "No"
-        };
-        confirm(options)
-            .then((result: boolean) => {
-                if (result === true) {
-                    alsoEmail = true;
-                } else if (result === undefined) {
-                    return;
-                }
-                this.order.uploaded = true;
-                this.order.uploadedDateTime = curDate;
-                if (alsoEmail) {
-                    this.order.emailed = true;
-                    this.order.emailedDateTime = curDate;
-                }
-                //order already on server?
-                this.orderService.getOrderIDsFromServer()
-                    .subscribe((ids) => {
-                        if (ids.indexOf(this.order.orderId) !== -1) {
-                            //Order already exists on server
-                            console.log("EXISTING ORDER: Order " + this.order.orderId + " already exists on server.");
-                            this.orderService.updateOrderOnServer(this.order.orderId, this.order)
-                                .subscribe((order) => {
-                                    this.updateOrdersLocally(order, alsoEmail);
-                                });
-                        } else {
-                            //POST new order on server
-                            //TODO: Image uploads
-                            console.log("NEW ORDER: Order " + this.order.orderId + " not found on server.");
-                            //this.imageService.uploadImage(this.order.orderId, 1);
-                            this.orderService.postOrderOnServer(this.order)
-                                .subscribe((order) => {
-                                    this.updateOrdersLocally(order, alsoEmail);
-                                    //TODO: Increment company next order number
-                                });
-                        }
-                    });
-            });        
+        if (this.globals.isOffline) {
+            this.message = "Sync with Server Unavailable While Offline!";
+            let toast = new Toasty(this.message, "short", "center");
+            toast.show();
+        } else {
+            let curDate: string = new Date().toISOString();
+            let alsoEmail = false;
+            let options = {
+                title: "Uploading Order " + this.order.orderId,
+                message: "Email Order " + this.order.orderId + " as well?",
+                neutralButtonText: "Cancel",
+                okButtonText: "Yes",
+                cancelButtonText: "No"
+            };
+            confirm(options)
+                .then((result: boolean) => {
+                    if (result === true) {
+                        alsoEmail = true;
+                    } else if (result === undefined) {
+                        return;
+                    }
+                    this.order.uploaded = true;
+                    this.order.uploadedDateTime = curDate;
+                    if (alsoEmail) {
+                        this.order.emailed = true;
+                        this.order.emailedDateTime = curDate;
+                    }
+                    //order already on server?
+                    this.orderService.getOrderIDsFromServer()
+                        .subscribe((ids) => {
+                            if (ids.indexOf(this.order.orderId) !== -1) {
+                                //Order already exists on server
+                                console.log("EXISTING ORDER: Order " + this.order.orderId + " already exists on server.");
+                                this.orderService.updateOrderOnServer(this.order.orderId, this.order)
+                                    .subscribe((order) => {
+                                        this.updateOrdersLocally(order, alsoEmail);
+                                    });
+                            } else {
+                                //POST new order on server
+                                //TODO: Image uploads
+                                console.log("NEW ORDER: Order " + this.order.orderId + " not found on server.");
+                                //this.imageService.uploadImage(this.order.orderId, 1);
+                                this.orderService.postOrderOnServer(this.order)
+                                    .subscribe((order) => {
+                                        this.updateOrdersLocally(order, alsoEmail);
+                                        //TODO: Increment company next order number
+                                    });
+                            }
+                        });
+                });
+        }     
     }
 
     updateOrdersLocally(order: OrderVO, alsoEmail: boolean) {
-        console.log("DISPLAY MODAL > updateOrdersLocally");
+        //console.log("DISPLAY MODAL > updateOrdersLocally");
         this.order = order;
-        let toast = new Toasty("Order " + this.order.orderId + " uploaded to server!", "short", "center");
+        this.message = "Order " + this.order.orderId + " uploaded to server!";
+        let toast = new Toasty(this.message, "short", "center");
         toast.show();
         if (alsoEmail) {
             this.saveChanges('both');

@@ -11,6 +11,7 @@ import { ActiveComponent } from "~/active/active.component";
 import { ArchiveComponent } from "~/archive/archive.component";
 import { SettingsComponent } from "~/settings/settings.component";
 import { InfoComponent } from "~/info/info.component";
+import { SyncComponent } from "~/sync/sync.component";
 
 const routes: Routes = [
     { path: "", redirectTo: "/home", pathMatch: "full" },
@@ -22,7 +23,8 @@ const routes: Routes = [
     { path: "active", component: ActiveComponent },
     { path: "archive", component: ArchiveComponent },
     { path: "settings", component: SettingsComponent },
-    { path: "info", component: InfoComponent }
+    { path: "info", component: InfoComponent },
+    { path: "sync", component: SyncComponent }
 ];
 
 @NgModule({
