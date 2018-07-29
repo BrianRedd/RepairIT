@@ -21,20 +21,23 @@ export class OrderService {
 
     public initializeOrders() {
         //local
-        //console.log("Initializing Orders DB Document");
+        console.log("Initializing Orders DB Document");
         this.couchbaseService.createDocument({"orders": []}, "orders");
     }; 
 
     public getOrders() {
         //local
-        //console.log("ORDER SERVICE > updateOrders");
-        return this.couchbaseService.getDocument("orders").orders;
+        console.log("ORDER SERVICE > getOrders");
+        return this.couchbaseService.getDocument("orders").orders
+            .filter((order) => 
+                order.orderId.indexOf(getString("currentAssociateID")) !== -1
+            );
     }
 
     public updateOrders(data) {
         //local
-        //console.log("ORDER SERVICE > updateOrders");
-        return (this.couchbaseService.updateDocument("orders", {"orders": data}));
+        console.log("ORDER SERVICE > updateOrders", data.length);
+        return this.couchbaseService.updateDocument("orders", {"orders": data});
     }
 
     public getOrdersFromServer(): Observable<OrderVO[]> {
@@ -48,7 +51,7 @@ export class OrderService {
 
     public getOrderIDsFromServer(): Observable<String[] | any> {
         //server: Get only OrderIDs from server
-        //console.log("***ORDER SERVICE > getOrderIDsFromServer()");
+        console.log("ORDER SERVICE > getOrderIDsFromServer()");
         return this.getOrdersFromServer()
             .map((orders) => {
                 return orders.map(order => order.orderId);
@@ -60,7 +63,7 @@ export class OrderService {
 
     public getOrderFromServer(orderId: string): Observable<OrderVO> {
         //server: Get Order from Server by OrderId
-        //console.log("***ORDER SERVICE > getOrderFromServer(" + orderId + ")");
+        console.log("ORDER SERVICE > getOrderFromServer(" + orderId + ")");
         return this.http.get(BaseURL + 'orders/' + getString("CompanyID") + '/' + orderId)
             .catch(error => {
                 return this.processHTTPMsgService.handleError(error);
@@ -69,7 +72,7 @@ export class OrderService {
 
     public postOrderOnServer(data: any): Observable<any> {
         //server: Post new order to server
-        console.log("***ORDER SERVICE > postOrderOnServer()");
+        console.log("ORDER SERVICE > postOrderOnServer()");
         return this.http.post(BaseURL + 'orders/' + getString("CompanyID"), data)
             .catch(error => {
                 return this.processHTTPMsgService.handleError(error);
@@ -78,7 +81,7 @@ export class OrderService {
 
     public updateOrderOnServer(orderId: string, data: any): Observable<any> {
         //server: Update existing order on server
-        //console.log("***ORDER SERVICE > updateOrderOnServer(" + orderId + ")");
+        console.log("ORDER SERVICE > updateOrderOnServer(" + orderId + ")");
         return this.http.put(BaseURL + 'orders/' + getString("CompanyID") + '/' + orderId, data)
             .catch(error => {
                 return this.processHTTPMsgService.handleError(error);

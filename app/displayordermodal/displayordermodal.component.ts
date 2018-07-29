@@ -232,10 +232,9 @@ export class DisplayOrderModalComponent implements OnInit {
 
     saveChanges(flag?: string) {
         //console.log("DISPLAY MODAL > saveChanges");
-        let curDate: string = new Date().toISOString();
         let orders = this.orderService.getOrders();
         let idx = orders.findIndex((res) => res.orderId === this.order.orderId);
-        orders[idx].editedDateTime = curDate;
+        orders[idx].editedDateTime = this.order.editedDateTime;
         //flag
         if (flag) {
             if (flag === "email" || flag === "both") {
@@ -311,6 +310,7 @@ export class DisplayOrderModalComponent implements OnInit {
                     } else if (result === undefined) {
                         return;
                     }
+                    this.order.editedDateTime = curDate;
                     this.order.uploaded = true;
                     this.order.uploadedDateTime = curDate;
                     if (alsoEmail) {

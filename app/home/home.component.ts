@@ -4,6 +4,7 @@ import { CompanyService } from "~/services/company.service";
 import { getString, setString, getBoolean, setBoolean } from "tns-core-modules/application-settings/application-settings";
 import { CouchbaseService } from "~/services/couchbase.service";
 import { PlatformService } from "../services/platform.service";
+import { OrderService } from "../services/order.service";
 import { RouterExtensions } from "nativescript-angular/router";
 import { TNSFontIconService } from "nativescript-ngx-fonticon";
 import { Toasty } from "nativescript-toasty";
@@ -34,6 +35,7 @@ export class HomeComponent implements OnInit {
         private fonticon: TNSFontIconService,
         private routerExtensions: RouterExtensions,
         private platformService: PlatformService,
+        private orderService: OrderService,
         private globals: Globals
     ) {
     }
@@ -70,7 +72,7 @@ export class HomeComponent implements OnInit {
             this.archBtnStyle += "background-color: " + this.company.colors[0] + ";";
         }
         this.isPending();
-        this.FirstUse = getBoolean("FirstUse");
+        this.FirstUse = (this.orderService.getOrders().length === 0);
         if (this.platformService.getConnectionType() === "None") {
             this.globals.isOffline = true;
         }

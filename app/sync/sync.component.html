@@ -6,16 +6,6 @@
     <StackLayout orientation="horizontal" horizontalAlignment="center" [visibility]="(message !== '') ? 'visible' : 'collapsed'" dock="top" class="p-b-5">
         <Label [text]="message"></Label>
     </StackLayout>
-    <!--<GridLayout *ngIf="local_orders" rows="auto auto" columns="auto, *">
-        <Label row="0" col="0" class="m-5 h3" text="Number of Orders Locally:" textWrap="true" horizontalAlignment="center"></Label>
-        <Label row="0" col="1" class="m-5 h3" [text]="(local_orders.length)" horizontalAlignment="center"></Label>
-    </GridLayout>
-    <ActivityIndicator busy="true" *ngIf="!local_orders" width="40" height="40" class="activity-indicator"></ActivityIndicator>
-    <GridLayout *ngIf="server_orders" rows="auto auto" columns="auto, *">
-        <Label row="0" col="0" class="m-5 h3" text="Number of Orders on Server:" textWrap="true" horizontalAlignment="center"></Label>
-        <Label row="0" col="1" class="m-5 h3" [text]="(server_orders.length)" horizontalAlignment="center"></Label>
-    </GridLayout>
-    <ActivityIndicator busy="true" *ngIf="!server_orders" width="40" height="40" class="activity-indicator"></ActivityIndicator>-->
     <ActivityIndicator busy="true" *ngIf="!local_orders || !server_orders" width="50" height="50" class="activity-indicator"></ActivityIndicator>-->
     <GridLayout *ngIf="local_orders && server_orders" rows="*, auto" columns="*, *">
         <StackLayout row="0" col="0" colSpan="2">

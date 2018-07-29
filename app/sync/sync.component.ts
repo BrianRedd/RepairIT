@@ -3,7 +3,7 @@ import { Globals } from '../shared/globals';
 import { Toasty } from "nativescript-toasty";
 import { OrderService } from "~/services/order.service";
 import { PlatformService } from "../services/platform.service";
-import { setBoolean } from "tns-core-modules/application-settings/application-settings";
+import { setBoolean, setNumber, getNumber, getString } from "tns-core-modules/application-settings/application-settings";
 import { OrderVO } from "~/shared/orderVO";
 //import * as fs from "tns-core-modules/file-system/file-system";
 import { RouterExtensions } from "nativescript-angular/router";
@@ -34,6 +34,7 @@ export class SyncComponent {
     serverNotOnLocal: Array<string> = [];
     serverNewerThanLocal: Array<string> = [];
     conflictOrders: Array<string> = [];
+    nextOrderNumber: number;
 
     constructor(
         private couchbaseService: CouchbaseService,
@@ -55,12 +56,18 @@ export class SyncComponent {
         if (this.platformService.getConnectionType() === "None") {
             this.globals.isOffline = true;
         }
-        this.local_orders = this.orderService.getOrders();
-        this.syncLogBody += "<p>Number of Records Stored Locally: <span class='bold'>" + this.local_orders.length + "</span></p>";
+        this.nextOrderNumber = getNumber("nextOrderNumber");
         this.orderService.getOrdersFromServer()
             .subscribe((orders) => {
                 this.server_orders = orders;
-                this.syncLogBody += "<p>Number of Records on Server: <span class='bold'>" + this.server_orders.length + "</span></p>";
+                this.syncLogBody += "<p>Total Number of Records on Server: <span class='bold'>" + this.server_orders.length + "</span></p>";
+                this.server_orders = this.server_orders
+                    .filter((order) => 
+                        order.orderId.indexOf(getString("currentAssociateID")) !== -1
+                    );
+                this.syncLogBody += "<p>Number of Records for " + getString('currentAssociateID') + " on Server: <span class='bold'>" + this.server_orders.length + "</span></p>";
+                this.local_orders = this.orderService.getOrders();
+                this.syncLogBody += "<p>Number of Records for " + getString('currentAssociateID') + " Stored Locally: <span class='bold'>" + this.local_orders.length + "</span></p>";
             });
     };
 
@@ -69,7 +76,10 @@ export class SyncComponent {
         this.orderService.getOrdersFromServer()
             .subscribe((orders) => {
                 let syncEvent: boolean = false;
-                this.server_orders = orders;
+                this.server_orders = orders
+                    .filter((order) => 
+                        order.orderId.indexOf(getString("currentAssociateID")) !== -1
+                    );
                 this.comparisonRan = true;
                 let map_local: any;
                 let map_server: any;
@@ -79,18 +89,24 @@ export class SyncComponent {
                 map_server = this.server_orders.map((sorder) => {
                     return sorder = sorder.orderId;
                 });
-                for (let i: number = 0; i < this.local_orders.length; i++ ) {
+                //console.log("map_local:", map_local, "\nmap_server:", map_server);
+                let localOrdersLength = this.local_orders.length;
+                if (this.local_orders.length === 0) { localOrdersLength = 1};
+                for (let i: number = 0; i < localOrdersLength; i++ ) {
+                    //console.log("localOrdersLength", i, "out of", localOrdersLength);
                     //check for missing server orders
-                    if (map_server.indexOf(this.local_orders[i].orderId) === -1) {
+                    if (this.local_orders.length > 0 && map_server.indexOf(this.local_orders[i].orderId) === -1) {
                         this.localNotOnServer.push(this.local_orders[i].orderId);
                     }
                     //check for order age
                     for (let ii: number = 0; ii < this.server_orders.length; ii++ ) {
-                        //check for missing local orders
-                        if (map_local.indexOf(this.server_orders[ii].orderId) === -1) {
+                        //check for missing local orders (first primary iteration only)
+                        //console.log(i, "map_local.indexOf(this.server_orders[" +  ii + "].orderId)", map_local.indexOf(this.server_orders[ii].orderId))
+                        if (i === 0 && map_local.indexOf(this.server_orders[ii].orderId) === -1) {
                             this.serverNotOnLocal.push(this.server_orders[ii].orderId);
+                            //console.log(ii, "this.serverNotOnLocal", this.serverNotOnLocal);
                         }
-                        if (this.local_orders[i].orderId === this.server_orders[ii].orderId) {
+                        if (this.local_orders.length > 0 && this.local_orders[i].orderId === this.server_orders[ii].orderId) {
                             //matching orderIds
                             if (this.local_orders[i].acceptedDateTime !== this.server_orders[ii].acceptedDateTime) {
                                 //TODO: Orders don't match
@@ -126,7 +142,7 @@ export class SyncComponent {
                     this.syncLogBody += "<p>More recent versions of the following records are available from Server: <span class='bold'>" + this.serverNewerThanLocal.toString().replace(/,/g, ', ') + "</span></p>";
                 }
                 if (!syncEvent) {
-                    this.syncLogBody += "<p>Local Device is <span class='bold'>Synced!</span> with Server!</p>";
+                    this.syncLogBody += "<p>Local Device and Server are <span class='bold'>Synced</span>!</p>";
                     this.comparisonRan = false;
                 }
             });        
@@ -160,9 +176,7 @@ export class SyncComponent {
                 let thisOrder = this.local_orders.filter((order) => {
                     return order.orderId === this.localNewerThanServer[i];
                 });
-                //console.log("thisOrder", thisOrder);
                 let idx = this.local_orders.findIndex((res) => res.orderId === this.localNewerThanServer[i]);
-                //console.log("idx", idx);
                 this.local_orders[idx].uploaded = true;
                 this.local_orders[idx].uploadedDateTime = curDate;
                 this.orderService.updateOrderOnServer(thisOrder[0].orderId, thisOrder[0])
@@ -175,12 +189,98 @@ export class SyncComponent {
             this.localNewerThanServer = [];
         }
         console.log("serverNotOnLocal:", this.serverNotOnLocal);
+        if (this.serverNotOnLocal.length > 0) {
+            //Download records to Server not on local
+            //TODO: Limit to only users on device
+            for (let i: number = 0; i < this.serverNotOnLocal.length; i++) {
+                //console.log(this.serverNotOnLocal[i]);
+                this.orderService.getOrderFromServer(this.serverNotOnLocal[i])
+                    .subscribe((order) => {
+                        let newOrder: OrderVO = {
+                            orderId: order.orderId,
+                            firstName: order.firstName,
+                            lastName: order.lastName,
+                            addressStreet: order.addressState,
+                            addressCity: order.addressCity,
+                            addressState: order.addressState,
+                            addressZip: order.addressZip,
+                            email: order.email,
+                            phone: order.phone,
+                            contactMethod: order.contactMethod,
+                            images: order.images,
+                            issue: order.issue,
+                            issueDetail: order.issueDetail,
+                            repairLoc: order.repairLoc,
+                            repairCost: order.repairCost,
+                            repairPaid: order.repairPaid,
+                            shipCost: order.shipCost,
+                            shipPaid: order.shipPaid,
+                            estRepair: order.estRepair,
+                            shopLoc: order.shopLoc,
+                            notes: order.notes,
+                            emailed: order.emailed,
+                            uploaded: order.uploaded,
+                            uploadedDateTime: order.uploadedDateTime,
+                            accepted: order.accepted,
+                            acceptedDateTime: order.acceptedDateTime,
+                            shippedOffsite: order.shippedOffsite,
+                            shippedDateTime: order.shippedDateTime,
+                            completed: order.completed,
+                            completedDateTime: order.completedDateTime,
+                            delivered: order.delivered,
+                            deliveredDateTime: order.deliveredDateTime,
+                            editedDateTime: order.editedDateTime
+                        };
+                        //console.log("New Order:", newOrder);
+                        this.local_orders.push(newOrder);
+                        if (this.nextOrderNumber !== getNumber("initialOrderNumber")) { //if app isn't freshly set up
+                            this.nextOrderNumber++;
+                            setNumber("nextOrderNumber", this.nextOrderNumber);
+                        }
+                        //console.log("Revised local_orders", this.local_orders);
+                        this.orderService.updateOrders(this.local_orders);
+                        this.syncLogBody += "<p>Order <span class='bold'>" + order.orderId + "</span> Downloaded from Server!</p>";
+                    });
+                    //TODO: Increment local order number
+            }
+            this.serverNotOnLocal = [];
+        }
         console.log("serverNewerThanLocal:", this.serverNewerThanLocal);
-        this.serverNotOnLocal = [];
-        this.serverNewerThanLocal = [];
+        if (this.serverNewerThanLocal.length > 0) {
+            //Download records to Server not on local
+            //TODO: Limit to only users on device
+            for (let i: number = 0; i < this.serverNewerThanLocal.length; i++) {                
+                let thisOrder = this.local_orders.filter((order) => {
+                    return order.orderId === this.serverNewerThanLocal[i];
+                });
+                let idx = this.local_orders.findIndex((res) => res.orderId === this.serverNewerThanLocal[i]);
+                this.orderService.getOrderFromServer(this.serverNewerThanLocal[i])
+                    .subscribe((order) => {
+                        this.local_orders[idx].repairCost = order.repairCost;
+                        this.local_orders[idx].repairPaid = order.repairPaid;
+                        this.local_orders[idx].shipCost = order.shipCost;
+                        this.local_orders[idx].shipPaid = order.shipPaid;
+                        this.local_orders[idx].emailed = order.emailed;
+                        this.local_orders[idx].uploaded = order.uploaded;
+                        this.local_orders[idx].uploadedDateTime = order.uploadedDateTime;
+                        this.local_orders[idx].accepted = order.accepted;
+                        this.local_orders[idx].acceptedDateTime = order.acceptedDateTime;
+                        this.local_orders[idx].shippedOffsite = order.shippedOffsite;
+                        this.local_orders[idx].shippedDateTime = order.shippedDateTime;
+                        this.local_orders[idx].completed = order.completed;
+                        this.local_orders[idx].completedDateTime = order.completedDateTime;
+                        this.local_orders[idx].delivered = order.delivered;
+                        this.local_orders[idx].deliveredDateTime = order.deliveredDateTime;
+                        this.local_orders[idx].editedDateTime = order.editedDateTime;
+                        this.orderService.updateOrders(this.local_orders);
+                        this.syncLogBody += "<p>Order <span class='bold'>" + order.orderId + "</span> Updated from Server!</p>";
+                    });
+            }
+            this.serverNewerThanLocal = [];
+        }
         this.conflictOrders = [];
-        this.orderService.updateOrders(this.local_orders);
         this.comparisonRan = false;
+        this.orderService.updateOrders(this.local_orders);
         setBoolean("pendingOrders", false);
     }
 

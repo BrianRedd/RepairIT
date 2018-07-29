@@ -3,5 +3,9 @@
     <Label [text]="('fa-cog' | fonticon) + ' Settings'" class="h2 fa" [style]="actionBarTextStyle"></Label>
 </ActionBar>
 <StackLayout class="page m-5">
-    <Button text="Reset Data" (tap)="reset()"></Button>
+    <GridLayout rows="auto, *, auto" columns="*,*">
+        <Button row="0" col="0" text="Change User" class="btn btn-primary" (tap)="changeUser()"></Button>
+        <Button row="0" col="1" text="New User" class="btn btn-primary" [nsRouterLink]="['/newuser']"></Button>
+        <Button row="2" col="0" colSpan="2" text="Reset Data" (tap)="reset()"></Button>
+    </GridLayout>
 </StackLayout>

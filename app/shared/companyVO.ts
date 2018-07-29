@@ -5,6 +5,7 @@ export interface CompanyVO {
     issues: Array<string>,
     locations: Array<string>,
     initialOrderNumber: number,
+    currentOrderNumber: number,
     requiredPhotos: Array<string>,
     licenses: number,
     _id: string,

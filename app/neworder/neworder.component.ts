@@ -74,8 +74,8 @@ export class NeworderComponent implements OnInit {
     numslides: number = 4;
     actionBarStyle: string = "background-color: #006A5C;";
     actionBarTextStyle: string = "color: #FFFFFF";
-    cancelBtnStyle: string;
-    submitBtnStyle: string;
+    cancelBtnStyle: string = "";
+    submitBtnStyle: string = "";
     nextOrderNumber: number;
     orderID: string;
     issuesMore: boolean = false;
@@ -354,9 +354,9 @@ export class NeworderComponent implements OnInit {
     }
 
     submit() {
-        if (getBoolean("FirstUse")) {
+        /*if (getBoolean("FirstUse")) {
             setBoolean("FirstUse", false);
-        }
+        }*/
         this.newOrder.orderId = this.orderID;
         this.newOrder.firstName = this.orderForm.get("firstName").value;
         this.newOrder.lastName = this.orderForm.get("lastName").value;

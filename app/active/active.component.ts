@@ -55,7 +55,7 @@ export class ActiveComponent implements OnInit {
         this.aorders = this.orders.filter((res) => {
             //add only orders that have NOT been completed
             this.loading = false;            
-            return (!res.delivered && (res.orderId.indexOf(this.curAssociate) !== -1));
+            return (!res.delivered);// && (res.orderId.indexOf(this.curAssociate) !== -1));
         });
     }
 

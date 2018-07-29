@@ -55,7 +55,7 @@ export class PendingComponent implements OnInit {
         this.porders = this.orders.filter((res) => {
             //add only orders that have NOT been uploaded
             this.loading = false;
-            return (!res.uploaded && (res.orderId.indexOf(this.curAssociate) !== -1));
+            return (!res.uploaded); // && (res.orderId.indexOf(this.curAssociate) !== -1));
         });
         if (this.porders.length === 0) {
             setBoolean("pendingOrders", false);

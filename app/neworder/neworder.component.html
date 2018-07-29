@@ -26,10 +26,10 @@
                         <Label row="7" col="0" text="Preferred Contact Method*" textWrap="true" class="label font-weight-bold p-10" verticalAlignment="center"></Label>
                         <TextField row="7" col="1" colSpan="2" formControlName="contactMethod" id="contactMethod" hint="Contact Method" [text]="" class="input input-border" (tap)="createModalView('contactMethod')"></TextField>
                         <GridLayout row="8" col="0" colSpan="3" orientation="horizontal" rows="auto" columns="*, *, *, *, *, *">
-                            <Button row="0" col="0" [text]="('fa-chevron-circle-left' | fonticon)" (tap)="prevSlide()" class="fa btn-outline"></Button>
-                            <Button row="0" col="1" colSpan="2" text="Cancel" (tap)="cancel()" class="btn"></Button>
-                            <Button row="0" col="3" colspan="2" text="Submit" (tap)="submit()" [isEnabled]="orderForm.valid && !formBlock && required_photos_taken" class="btn btn-primary"></Button>
-                            <Button row="0" col="5" [text]="('fa-chevron-circle-right' | fonticon)" (tap)="nextSlide()" class="fa btn-outline"></Button>
+                            <Button row="0" col="0" [text]="('fa-chevron-circle-left' | fonticon)" (tap)="prevSlide()" class="fa btn-outline" horizontalAlign="center"></Button>
+                            <Button row="0" col="1" colSpan="2" text="Cancel" (tap)="cancel()" class="btn" [style]="cancelBtnStyle" horizontalAlign="center"></Button>
+                            <Button row="0" col="3" colSpan="2" text="Submit" (tap)="submit()" [isEnabled]="orderForm.valid && !formBlock && required_photos_taken" class="btn btn-primary" [style]="submitBtnStyle" horizontalAlign="center"></Button>
+                            <Button row="0" col="5" [text]="('fa-chevron-circle-right' | fonticon)" (tap)="nextSlide()" class="fa btn-outline" horizontalAlign="center"></Button>
                         </GridLayout>
                     </GridLayout>
                 </ScrollView>
@@ -55,10 +55,10 @@
                             <Button [visibility]="required_photos_taken ? 'visible' : 'collapsed'" [text]="('fa-camera' | fonticon) + ' Additional Photo'" (tap)="takeAdditionalPicture()" class="fa btn-outline"></Button>
                         </StackLayout>
                         <GridLayout row="5" col="0" colSpan="3" orientation="horizontal" rows="auto" columns="*, *, *, *, *, *">
-                            <Button row="0" col="0" [text]="('fa-chevron-circle-left' | fonticon)" (tap)="prevSlide()" class="fa btn-outline"></Button>
-                            <Button row="0" col="1" colSpan="2" text="Cancel" (tap)="cancel()" class="btn"></Button>
-                            <Button row="0" col="3" colspan="2" text="Submit" (tap)="submit()" [isEnabled]="orderForm.valid && !formBlock && required_photos_taken" class="btn btn-primary"></Button>
-                            <Button row="0" col="5" [text]="('fa-chevron-circle-right' | fonticon)" (tap)="nextSlide()" class="fa btn-outline"></Button>
+                            <Button row="0" col="0" [text]="('fa-chevron-circle-left' | fonticon)" (tap)="prevSlide()" class="fa btn-outline" horizontalAlign="center"></Button>
+                            <Button row="0" col="1" colSpan="2" text="Cancel" (tap)="cancel()" class="btn btn-primary" [style]="cancelBtnStyle" horizontalAlign="center"></Button>
+                            <Button row="0" col="3" colSpan="2" text="Submit" (tap)="submit()" [isEnabled]="orderForm.valid && !formBlock && required_photos_taken" class="btn btn-primary" [style]="submitBtnStyle" horizontalAlign="center"></Button>
+                            <Button row="0" col="5" [text]="('fa-chevron-circle-right' | fonticon)" (tap)="nextSlide()" class="fa btn-outline" horizontalAlign="center"></Button>
                         </GridLayout>
                     </GridLayout>
                 </ScrollView>
@@ -86,10 +86,10 @@
                             <Switch row="0" col="1" checked="false" formControlName="shipPaid"></Switch>
                         </GridLayout>
                         <GridLayout row="6" col="0" colSpan="3" orientation="horizontal" rows="auto" columns="*, *, *, *, *, *">
-                            <Button row="0" col="0" [text]="('fa-chevron-circle-left' | fonticon)" (tap)="prevSlide()" class="fa btn-outline"></Button>
-                            <Button row="0" col="1" colSpan="2" text="Cancel" (tap)="cancel()" class="btn"></Button>
-                            <Button row="0" col="3" colspan="2" text="Submit" (tap)="submit()" [isEnabled]="orderForm.valid && !formBlock && required_photos_taken" class="btn btn-primary"></Button>
-                            <Button row="0" col="5" [text]="('fa-chevron-circle-right' | fonticon)" (tap)="nextSlide()" class="fa btn-outline"></Button>
+                            <Button row="0" col="0" [text]="('fa-chevron-circle-left' | fonticon)" (tap)="prevSlide()" class="fa btn-outline" horizontalAlign="center"></Button>
+                            <Button row="0" col="1" colSpan="2" text="Cancel" (tap)="cancel()" class="btn btn-primary" [style]="cancelBtnStyle" horizontalAlign="center"></Button>
+                            <Button row="0" col="3" colSpan="2" text="Submit" (tap)="submit()" [isEnabled]="orderForm.valid && !formBlock && required_photos_taken" class="btn btn-primary" [style]="submitBtnStyle" horizontalAlign="center"></Button>
+                            <Button row="0" col="5" [text]="('fa-chevron-circle-right' | fonticon)" (tap)="nextSlide()" class="fa btn-outline" horizontalAlign="center"></Button>
                         </GridLayout>
                     </GridLayout>
                 </ScrollView>
@@ -100,10 +100,10 @@
                         <Label row="0" col="0" [text]="'[' + orderID + ']: Additional Notes'" class="h3 text-uppercase m-10"></Label>
                         <TextView row="1" col="0" formControlName="notes" id="notes" [text]="" class="input input-border"></TextView>
                         <GridLayout row="6" col="0" orientation="horizontal" rows="auto" columns="*, *, *, *, *, *">
-                            <Button row="0" col="0" [text]="('fa-chevron-circle-left' | fonticon)" (tap)="prevSlide()" class="fa btn-outline"></Button>
-                            <Button row="0" col="1" colSpan="2" text="Cancel" (tap)="cancel()" class="btn" [style]="cancelBtnStyle"></Button>
-                            <Button row="0" col="3" colSpan="2" text="Submit" (tap)="submit()" [isEnabled]="orderForm.valid && !formBlock && required_photos_taken" class="btn btn-primary" [style]="submitBtnStyle"></Button>
-                            <Button row="0" col="5" [text]="('fa-chevron-circle-right' | fonticon)" (tap)="nextSlide()" class="fa btn-outline"></Button>
+                            <Button row="0" col="0" [text]="('fa-chevron-circle-left' | fonticon)" (tap)="prevSlide()" class="fa btn-outline" horizontalAlign="center"></Button>
+                            <Button row="0" col="1" colSpan="2" text="Cancel" (tap)="cancel()" class="btn btn-primary" [style]="cancelBtnStyle" horizontalAlign="center"></Button>
+                            <Button row="0" col="3" colSpan="2" text="Submit" (tap)="submit()" [isEnabled]="orderForm.valid && !formBlock && required_photos_taken" class="btn btn-primary" [style]="submitBtnStyle" horizontalAlign="center"></Button>
+                            <Button row="0" col="5" [text]="('fa-chevron-circle-right' | fonticon)" (tap)="nextSlide()" class="fa btn-outline" horizontalAlign="center"></Button>
                         </GridLayout>
                     </GridLayout>
                 </ScrollView>

@@ -55,7 +55,7 @@ export class ArchiveComponent implements OnInit {
         this.corders = this.orders.filter((res) => {
             //add only orders that HAVE been completed
             this.loading = false;
-            return (res.delivered && (res.orderId.indexOf(this.curAssociate) !== -1));
+            return (res.delivered);// && (res.orderId.indexOf(this.curAssociate) !== -1));
         });
     }
 

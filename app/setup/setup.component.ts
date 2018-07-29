@@ -159,14 +159,15 @@ export class SetupComponent {
         setString("CompanyState", this.company.state); //Company State (for about)
         setString("CompanyZip", this.company.zip); //Company Zip (for about)
         setString("ProductType", this.company.productType); //product type
-        setNumber("nextOrderNumber", this.company.initialOrderNumber); //next Order Number, increment with each order
+        setNumber("initialOrderNumber", this.company.currentOrderNumber); //initial company order number when app is configured (immutable)
+        setNumber("nextOrderNumber", this.company.currentOrderNumber); //next Order Number, increment with each order
         this.couchbaseService.updateDocument("colors", {"colors": this.company.colors}); //Company colors (2; for app display)
         this.couchbaseService.updateDocument("issues", {"issues": this.company.issues}); //List of common repair types
         this.couchbaseService.updateDocument("locations", {"locations": this.company.locations});//List of company store locations
         this.couchbaseService.updateDocument("requiredPhotos", {"requiredPhotos": this.company.requiredPhotos});//list of required photos
         setString("defaultLoc", this.company.locations[0]);//default store location, starting with first in company list, updated when form is submitted
         setString("defaultState", "AL");//default customer state (address), updates when form is submitted
-        setBoolean("FirstUse", true);
+        //setBoolean("FirstUse", true);
         setNumber("numusers", 0); //number of users (0 to start)
         setString("users", "");//string of user ID (empty to start), delimited with "|"
         setString("currentAssociateID", ""); //current associate ID (empty to start)

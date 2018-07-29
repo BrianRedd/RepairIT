@@ -27,6 +27,10 @@ export class SettingsComponent implements OnInit {
         this.routerExtensions.navigate(["/home"], { clearHistory: true });
     }
 
+    changeUser() {
+        
+    }
+
     reset() {
         clear();
         this.couchbaseService.deleteDocument("colors");
