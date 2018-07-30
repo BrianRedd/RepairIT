@@ -7,6 +7,7 @@ export class CouchbaseService {
     private database: any;
 
     public constructor() {
+        console.info("Couchbase Service");
         this.database = new Couchbase("repairit");
     }
 

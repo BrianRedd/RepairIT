@@ -7,7 +7,9 @@ import "rxjs/add/observable/throw";
 @Injectable()
 export class ProcessHTTPMsgService {
     
-    constructor() {}
+    constructor() {
+      console.info("ProcessHTTPMsg Service");
+    }
 
     public handleError(error: HttpErrorResponse | any) {
       let errMsg: string;

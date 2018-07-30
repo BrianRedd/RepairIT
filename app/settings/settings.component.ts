@@ -18,6 +18,7 @@ export class SettingsComponent implements OnInit {
         private couchbaseService: CouchbaseService,
         private routerExtensions: RouterExtensions
     ){
+        console.info("Settings Component");
         this.actionBarStyle = "background-color: " + this.couchbaseService.getDocument("colors").colors[1] + ";";
     }
 

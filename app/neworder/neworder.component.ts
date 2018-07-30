@@ -94,6 +94,7 @@ export class NeworderComponent implements OnInit {
         private orderService: OrderService,
         private routerExtensions: RouterExtensions
     ) {
+        console.info("NewOrder Component");
         this.actionBarStyle = "background-color: " + this.couchbaseService.getDocument("colors").colors[1] + ";";
         this.cancelBtnStyle = "background-color: " + this.couchbaseService.getDocument("colors").colors[1] + ";";
         this.submitBtnStyle = "background-color: " + this.couchbaseService.getDocument("colors").colors[0] + ";";
@@ -336,7 +337,7 @@ export class NeworderComponent implements OnInit {
                     this.newOrder.images[id].filename = filename;
                 });              
             }).catch((error) => {
-                console.log("Error taking picture: " + error);
+                console.error("Error taking picture: " + error);
             });
         } else {
             this.message = "Camera is unavailable."

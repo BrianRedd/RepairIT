@@ -37,6 +37,7 @@ export class PlatformService {
     constructor(
         private globals: Globals
     ) {
+        console.info("Platform Service");
         this.deviceInformation = new DeviceInfo(
             device.model,
             device.deviceType,
@@ -124,7 +125,6 @@ export class PlatformService {
     }
 
     public getConnectionType(): string {
-        //console.log('Platform.Service > getConnectionType: ', this.connectionType);
         return this.connectionType;
     }
 }

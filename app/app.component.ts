@@ -19,16 +19,13 @@ export class AppComponent implements OnInit, OnDestroy {
     ngOnInit() {
         this.platformService.startMonitoringNetwork()
             .subscribe((connection: string) => {
-                //console.log('connection', connection);
                 if (connection === 'None') {
                     this.globals.isOffline = true;
                 } else {
                     this.globals.isOffline = false;
                 }
                 let message = 'Connection type changed to ' + connection;
-                console.log(message);
-                //let toast = new Toasty(message, "short", "top");
-                //toast.show();
+                console.info(message);
             });
         if (getBoolean("pendingOrders") === undefined) {
             setBoolean("pendingOrders", false);

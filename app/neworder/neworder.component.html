@@ -27,7 +27,7 @@
                         <TextField row="7" col="1" colSpan="2" formControlName="contactMethod" id="contactMethod" hint="Contact Method" [text]="" class="input input-border" (tap)="createModalView('contactMethod')"></TextField>
                         <GridLayout row="8" col="0" colSpan="3" orientation="horizontal" rows="auto" columns="*, *, *, *, *, *">
                             <Button row="0" col="0" [text]="('fa-chevron-circle-left' | fonticon)" (tap)="prevSlide()" class="fa btn-outline" horizontalAlign="center"></Button>
-                            <Button row="0" col="1" colSpan="2" text="Cancel" (tap)="cancel()" class="btn" [style]="cancelBtnStyle" horizontalAlign="center"></Button>
+                            <Button row="0" col="1" colSpan="2" text="Cancel" (tap)="cancel()" class="btn btn-primary" [style]="cancelBtnStyle" horizontalAlign="center"></Button>
                             <Button row="0" col="3" colSpan="2" text="Submit" (tap)="submit()" [isEnabled]="orderForm.valid && !formBlock && required_photos_taken" class="btn btn-primary" [style]="submitBtnStyle" horizontalAlign="center"></Button>
                             <Button row="0" col="5" [text]="('fa-chevron-circle-right' | fonticon)" (tap)="nextSlide()" class="fa btn-outline" horizontalAlign="center"></Button>
                         </GridLayout>

@@ -39,23 +39,23 @@ export class ActiveComponent implements OnInit {
         private orderService: OrderService,
         private routerExtensions: RouterExtensions
     ) {
+        console.info("Active Component");
         this.actionBarStyle = "background-color: " + this.couchbaseService.getDocument("colors").colors[1] + ";";
     }
 
     ngOnInit() {
         this.refreshOrders();
     }
-    // TODO: Remember to only grab orders by current user, even if other orders are available 
     // Perhaps as a setting - some companies may want all associates to have access to all device orders
     refreshOrders() {
-        console.log("Active > refreshOrders()");
+        //console.log("Active > refreshOrders()");
         this.loading = true;
         this.aorders = [];
         this.orders = this.orderService.getOrders();
         this.aorders = this.orders.filter((res) => {
             //add only orders that have NOT been completed
             this.loading = false;            
-            return (!res.delivered);// && (res.orderId.indexOf(this.curAssociate) !== -1));
+            return (!res.delivered);
         });
     }
 
@@ -73,7 +73,7 @@ export class ActiveComponent implements OnInit {
             .then((result: any) => {
                 this.refreshOrders();
             })
-            .catch((err) => { console.log("Error: "+ err); });
+            .catch((err) => { console.error("Error: "+ err); });
     }
 
     displayOrder(order) {

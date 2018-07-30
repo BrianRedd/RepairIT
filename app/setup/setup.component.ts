@@ -38,6 +38,7 @@ export class SetupComponent {
         private routerExtensions: RouterExtensions,
         private globals: Globals
     ) {
+        console.info("Setup Component");
         this.message = "";
         this.setupForm = this.formBuilder.group({
             companyid: ["", Validators.required],
@@ -167,7 +168,7 @@ export class SetupComponent {
         this.couchbaseService.updateDocument("requiredPhotos", {"requiredPhotos": this.company.requiredPhotos});//list of required photos
         setString("defaultLoc", this.company.locations[0]);//default store location, starting with first in company list, updated when form is submitted
         setString("defaultState", "AL");//default customer state (address), updates when form is submitted
-        //setBoolean("FirstUse", true);
+        setBoolean("Initialized", true);
         setNumber("numusers", 0); //number of users (0 to start)
         setString("users", "");//string of user ID (empty to start), delimited with "|"
         setString("currentAssociateID", ""); //current associate ID (empty to start)

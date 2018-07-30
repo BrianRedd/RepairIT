@@ -39,23 +39,23 @@ export class ArchiveComponent implements OnInit {
         private orderService: OrderService,
         private routerExtensions: RouterExtensions
     ) {
+        console.info("Archive Component");
         this.actionBarStyle = "background-color: " + this.couchbaseService.getDocument("colors").colors[0] + ";";
     }
 
     ngOnInit() {
         this.refreshOrders();
     }
-    // TODO: Remember to only grab orders by current user, even if other orders are available 
     // Perhaps as a setting - some companies may want all associates to have access to all device orders
     refreshOrders() {
-        console.log("Archive > refreshOrders()");
+        //console.log("Archive > refreshOrders()");
         this.loading = true;
         this.corders = [];
         this.orders = this.orderService.getOrders();
         this.corders = this.orders.filter((res) => {
             //add only orders that HAVE been completed
             this.loading = false;
-            return (res.delivered);// && (res.orderId.indexOf(this.curAssociate) !== -1));
+            return (res.delivered);
         });
     }
 
@@ -73,7 +73,7 @@ export class ArchiveComponent implements OnInit {
             .then((result: any) => {
                 this.refreshOrders();
             })
-            .catch((err) => { console.log("Error: "+ err); });
+            .catch((err) => { console.error("Error: "+ err); });
     }
 
     displayOrder(order) {

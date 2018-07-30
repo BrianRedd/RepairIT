@@ -14,7 +14,9 @@ export class EmailService {
     constructor(
         private orderService: OrderService,
         private couchbaseService: CouchbaseService
-    ) {}
+    ) {
+        console.info("Email Service");
+    }
 
     sendEmail(order: any) {
         //console.log("Email Service > sendEmail(" + order.orderId + ")");
@@ -66,7 +68,7 @@ export class EmailService {
                     body: body
                 });
             } else {
-                console.log("No Email Configured");
+                console.error("No Email Configured");
                 let toast = new Toasty ("No Email Configured", "long", "center");
                 toast.show();
             }

@@ -7,6 +7,7 @@ import { Switch } from "tns-core-modules/ui/switch/switch";
 import { confirm } from "tns-core-modules/ui/dialogs/dialogs";
 import { Page, borderTopRightRadiusProperty } from 'tns-core-modules/ui/page/page';
 import { OrderVO } from "~/shared/orderVO";
+import { CouchbaseService } from "~/services/couchbase.service";
 import { OrderService } from "~/services/order.service";
 import { ImageService } from "~/services/image.service";
 import * as ImageSource from "tns-core-modules/image-source/image-source";
@@ -14,6 +15,8 @@ import * as fs from "tns-core-modules/file-system/file-system";
 import { Image, imageSourceProperty } from "tns-core-modules/ui/image/image";
 import { EmailService } from "~/services/email.service";
 import { Globals } from '../shared/globals';
+
+import * as bghttp from "nativescript-background-http";
 
 @Component({
     moduleId: module.id,
@@ -37,16 +40,21 @@ export class DisplayOrderModalComponent implements OnInit {
     folder = fs.knownFolders.currentApp();
     path: any;
     message: string = "";
+    acceptBtnStyle: string = "";
+    uploadBtnStyle: string = "";
+    emailBtnStyle: string = "";
 
     constructor(
         private formBuilder: FormBuilder,
         private params: ModalDialogParams,
+        private couchbaseService: CouchbaseService,
         private orderService: OrderService,
         private imageService: ImageService,
         private emailService: EmailService,
         private globals: Globals,
         private page: Page
     ) {
+        console.info("DisplayOrderModal Component");
         this.displayType = params.context[0];
         this.order = params.context[1];
         this.displayForm = this.formBuilder.group({
@@ -57,6 +65,9 @@ export class DisplayOrderModalComponent implements OnInit {
             delivered: this.order.delivered
         });
         this.updatePhotos();
+        this.acceptBtnStyle = "background-color: " + this.couchbaseService.getDocument("colors").colors[1] + ";";
+        this.uploadBtnStyle = "background-color: " + this.couchbaseService.getDocument("colors").colors[1] + ";";
+        this.emailBtnStyle = "background-color: " + this.couchbaseService.getDocument("colors").colors[0] + ";";
     }
 
     ngOnInit() {
@@ -67,7 +78,7 @@ export class DisplayOrderModalComponent implements OnInit {
         this.showComplete = !this.order.completed;
         this.showDeliver = !this.order.delivered;
         this.renderDisplay();
-        console.log("Order opened:", this.order);
+        //console.log("Order opened:", this.order);
     }
 
     convertISOtoDate(isodate: string) {
@@ -322,21 +333,30 @@ export class DisplayOrderModalComponent implements OnInit {
                         .subscribe((ids) => {
                             if (ids.indexOf(this.order.orderId) !== -1) {
                                 //Order already exists on server
-                                console.log("EXISTING ORDER: Order " + this.order.orderId + " already exists on server.");
+                                //console.log("EXISTING ORDER: Order " + this.order.orderId + " already exists on server.");
                                 this.orderService.updateOrderOnServer(this.order.orderId, this.order)
                                     .subscribe((order) => {
+                                        for (let i: number = 0; i < this.order.images.length; i++) {
+                                            this.imageService.uploadImage(this.order.images[i].filename)
+                                                .subscribe((response) => {
+                                                    console.log(response);
+                                                }, (err) => console.error("Error:", err));
+                                        }
                                         this.updateOrdersLocally(order, alsoEmail);
-                                    });
+                                    }, (err) => console.error("Error:", err));
                             } else {
                                 //POST new order on server
-                                //TODO: Image uploads
-                                console.log("NEW ORDER: Order " + this.order.orderId + " not found on server.");
-                                //this.imageService.uploadImage(this.order.orderId, 1);
+                                //console.log("NEW ORDER: Order " + this.order.orderId + " not found on server.");
                                 this.orderService.postOrderOnServer(this.order)
                                     .subscribe((order) => {
+                                        for (let i: number = 0; i < this.order.images.length; i++) {
+                                            this.imageService.uploadImage(this.order.images[i].filename)
+                                                .subscribe((response) => {
+                                                    console.log(response);
+                                                }, (err) => console.error("Error:", err));
+                                        }
                                         this.updateOrdersLocally(order, alsoEmail);
-                                        //TODO: Increment company next order number
-                                    });
+                                    }, (err) => console.error("Error:", err));
                             }
                         });
                 });

@@ -13,7 +13,9 @@ export class CompanyService {
     constructor(
         public http: HttpClient,
         private processHTTPMsgService: ProcessHTTPMsgService
-    ) {}
+    ) {
+        console.info("Company Service");
+    }
 
     getCompanies(): Observable<CompanyVO[]> {
         return this.http.get(BaseURL + "companies")

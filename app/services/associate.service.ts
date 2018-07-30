@@ -13,7 +13,9 @@ export class AssociateService {
     constructor(
         public http: HttpClient,
         private processHTTPMsgService: ProcessHTTPMsgService
-    ) {}
+    ) {
+        console.info("Associate Service");
+    }
 
     getAssociateIDs(companyID: string): Observable<AssociateVO[]> {
         return this.http.get(BaseURL + "associates/verify/" + companyID)

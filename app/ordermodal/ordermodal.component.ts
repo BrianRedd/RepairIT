@@ -23,6 +23,7 @@ export class OrderModalComponent implements OnInit {
         private page: Page,
         private couchbaseService: CouchbaseService
     ) {
+        console.info("OrderModal Component");
         this.activeModal = params.context;
     }
 

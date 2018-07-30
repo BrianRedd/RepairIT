@@ -9,8 +9,10 @@ import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/delay';
 import 'rxjs/add/operator/catch';
 import { getString } from "tns-core-modules/application-settings/application-settings";
+import * as fs from "tns-core-modules/file-system/file-system";
 import * as bghttp from "nativescript-background-http";
-//var session = bghttp.session("image-upload");
+import { imageSourceProperty } from "../../node_modules/tns-core-modules/ui/image/image";
+
 
 @Injectable()
 export class ImageService {
@@ -21,18 +23,45 @@ export class ImageService {
         public http: HttpClient,
         private processHTTPMsgService: ProcessHTTPMsgService,
         private orderServer: OrderService
-    ) {}
+    ) {
+        console.info("Image Service");
+    }
 
-    public uploadImage(orderId: string, filename: string) {
-        /*var request = {
-            url: BaseURL + '/imageUpload',
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/octet-steam',
-                'File-Name': filename
+    public uploadImage(filename: string): Observable<any> {
+        return new Observable((observer: any) => {
+            let session = bghttp.session("file-upload");
+            let request = {
+                url: BaseURL + 'imageUpload',
+                method: 'POST',
+                headers: {
+                    "companycode": getString("CompanyCode")
+                }
+            };
+            let params = [{
+                name: "imageFile",
+                filename: fs.knownFolders.currentApp().path + '/' + filename,
+                mimeType: "image/png"
+            }];
+            let task = session.multipartUpload(params, request);
+            task.on("progress", logEvent);
+            task.on("error", logEvent);
+            task.on("complete", uploadComplete);
+
+            function logEvent(e) {
+                console.log("----------------");
+                console.log('File:', filename);
+                console.log('Status:', e.eventName);
+                if (e.totalBytes !== undefined) {
+                    console.log('Bytes transfered:', e.currentBytes);
+                    console.log('Total file size (bytes):', e.totalBytes);
+                }
             }
-        }*/
-
+        
+            function uploadComplete() {
+                console.log("----------------");
+                console.log('Upload complete!');
+            }
+        });
     }
 
 }

@@ -39,23 +39,24 @@ export class PendingComponent implements OnInit {
         private orderService: OrderService,
         private routerExtensions: RouterExtensions
     ) {
+        console.info("Pending Component");
         this.actionBarStyle = "background-color: " + this.couchbaseService.getDocument("colors").colors[0] + ";";
     }
 
     ngOnInit() {
         this.refreshOrders();
     }
-    // TODO: Remember to only grab orders by current user, even if other orders are available 
+
     // Perhaps as a setting - some companies may want all associates to have access to all device orders
     refreshOrders() {
-        console.log("Pending > refreshOrders()");
+        //console.log("Pending > refreshOrders()");
         this.loading = true;
         this.porders = [];
         this.orders = this.orderService.getOrders();
         this.porders = this.orders.filter((res) => {
             //add only orders that have NOT been uploaded
             this.loading = false;
-            return (!res.uploaded); // && (res.orderId.indexOf(this.curAssociate) !== -1));
+            return (!res.uploaded);
         });
         if (this.porders.length === 0) {
             setBoolean("pendingOrders", false);
@@ -81,7 +82,7 @@ export class PendingComponent implements OnInit {
             .then((result: any) => {
                 this.refreshOrders();
             })
-            .catch((err) => { console.log("Error: "+ err); });
+            .catch((err) => { console.error("Error: "+ err); });
     }
 
     displayOrder(order) {

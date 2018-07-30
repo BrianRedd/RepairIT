@@ -38,9 +38,7 @@ export class HomeComponent implements OnInit {
         private orderService: OrderService,
         private globals: Globals
     ) {
-    }
-
-    ngOnInit() {
+        console.info("Home Component");
         if (getString("Company", "") === "") {
             this.routerExtensions.navigate(["/setup"], { clearHistory: true });
         } else if (getString("users") === "") {
@@ -71,8 +69,13 @@ export class HomeComponent implements OnInit {
             this.actvBtnStyle += "background-color: " + this.company.colors[1] + ";";
             this.archBtnStyle += "background-color: " + this.company.colors[0] + ";";
         }
+    }
+
+    ngOnInit() {
         this.isPending();
-        this.FirstUse = (this.orderService.getOrders().length === 0);
+        if (getBoolean('Initialized')) {
+            this.FirstUse = (this.orderService.getOrders().length === 0);
+        }
         if (this.platformService.getConnectionType() === "None") {
             this.globals.isOffline = true;
         }
@@ -98,7 +101,7 @@ export class HomeComponent implements OnInit {
                 }]).then(() => {
                     //console.log("Local Notification scheduled");
                 }, (error) => {
-                    console.log("Local Notification Error occurred: " + error);
+                    console.error("Local Notification Error occurred: " + error);
                 });
             }
         } else {

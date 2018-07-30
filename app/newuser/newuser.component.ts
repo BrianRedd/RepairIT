@@ -39,6 +39,7 @@ export class NewuserComponent implements OnInit {
         private routerExtensions: RouterExtensions,
         private associateService: AssociateService
     ) {
+        console.info("NewUser Component");
         let colors = this.couchbaseService.getDocument("colors").colors;
         if (colors[0]) {
             this.actionBarStyle = "background-color: " + colors[0] + ";";
