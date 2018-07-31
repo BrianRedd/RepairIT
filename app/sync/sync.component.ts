@@ -221,10 +221,13 @@ export class SyncComponent {
                             acceptedDateTime: order.acceptedDateTime,
                             shippedOffsite: order.shippedOffsite,
                             shippedDateTime: order.shippedDateTime,
+                            shippedOffsiteRef: order.shippedOffsiteRef,
                             completed: order.completed,
                             completedDateTime: order.completedDateTime,
                             delivered: order.delivered,
                             deliveredDateTime: order.deliveredDateTime,
+                            deliveryMethod: order.deliveryMethod,
+                            deliveredRef: order.deliveredRef,
                             editedDateTime: order.editedDateTime
                         };
                         this.local_orders.push(newOrder);

@@ -2,7 +2,9 @@ export interface ImageVO {
     imageid: number,
     localpath: string,
     filename: string,
+    url: string,
     caption: string,
     valid: boolean,
-    uploaded: boolean
+    uploaded: boolean,
+    uploading: boolean
 }

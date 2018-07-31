@@ -29,9 +29,12 @@ export interface OrderVO {
     acceptedDateTime: string,
     shippedOffsite: boolean,
     shippedDateTime: string,
+    shippedOffsiteRef: string,
     completed: boolean,
     completedDateTime: string
     delivered: boolean,
     deliveredDateTime: string,
+    deliveryMethod: string,
+    deliveredRef: string,
     editedDateTime: string
 }

@@ -10,7 +10,8 @@
         <StackLayout row="1" col="0" colSpan="3" horizontalAlignment="center" [visibility]="(order.images.length > 0) ? 'visible' : 'hidden'">
             <WrapLayout orientation="horizontal">
                 <StackLayout orientation="vertical" width="110" *ngFor="let image of order.images">
-                    <Image [id]="'image_' + image.imageid" [src]="PhotoSource[image.imageid]" height="100" width="100" class="m-5"></Image>
+                    <ActivityIndicator *ngIf="image.uploading" busy="true" width="100" height="100" class="activity-indicator"></ActivityIndicator>
+                    <Image *ngIf="!image.uploading" [id]="'image_' + image.imageid" [src]="PhotoSource[image.imageid]" height="100" width="100" class="m-5"></Image>
                     <Label [text]="image.caption" class="text-center"></Label>
                 </StackLayout>
             </WrapLayout>
@@ -27,6 +28,10 @@
             <GridLayout [visibility]="(showOffsite) ? 'visible' : 'collapsed'" rows="auto" columns="*, auto">
                 <Label row="0" col="0" text="Shipped Offsite" textWrap="true" class="h3"></Label>
                 <Switch row="0" col="1" formControlName="shippedOffsite" [isEnabled]="(this.order.repairPaid && this.order.shipPaid)" (checkedChange)="formChange('shippedOffsite', $event)"></Switch>
+            </GridLayout>
+            <GridLayout [visibility]="(showOffsiteRef) ? 'visible' : 'collapsed'" rows="auto" columns="*, auto">
+                <Label row="0" col="0" text="Tracking Number" textWrap="true" class="h3"></Label>
+                <TextField row="0" col="1" formControlName="shippedOffsiteRef" id="shippedOffsiteRef" hint="Tracking Number" [text]="" class="input"></TextField>
             </GridLayout>
             <GridLayout [visibility]="(showComplete) ? 'visible' : 'collapsed'" rows="auto" columns="*, auto">
                 <Label row="0" col="0" text="Order Completed" textWrap="true" class="h3"></Label>

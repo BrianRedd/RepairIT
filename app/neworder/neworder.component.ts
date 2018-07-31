@@ -63,10 +63,13 @@ export class NeworderComponent implements OnInit {
         acceptedDateTime: "",
         shippedOffsite: false,
         shippedDateTime: "",
+        shippedOffsiteRef: "",
         completed: false,
         completedDateTime: "",
         delivered: false,
         deliveredDateTime: "",
+        deliveryMethod: "",
+        deliveredRef: "",
         editedDateTime: ""
     };
     message: string;
@@ -126,9 +129,11 @@ export class NeworderComponent implements OnInit {
                 "imageid": i,
                 "localpath": "res:/",
                 "filename": "blank_picture",
+                "url": "",
                 "caption": photos[i],
                 "valid": (i === 0) ? true : false,
-                "uploaded": false
+                "uploaded": false,
+                "uploading": false
             };
         }
     }
@@ -326,9 +331,11 @@ export class NeworderComponent implements OnInit {
                             imageid: id,
                             localpath: documents.path,
                             filename: this.orderID + "_" + id + ".png",
+                            url: "",
                             caption: "Additional",
                             valid: true,
-                            uploaded: false
+                            uploaded: false,
+                            uploading: false
                         };
                         this.newOrder.images.push(newPicture);
                     }

@@ -29,6 +29,7 @@ export class ImageService {
 
     public uploadImage(filename: string): Observable<any> {
         return new Observable((observer: any) => {
+            let response;
             let session = bghttp.session("file-upload");
             let request = {
                 url: BaseURL + 'imageUpload',
@@ -44,24 +45,31 @@ export class ImageService {
             }];
             let task = session.multipartUpload(params, request);
             task.on("progress", logEvent);
-            task.on("error", logEvent);
+            task.on("error", () => {
+                observer.error("Error uploading " + filename + "!");
+            });
             task.on("complete", uploadComplete);
+            task.on("responded", (e) => {
+                observer.next(JSON.parse(e.data));
+            });
 
             function logEvent(e) {
-                console.log("----------------");
-                console.log('File:', filename);
-                console.log('Status:', e.eventName);
+                /*console.log('Status:', e.eventName);
                 if (e.totalBytes !== undefined) {
                     console.log('Bytes transfered:', e.currentBytes);
                     console.log('Total file size (bytes):', e.totalBytes);
-                }
+                }*/
             }
         
             function uploadComplete() {
-                console.log("----------------");
-                console.log('Upload complete!');
+                //console.log('Upload complete!');
             }
+
         });
     }
+
+    public cacheLogo() {}
+
+    public cacheImage() {}
 
 }

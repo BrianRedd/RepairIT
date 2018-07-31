@@ -33,12 +33,17 @@ export class DisplayOrderModalComponent implements OnInit {
     showRepair: boolean;
     showShip: boolean;
     showOffsite: boolean;
+    showOffsiteRef: boolean;
     showComplete: boolean;
     showDeliver: boolean;
+    showDeliverMethod: boolean;
+    showDeliverRef: boolean;
     dataChanged: boolean;
     PhotoSource: Array<any> = [];
     folder = fs.knownFolders.currentApp();
     path: any;
+    imagesToUpload: number = 0;
+    tempImageObj: Object = [];
     message: string = "";
     acceptBtnStyle: string = "";
     uploadBtnStyle: string = "";
@@ -61,8 +66,11 @@ export class DisplayOrderModalComponent implements OnInit {
             repairPaid: this.order.repairPaid,
             shipPaid: this.order.shipPaid,
             shippedOffsite: this.order.shippedOffsite,
+            shippedOffsiteRef: this.order.shippedOffsiteRef,
             completed: this.order.completed,
-            delivered: this.order.delivered
+            delivered: this.order.delivered,
+            deliveryMethod: this.order.deliveryMethod,
+            deliveredRef: this.order.deliveredRef            
         });
         this.updatePhotos();
         this.acceptBtnStyle = "background-color: " + this.couchbaseService.getDocument("colors").colors[1] + ";";
@@ -75,8 +83,11 @@ export class DisplayOrderModalComponent implements OnInit {
         this.showRepair = !this.order.repairPaid;
         this.showShip = (this.order.repairLoc === 'Offsite' && !this.order.shipPaid);
         this.showOffsite = (this.order.repairLoc === 'Offsite' && !this.order.shippedOffsite);
+        this.showOffsiteRef = !(this.order.showOffsiteRef === "");
         this.showComplete = !this.order.completed;
         this.showDeliver = !this.order.delivered;
+        this.showDeliverMethod = !(this.order.showDeliverMethod === "");
+        this.showDeliverRef = !(this.order.showDeliverRef === "");
         this.renderDisplay();
         //console.log("Order opened:", this.order);
     }
@@ -151,7 +162,9 @@ export class DisplayOrderModalComponent implements OnInit {
 
     updatePhotos() {
         for (var i: number = 0; i < this.order.images.length; i ++ ) {
-            this.path = fs.path.join(this.folder.path, this.order.orderId + "_" + this.order.images[i].imageid + ".png");
+            this.order.images[i].uploading = false;
+            this.path = fs.path.join(this.folder.path, this.order.images[i].filename);
+            //TODO - cached images
             this.PhotoSource[i] = ImageSource.fromFile(this.path);
         }
     }
@@ -169,7 +182,7 @@ export class DisplayOrderModalComponent implements OnInit {
         if (this.dataChanged) {
             this.confirmChange('upload');
         } else {
-            this.uploadOrder();
+            this.fireUpload();
         }
     }
 
@@ -195,12 +208,15 @@ export class DisplayOrderModalComponent implements OnInit {
             switch (field) {
                 case "shippedOffsite":
                     this.order.shippedDateTime = curDate;
+                    this.showOffsiteRef = true;
                     break;
                 case "completed":
                     this.order.completedDateTime = curDate;
                     break;
                 case "delivered":
                     this.order.deliveredDateTime = curDate;
+                    this.showDeliverMethod = true;
+                    this.showDeliverRef = true;
                     break;
                 default:
                     break;
@@ -285,6 +301,9 @@ export class DisplayOrderModalComponent implements OnInit {
             orders[idx].delivered = this.order.delivered;
             orders[idx].deliveredDateTime = this.order.deliveredDateTime;
         }
+        if (this.order.images !== orders[idx].images) {
+            orders[idx].images = this.order.images;
+        }
         this.orderService.updateOrders(orders);
     }    
 
@@ -299,7 +318,7 @@ export class DisplayOrderModalComponent implements OnInit {
         this.params.closeCallback();
     }
 
-    uploadOrder() {
+    fireUpload() {
         if (this.globals.isOffline) {
             this.message = "Sync with Server Unavailable While Offline!";
             let toast = new Toasty(this.message, "short", "center");
@@ -321,6 +340,8 @@ export class DisplayOrderModalComponent implements OnInit {
                     } else if (result === undefined) {
                         return;
                     }
+                    this.imagesToUpload = this.order.images.length;
+                    this.tempImageObj = this.order.images;
                     this.order.editedDateTime = curDate;
                     this.order.uploaded = true;
                     this.order.uploadedDateTime = curDate;
@@ -328,54 +349,71 @@ export class DisplayOrderModalComponent implements OnInit {
                         this.order.emailed = true;
                         this.order.emailedDateTime = curDate;
                     }
-                    //order already on server?
-                    this.orderService.getOrderIDsFromServer()
-                        .subscribe((ids) => {
-                            if (ids.indexOf(this.order.orderId) !== -1) {
-                                //Order already exists on server
-                                //console.log("EXISTING ORDER: Order " + this.order.orderId + " already exists on server.");
-                                this.orderService.updateOrderOnServer(this.order.orderId, this.order)
-                                    .subscribe((order) => {
-                                        for (let i: number = 0; i < this.order.images.length; i++) {
-                                            this.imageService.uploadImage(this.order.images[i].filename)
-                                                .subscribe((response) => {
-                                                    console.log(response);
-                                                }, (err) => console.error("Error:", err));
-                                        }
-                                        this.updateOrdersLocally(order, alsoEmail);
-                                    }, (err) => console.error("Error:", err));
-                            } else {
-                                //POST new order on server
-                                //console.log("NEW ORDER: Order " + this.order.orderId + " not found on server.");
-                                this.orderService.postOrderOnServer(this.order)
-                                    .subscribe((order) => {
-                                        for (let i: number = 0; i < this.order.images.length; i++) {
-                                            this.imageService.uploadImage(this.order.images[i].filename)
-                                                .subscribe((response) => {
-                                                    console.log(response);
-                                                }, (err) => console.error("Error:", err));
-                                        }
-                                        this.updateOrdersLocally(order, alsoEmail);
-                                    }, (err) => console.error("Error:", err));
-                            }
-                        });
+                    this.uploadImages(alsoEmail);
                 });
         }     
     }
 
-    updateOrdersLocally(order: OrderVO, alsoEmail: boolean) {
-        //console.log("DISPLAY MODAL > updateOrdersLocally");
-        this.order = order;
-        this.message = "Order " + this.order.orderId + " uploaded to server!";
-        let toast = new Toasty(this.message, "short", "center");
-        toast.show();
-        if (alsoEmail) {
-            this.saveChanges('both');
-            this.emailOrder("upload");
-        } else {
-            this.saveChanges('upload');
-            this.params.closeCallback();
+    uploadImages(alsoEmail: boolean) {
+        for (let i: number = 0; i < this.order.images.length; i++) {
+            this.order.images[i].uploading = true;
+            this.imageService.uploadImage(this.order.images[i].filename)
+                .subscribe((response) => {
+                    this.order.images[i].uploading = false;
+                    this.tempImageObj[i].uploaded = true;
+                    this.tempImageObj[i].url = response.fileurl + this.order.images[i].filename;
+                    this.updateOrdersLocally(alsoEmail);
+                }, (err) => this.errorToast(err));
         }
+    }
+
+    updateOrdersLocally(alsoEmail: boolean) {
+        this.imagesToUpload--;
+        if (this.imagesToUpload === 0) {
+            this.order.images = this.tempImageObj;
+            this.message = "Order " + this.order.orderId + " uploaded to server!";
+            let toast = new Toasty(this.message, "short", "center");
+            toast.show();
+            this.uploadOrder(alsoEmail);
+        }
+    }
+
+    uploadOrder(alsoEmail: boolean) {
+        this.orderService.getOrderIDsFromServer()
+            .subscribe((ids) => {
+                if (ids.indexOf(this.order.orderId) !== -1) {
+                    //Order already exists on server
+                    this.orderService.updateOrderOnServer(this.order.orderId, this.order)
+                        .subscribe((order) => {
+                            if (alsoEmail) {
+                                this.saveChanges('both');
+                                this.emailOrder("upload");
+                            } else {
+                                this.saveChanges('upload');
+                                this.params.closeCallback();
+                            }
+                        }, (err) => this.errorToast(err));
+                } else {
+                    //POST new order on server
+                    this.orderService.postOrderOnServer(this.order)
+                        .subscribe((order) => {
+                            if (alsoEmail) {
+                                this.saveChanges('both');
+                                this.emailOrder("upload");
+                            } else {
+                                this.saveChanges('upload');
+                                this.params.closeCallback();
+                            }
+                        }, (err) => this.errorToast(err));
+                }
+            });
+    }
+
+    errorToast(err: string) {
+        this.message = "Error: " + err;
+        console.error(this.message);
+        let toast = new Toasty(this.message, "long", "center");
+        toast.show();
     }
 
 }
