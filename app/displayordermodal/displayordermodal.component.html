@@ -5,7 +5,7 @@
     <GridLayout rows="*, auto, auto, auto" columns="*">
         <ScrollView row="0" col="0">
             <ActivityIndicator *ngIf="orderFormBody === ''" busy="true" width="50" height="50" class="activity-indicator"></ActivityIndicator>
-            <WebView *ngIf="orderFormBody !== ''" [src]="orderFormHead + orderFormBody + orderFormFoot"></WebView>
+            <WebView *ngIf="orderFormBody !== ''" (tap)="editAll()" [src]="orderFormHead + orderFormBody + orderFormFoot"></WebView>
         </ScrollView>
         <StackLayout row="1" col="0" colSpan="3" horizontalAlignment="center" [visibility]="(order.images.length > 0) ? 'visible' : 'hidden'">
             <WrapLayout orientation="horizontal">
@@ -30,8 +30,8 @@
                 <Switch row="0" col="1" formControlName="shippedOffsite" [isEnabled]="(this.order.repairPaid && this.order.shipPaid)" (checkedChange)="formChange('shippedOffsite', $event)"></Switch>
             </GridLayout>
             <GridLayout [visibility]="(showOffsiteRef) ? 'visible' : 'collapsed'" rows="auto" columns="*, auto">
-                <Label row="0" col="0" text="Tracking Number" textWrap="true" class="h3"></Label>
-                <TextField row="0" col="1" formControlName="shippedOffsiteRef" id="shippedOffsiteRef" hint="Tracking Number" [text]="" class="input"></TextField>
+                <Label row="0" col="0" text="Tracking Number" textWrap="true" class="h3" verticalAlignment="center"></Label>
+                <TextField row="0" col="1" formControlName="shippedOffsiteRef" id="shippedOffsiteRef" hint="Tracking Number" [text]="" class="input" (textChange)="onFieldChange('shippedOffsiteRef', $event)"></TextField>
             </GridLayout>
             <GridLayout [visibility]="(showComplete) ? 'visible' : 'collapsed'" rows="auto" columns="*, auto">
                 <Label row="0" col="0" text="Order Completed" textWrap="true" class="h3"></Label>
@@ -41,11 +41,20 @@
                 <Label row="0" col="0" text="Order Delivered" textWrap="true" class="h3"></Label>
                 <Switch row="0" col="1" formControlName="delivered" [isEnabled]="(this.order.repairPaid && this.order.shipPaid && this.order.completed)" (checkedChange)="formChange('delivered', $event)"></Switch>
             </GridLayout>
+            <GridLayout [visibility]="(showDeliverMethod) ? 'visible' : 'collapsed'" rows="auto" columns="auto, *, *">
+                <Label row="0" col="0" text="Delivery Method" textWrap="true" class="h3" verticalAlignment="center"></Label>
+                <Button row="0" col="1" [class]="btnHand_class" text="By Hand" (tap)="deliveryMethod('hand')"></Button>
+                <Button row="0" col="2" [class]="btnSent_class" text="By Post" (tap)="deliveryMethod('sent')"></Button>
+            </GridLayout>
+            <GridLayout [visibility]="(showDeliverRef) ? 'visible' : 'collapsed'" rows="auto" columns="*, auto">
+                <Label row="0" col="0" text="Tracking Number" textWrap="true" class="h3" verticalAlignment="center"></Label>
+                <TextField row="0" col="1" formControlName="deliveredRef" id="deliveredRef" hint="Tracking Number" [text]="" class="input" (textChange)="onFieldChange('deliveredRef', $event)"></TextField>
+            </GridLayout>
         </StackLayout>
         <Label row="2" col="0" [visibility]="(displayType === 'neworder') ? 'visible' : 'collapsed'" class="m-5 body" textWrap="true" [text]="'By clicking &quot;Accept&quot;, I, ' + order.firstName + ' ' + order.lastName + ', hereby agree that the information above is correct and agreed upon.'"></Label>
         <GridLayout row="3" col="0" rows="auto" columns="*, *, *">
             <Button [visibility]="(displayType === 'neworder') ? 'visible' : 'collapsed'" row="0" col="0" class="btn btn-primary btn-active fa" [text]="('fa-check-circle' | fonticon) + ' Accept'" [style]="acceptBtnStyle" (tap)="accept()"></Button>
-            <Button [visibility]="(displayType !== 'neworder') ? 'visible' : 'collapsed'" row="0" col="0" [isEnabled]="!globals.isOffline" class="btn btn-primary btn-active fa" [text]="('fa-upload' | fonticon) + ' Upload'" [style]="uploadBtnStyle" (tap)="upload()"></Button>
+            <Button [visibility]="(displayType !== 'neworder') ? 'visible' : 'collapsed'" row="0" col="0" class="btn btn-primary btn-active fa" [isEnabled]="!globals.isOffline" [text]="('fa-upload' | fonticon) + ' Upload'" [style]="uploadBtnStyle" (tap)="upload()"></Button>
             <Button [visibility]="(displayType !== 'neworder') ? 'visible' : 'collapsed'" row="0" col="1" class="btn btn-primary btn-active fa" [text]="('fa-envelope' | fonticon) + ' Email'" [style]="emailBtnStyle" (tap)="email()"></Button>
             <Button row="0" col="2" class="btn btn-active fa" [text]="('fa-times-circle' | fonticon) + '  ' + ((displayType === 'neworder') ? 'Cancel' :  'Close')" (tap)="close()"></Button>
         </GridLayout>

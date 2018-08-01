@@ -28,16 +28,17 @@ export class EmailService {
                 mimeType: 'image/png'
             });
         }
-        let body = "<p>Order #: " + order.orderId + "</p>";
+        let body = "<h2>" + getString('Company') + " Repair Order Summary</h2>";
+        body += "<p>Order #: " + order.orderId + "</p>";
         body += "<p>Date Order Accepted: " + order.acceptedDateTime + "</p>";
         body += "<p>Record Last Updated: " + order.editedDateTime + "</p>";
-        body += "<p>Submitted by: " + getString("currentAssociateName") + " [" + getString("currentAssociateID") + "]</p>";
-        body += "<p>CLIENT DETAILS</p>";
+        body += "<p>Submitted by: " + getString('currentAssociateName') + " [" + getString('currentAssociateID') + "]</p>";
+        body += "<p><u>CLIENT DETAILS</u></p>";
         body += "<p>Name: " + order.firstName + " " + order.lastName + "</p>";
         body += "<p>Address: <br/>" + order.addressStreet + "<br/>" + order.addressCity + "<br/>" + order.addressState + ", " + order.addressZip + "</p>";
         body += "<p>Email: " + order.email + "</p>";
         body += "<p>Phone: (" + order.phone.substring(0,3) + ") " + order.phone.substring(3,6) + "-" + order.phone.substring(6) + "</p>";
-        body += "<p>REPAIR DETAILS</p>";
+        body += "<p><u>REPAIR DETAILS</u></p>";
         body += "<p>Problem : " + order.issue; 
         if (order.issueDetail) { 
             body += "<p>Details : " + order.issueDetail + "</p>"; 
@@ -53,16 +54,23 @@ export class EmailService {
         if (order.repairLoc === "Offsite") {
             body += "<p>Order Shipped Offsite: " + (order.shippedOffsite ? 'YES' : 'NO') + "</p>";
             body += "<p>Date Order Shipped: " + order.shippedDateTime + "</p>";
+            body += "<p>Tracking Number: " + order.shippedOffsiteRef + "</p>";
         }
         body += "<p>Order Completed: " + (order.completed ? 'YES' : 'NO') + "</p>";
         body += "<p>Order Completed Date: " + order.completedDateTime + "</p>";
         body += "<p>Order Delivered to Customer: " + (order.delivered ? 'YES' : 'NO') + "</p>";
         body += "<p>Order Delivery Date: " + order.deliveredDateTime + "</p>";
+        if (order.delivered) {
+            body += "<p>Order Delivery Method: " + order.deliveryMethod + "</p>";
+            if (order.deliveryMethod === "Sent via Post") {
+                body += "<p>Tracking Number: " + order.deliveredRef+ "</p>";
+            }
+        }
         Email.available()
             .then((avail: boolean) => {
             if (avail) {
                 Email.compose({
-                    to: [getString('CompanyEmail')],
+                    to: [getString('CompanyEmail'), order.email],
                     subject: 'Repair Order ' + order.orderId,
                     attachments: attachments,
                     body: body

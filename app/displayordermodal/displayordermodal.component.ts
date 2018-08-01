@@ -4,6 +4,7 @@ import { Toasty } from "nativescript-toasty";
 import { setBoolean } from "tns-core-modules/application-settings/application-settings";
 import { FormBuilder, FormGroup } from "@angular/forms";
 import { Switch } from "tns-core-modules/ui/switch/switch";
+import { TextField } from "tns-core-modules/ui/text-field/text-field";
 import { confirm } from "tns-core-modules/ui/dialogs/dialogs";
 import { Page, borderTopRightRadiusProperty } from 'tns-core-modules/ui/page/page';
 import { OrderVO } from "~/shared/orderVO";
@@ -15,7 +16,6 @@ import * as fs from "tns-core-modules/file-system/file-system";
 import { Image, imageSourceProperty } from "tns-core-modules/ui/image/image";
 import { EmailService } from "~/services/email.service";
 import { Globals } from '../shared/globals';
-
 import * as bghttp from "nativescript-background-http";
 
 @Component({
@@ -38,7 +38,7 @@ export class DisplayOrderModalComponent implements OnInit {
     showDeliver: boolean;
     showDeliverMethod: boolean;
     showDeliverRef: boolean;
-    dataChanged: boolean;
+    dataChanged: boolean = false;
     PhotoSource: Array<any> = [];
     folder = fs.knownFolders.currentApp();
     path: any;
@@ -48,6 +48,9 @@ export class DisplayOrderModalComponent implements OnInit {
     acceptBtnStyle: string = "";
     uploadBtnStyle: string = "";
     emailBtnStyle: string = "";
+    btnHand_class: string = "btn";
+    btnSent_class: string = "btn";
+    editFlag: boolean = false;
 
     constructor(
         private formBuilder: FormBuilder,
@@ -80,16 +83,24 @@ export class DisplayOrderModalComponent implements OnInit {
 
     ngOnInit() {
         this.dataChanged = false;
+        this.checkFlags();
+        this.renderDisplay();
+        //console.log("Order opened:", this.order);
+    }
+
+    checkFlags() {
         this.showRepair = !this.order.repairPaid;
         this.showShip = (this.order.repairLoc === 'Offsite' && !this.order.shipPaid);
         this.showOffsite = (this.order.repairLoc === 'Offsite' && !this.order.shippedOffsite);
-        this.showOffsiteRef = !(this.order.showOffsiteRef === "");
+        this.showOffsiteRef = (this.order.repairLoc === 'Offsite' && !this.order.shippedOffsite && this.order.shippedOffsiteRef);
         this.showComplete = !this.order.completed;
         this.showDeliver = !this.order.delivered;
-        this.showDeliverMethod = !(this.order.showDeliverMethod === "");
-        this.showDeliverRef = !(this.order.showDeliverRef === "");
-        this.renderDisplay();
-        //console.log("Order opened:", this.order);
+        this.showDeliverMethod = (this.order.deliveryMethod !== "" && !this.order.delivered);
+        if (this.order.deliveryMethod === "Hand Delivered") {
+            this.btnHand_class = "btn btn-primary";
+        } else if (this.order.deliveryMethod === "Sent via Post") {
+            this.btnSent_class = "btn btn-primary";
+        }
     }
 
     convertISOtoDate(isodate: string) {
@@ -146,6 +157,7 @@ export class DisplayOrderModalComponent implements OnInit {
             if (this.order.repairLoc === "Offsite" && this.order.shippedOffsite) {
                 html += "<tr><td width='33%'>Shipped Offsite:</td><td width='17%' class='border'>" + this.order.shippedOffsite + "</td>";
                 html += "<td width='15%' style='text-align:center;'>Date:</td><td width='35%' class='border'>" + this.convertISOtoDate(this.order.shippedDateTime) + "</td></tr>";
+                html += "<tr><td width='33%'>Tracking Number:</td><td width='67%' colspan='3' class='border'>" + this.order.shippedOffsiteRef + "</td></tr>";
             }
             if (this.order.completed) {
                 html += "<tr><td width='33%'>Completed:</td><td width='17%' class='border'>" + this.order.completed + "</td>";
@@ -154,6 +166,10 @@ export class DisplayOrderModalComponent implements OnInit {
             if (this.order.delivered) {
                 html += "<tr><td width='33%'>Delivered:</td><td width='17%' class='border'>" + this.order.delivered + "</td>";
                 html += "<td width='15%' style='text-align:center;'>Date:</td><td width='35%' class='border'>" + this.convertISOtoDate(this.order.deliveredDateTime) + "</td></tr>";
+                html += "<tr><td width='33%'>Delivery Method:</td><td width='67%' colspan='3' class='border'>" + this.order.deliveryMethod + "</td></tr>";
+                if (this.order.deliveryMethod === "Sent via Post") {
+                    html += "<tr><td width='33%'>Tracking Number:</td><td width='67%' colspan='3' class='border'>" + this.order.deliveredRef + "</td></tr>";
+                }
             }
             html += "</table>";
         }
@@ -178,14 +194,6 @@ export class DisplayOrderModalComponent implements OnInit {
         }
     }
 
-    upload() {
-        if (this.dataChanged) {
-            this.confirmChange('upload');
-        } else {
-            this.fireUpload();
-        }
-    }
-
     email() {
         if (this.dataChanged) {
             this.confirmChange('email');
@@ -199,6 +207,45 @@ export class DisplayOrderModalComponent implements OnInit {
         this.params.closeCallback('accept');
     }
 
+    upload() {
+        if (this.dataChanged) {
+            this.confirmChange('upload');
+        } else {
+            this.fireUpload();
+        }
+    }
+
+    editAll() {
+        this.editFlag = !this.editFlag;
+        if (this.editFlag) {
+            this.showRepair = true;
+            this.showShip = true;
+            this.showOffsite = true;
+            if (this.order.shippedOffsite) {
+                this.showOffsiteRef = true;
+            }
+            this.showComplete = true;
+            this.showDeliver = true;
+            if (this.order.delivered) {
+                this.showDeliverMethod = true;
+                if (this.order.deliveryMethod === "Sent via Post") {
+                    this.showDeliverRef = true;
+                }
+            }
+        } else {
+            this.checkFlags();
+        }
+    }
+
+    onFieldChange(field, args) {
+        let textField = <TextField>args.object;
+        if (textField.text !== this.order[field]) {
+            this.dataChanged = true;
+        }
+        this.displayForm.patchValue({ [field]: textField.text });
+        this.displayForm.patchValue({ [field]: textField.text });
+    }
+
     formChange(field: string, args) {
         let curDate: string = new Date().toISOString();
         let switchChecked: any = <Switch>args.object.checked;
@@ -206,23 +253,67 @@ export class DisplayOrderModalComponent implements OnInit {
             this.dataChanged = true;
             this.order[field] = switchChecked;
             switch (field) {
+                case "shipPaid": 
+                    this.showOffsite = this.order.shipPaid;
+                    if (!this.order.shipPaid) {
+                        this.order.shippedOffsite = false;
+                        this.order.shippedDateTime = "";
+                        this.order.shippedOffsiteRef = "";
+                        this.displayForm.patchValue({'shippedOffsiteRef':''});
+                    }
+                    break;
                 case "shippedOffsite":
                     this.order.shippedDateTime = curDate;
-                    this.showOffsiteRef = true;
+                    this.showOffsiteRef = this.order.shippedOffsite;
+                    if (!this.order.shippedOffsite) {
+                        this.order.shippedOffsiteRef = "";
+                        this.displayForm.patchValue({'shippedOffsiteRef':''});
+                    }
                     break;
                 case "completed":
                     this.order.completedDateTime = curDate;
+                    if (!this.order.completed) {
+                        this.order.delivered = false;
+                        this.order.deliveryMethod = "";
+                        this.btnHand_class = "btn";
+                        this.btnSent_class = "btn";
+                        this.order.deliveredRef = "";
+                        this.showDeliverRef = false;
+                        this.displayForm.patchValue({'deliveredRef':''});
+                    }
                     break;
                 case "delivered":
                     this.order.deliveredDateTime = curDate;
-                    this.showDeliverMethod = true;
-                    this.showDeliverRef = true;
+                    this.showDeliverMethod = this.order.delivered;
+                    if (!this.order.delivered) {
+                        this.order.deliveryMethod = "";
+                        this.btnHand_class = "btn";
+                        this.btnSent_class = "btn";
+                        this.order.deliveredRef = "";
+                        this.showDeliverRef = false;
+                        this.displayForm.patchValue({'deliveredRef':''});
+                    }
                     break;
                 default:
                     break;
             }
             this.renderDisplay();
             this.updatePhotos();
+        }
+    }
+
+    deliveryMethod(method: string) {
+        this.dataChanged = true;
+        if (method === 'hand') {
+            this.order.deliveryMethod = 'Hand Delivered';
+            this.btnHand_class = "btn btn-primary";
+            this.btnSent_class = "btn";
+            this.showDeliverRef = false;
+        } else {
+            this.order.deliveryMethod = 'Sent via Post';
+            this.btnHand_class = "btn";
+            this.btnSent_class = "btn btn-primary";
+            this.showDeliverRef = true;
         }
     }
 
@@ -283,24 +374,19 @@ export class DisplayOrderModalComponent implements OnInit {
             setBoolean("pendingOrders", true);
         }
         //changed data
-        if (this.order.repairPaid !== orders[idx].repairPaid) {
-            orders[idx].repairPaid = this.order.repairPaid;
-        }
-        if (this.order.shipPaid !== orders[idx].shipPaid) {
-            orders[idx].shipPaid = this.order.shipPaid;
-        }
-        if (this.order.shippedOffsite !== orders[idx].shippedOffsite && this.order.shipPaid) {
-            orders[idx].shippedOffsite = this.order.shippedOffsite;
-            orders[idx].shippedDateTime = this.order.shippedDateTime;
-        }
-        if (this.order.completed !== orders[idx].completed && this.order.repairPaid && this.order.shipPaid) {
-            orders[idx].completed = this.order.completed;
-            orders[idx].completedDateTime = this.order.completedDateTime;
-        }
-        if (this.order.delivered !== orders[idx].delivered && this.order.completed) {
-            orders[idx].delivered = this.order.delivered;
-            orders[idx].deliveredDateTime = this.order.deliveredDateTime;
-        }
+        orders[idx].repairPaid = this.order.repairPaid;
+        orders[idx].shipPaid = this.order.shipPaid;
+        orders[idx].shippedOffsite = this.order.shippedOffsite;
+        orders[idx].shippedDateTime = this.order.shippedDateTime;
+        this.order.shippedOffsiteRef = this.displayForm.get('shippedOffsiteRef').value;
+        orders[idx].shippedOffsiteRef = this.order.shippedOffsiteRef;
+        orders[idx].completed = this.order.completed;
+        orders[idx].completedDateTime = this.order.completedDateTime;
+        orders[idx].delivered = this.order.delivered;
+        orders[idx].deliveredDateTime = this.order.deliveredDateTime;
+        orders[idx].deliveryMethod = this.order.deliveryMethod;
+        this.order.deliveredRef = this.displayForm.get('deliveredRef').value;
+        orders[idx].deliveredRef = this.order.deliveredRef;
         if (this.order.images !== orders[idx].images) {
             orders[idx].images = this.order.images;
         }
