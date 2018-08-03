@@ -13,6 +13,8 @@ export class SettingsComponent implements OnInit {
 
     actionBarStyle: string = "background-color: #006A5C;";
     actionBarTextStyle: string = "color: #FFFFFF";
+    priBtnStyle: string = "";
+    secBtnStyle: string = "";
 
     constructor(
         private couchbaseService: CouchbaseService,
@@ -20,6 +22,8 @@ export class SettingsComponent implements OnInit {
     ){
         console.info("Settings Component");
         this.actionBarStyle = "background-color: " + this.couchbaseService.getDocument("colors").colors[1] + ";";
+        this.priBtnStyle = "background-color: " + this.couchbaseService.getDocument("colors").colors[0] + ";";
+        this.secBtnStyle = "background-color: " + this.couchbaseService.getDocument("colors").colors[1] + ";";
     }
 
     ngOnInit() {}

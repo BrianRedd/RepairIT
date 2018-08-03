@@ -13,6 +13,9 @@ import { Page } from "tns-core-modules/ui/page/page";
 import { View } from "tns-core-modules/ui/core/view/view";
 import * as ImageSource from "tns-core-modules/image-source/image-source";
 import * as fs from "tns-core-modules/file-system/file-system";
+import { initializeOnAngular, setCacheLimit } from 'nativescript-image-cache';
+import { BaseURL } from "../shared/baseurl";
+import { Globals } from '../shared/globals';
 
 @Component({
     selector: "app-active",
@@ -37,18 +40,22 @@ export class ActiveComponent implements OnInit {
         private modalService: ModalDialogService,
         private vcRef: ViewContainerRef,
         private orderService: OrderService,
-        private routerExtensions: RouterExtensions
+        private routerExtensions: RouterExtensions,
+        private globals: Globals
     ) {
         console.info("Active Component");
         this.actionBarStyle = "background-color: " + this.couchbaseService.getDocument("colors").colors[1] + ";";
+        initializeOnAngular();
+        setCacheLimit(31);
     }
 
     ngOnInit() {
         this.refreshOrders();
     }
-    // Perhaps as a setting - some companies may want all associates to have access to all device orders
+    
     refreshOrders() {
         //console.log("Active > refreshOrders()");
+        // Perhaps as a setting - some companies may want all associates to have access to all device orders
         this.loading = true;
         this.aorders = [];
         this.orders = this.orderService.getOrders();
@@ -57,6 +64,21 @@ export class ActiveComponent implements OnInit {
             this.loading = false;            
             return (!res.delivered);
         });
+        for (let i: number = 0; i < this.aorders.length; i++) {
+            for (let ii: number = 0; ii < this.aorders[i].images.length; ii++) {
+                const path = fs.path.join(this.folder.path, this.aorders[i].images[ii].filename);
+                const exists = fs.File.exists(path);
+                if (exists) {
+                    this.aorders[i].images[ii].imagesource = this.folder.path + '/' + this.aorders[i].images[ii].filename;
+                } else {
+                    if (this.aorders[i].images[ii].url && !this.globals.isOffline) {
+                        this.aorders[i].images[ii].imagesource = BaseURL + this.aorders[i].images[ii].url;
+                    } else {
+                        this.aorders[i].images[ii].imagesource = "res://offline_product";
+                    }
+                }
+            }
+        }
     }
 
     goBack() {
@@ -79,5 +101,7 @@ export class ActiveComponent implements OnInit {
     displayOrder(order) {
         this.createDisplayOrderModal(["active", order]);
     };
+
+
 
 }

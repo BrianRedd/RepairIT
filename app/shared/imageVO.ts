@@ -6,5 +6,6 @@ export interface ImageVO {
     caption: string,
     valid: boolean,
     uploaded: boolean,
-    uploading: boolean
+    uploading: boolean,
+    imagesource: string
 }

@@ -6,17 +6,16 @@ import { FormBuilder, FormGroup } from "@angular/forms";
 import { Switch } from "tns-core-modules/ui/switch/switch";
 import { TextField } from "tns-core-modules/ui/text-field/text-field";
 import { confirm } from "tns-core-modules/ui/dialogs/dialogs";
-import { Page, borderTopRightRadiusProperty } from 'tns-core-modules/ui/page/page';
-import { OrderVO } from "~/shared/orderVO";
+import { Page } from 'tns-core-modules/ui/page/page';
 import { CouchbaseService } from "~/services/couchbase.service";
 import { OrderService } from "~/services/order.service";
 import { ImageService } from "~/services/image.service";
 import * as ImageSource from "tns-core-modules/image-source/image-source";
 import * as fs from "tns-core-modules/file-system/file-system";
-import { Image, imageSourceProperty } from "tns-core-modules/ui/image/image";
 import { EmailService } from "~/services/email.service";
 import { Globals } from '../shared/globals';
-import * as bghttp from "nativescript-background-http";
+import { initializeOnAngular, setCacheLimit } from 'nativescript-image-cache';
+import { BaseURL } from "../shared/baseurl";
 
 @Component({
     moduleId: module.id,
@@ -41,7 +40,6 @@ export class DisplayOrderModalComponent implements OnInit {
     dataChanged: boolean = false;
     PhotoSource: Array<any> = [];
     folder = fs.knownFolders.currentApp();
-    path: any;
     imagesToUpload: number = 0;
     tempImageObj: Object = [];
     message: string = "";
@@ -79,6 +77,8 @@ export class DisplayOrderModalComponent implements OnInit {
         this.acceptBtnStyle = "background-color: " + this.couchbaseService.getDocument("colors").colors[1] + ";";
         this.uploadBtnStyle = "background-color: " + this.couchbaseService.getDocument("colors").colors[1] + ";";
         this.emailBtnStyle = "background-color: " + this.couchbaseService.getDocument("colors").colors[0] + ";";
+        initializeOnAngular();
+        setCacheLimit(31);
     }
 
     ngOnInit() {
@@ -178,10 +178,20 @@ export class DisplayOrderModalComponent implements OnInit {
 
     updatePhotos() {
         for (var i: number = 0; i < this.order.images.length; i ++ ) {
-            this.order.images[i].uploading = false;
-            this.path = fs.path.join(this.folder.path, this.order.images[i].filename);
-            //TODO - cached images
-            this.PhotoSource[i] = ImageSource.fromFile(this.path);
+            this.order.images[i].uploading = true;
+            let path = fs.path.join(this.folder.path, this.order.images[i].filename);
+            const exists = fs.File.exists(path);
+            if (exists) {
+                this.order.images[i].imagesource = this.folder.path + '/' + this.order.images[i].filename;
+                this.order.images[i].uploading = false;
+            } else {
+                if (this.order.images[i].url && !this.globals.isOffline) {
+                    this.order.images[i].imagesource = BaseURL + this.order.images[i].url;
+                } else {
+                    this.order.images[i].imagesource = "res://offline_product";
+                }
+                this.order.images[i].uploading = false;
+            };
         }
     }
 
@@ -243,7 +253,7 @@ export class DisplayOrderModalComponent implements OnInit {
             this.dataChanged = true;
         }
         this.displayForm.patchValue({ [field]: textField.text });
-        this.displayForm.patchValue({ [field]: textField.text });
+        this.order[field] = textField.text;
     }
 
     formChange(field: string, args) {

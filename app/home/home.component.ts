@@ -10,6 +10,7 @@ import { TNSFontIconService } from "nativescript-ngx-fonticon";
 import { Toasty } from "nativescript-toasty";
 import * as LocalNotifications from "nativescript-local-notifications";
 import { Globals } from '../shared/globals';
+import { initializeOnAngular, setCacheLimit } from 'nativescript-image-cache';
 
 @Component({
     selector: "app-home",
@@ -50,7 +51,7 @@ export class HomeComponent implements OnInit {
             this.company.name = getString("Company");
             this.company.id= getString("CompanyID");
             this.company.password = getString("CompanyPW");
-            this.company.logo = getString("Logo");
+            this.company.logo = getString("Logo"); //logo URL
             this.company.email = getString("CompanyEmail");
             this.company.website = getString("CompanyWebsite");
             this.company.phone = getString("CompanyPhone");
@@ -69,6 +70,8 @@ export class HomeComponent implements OnInit {
             this.actvBtnStyle += "background-color: " + this.company.colors[1] + ";";
             this.archBtnStyle += "background-color: " + this.company.colors[0] + ";";
         }
+        initializeOnAngular();
+        setCacheLimit(31);
     }
 
     ngOnInit() {

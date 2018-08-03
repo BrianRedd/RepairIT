@@ -68,8 +68,4 @@ export class ImageService {
         });
     }
 
-    public cacheLogo() {}
-
-    public cacheImage() {}
-
 }

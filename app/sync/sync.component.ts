@@ -2,6 +2,7 @@ import { Component, OnInit } from "@angular/core";
 import { Globals } from '../shared/globals';
 import { Toasty } from "nativescript-toasty";
 import { OrderService } from "~/services/order.service";
+import { ImageService } from "~/services/image.service";
 import { PlatformService } from "../services/platform.service";
 import { setBoolean, setNumber, getNumber, getString } from "tns-core-modules/application-settings/application-settings";
 import { OrderVO } from "~/shared/orderVO";
@@ -42,6 +43,7 @@ export class SyncComponent {
         private routerExtensions: RouterExtensions,
         private platformService: PlatformService,
         private orderService: OrderService,
+        private imageService: ImageService,
         private globals: Globals
     ) {
         console.info("Sync Component");
@@ -230,6 +232,8 @@ export class SyncComponent {
                             deliveredRef: order.deliveredRef,
                             editedDateTime: order.editedDateTime
                         };
+                        for (let i: number = 0; i < order.images.length; i++) {
+                        }
                         this.local_orders.push(newOrder);
                         if (this.nextOrderNumber !== getNumber("initialOrderNumber")) { //if app isn't freshly set up
                             this.nextOrderNumber++;

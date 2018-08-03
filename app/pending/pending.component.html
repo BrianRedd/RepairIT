@@ -15,7 +15,7 @@
                         <Label row="0" col="0" [text]="order.orderId" class="list-group-item-text" textAlignment="left"></Label>
                         <Label row="0" col="2" [text]="('fa-envelope-open' | fonticon)" [visibility]="order.emailed ? 'visible' : 'collapsed'" class="list-group-item-text fa m-l-5" textAlignment="right"></Label>
                         <Label row="0" col="3" [text]="('fa-upload' | fonticon)" [visibility]="order.uploaded ? 'visible' : 'collapsed'" class="list-group-item-text fa m-l-5" textAlignment="left"></Label>
-                        <Image row="1" col="0" [src]="folder.path + '/' + order.orderId + '_0.png'" class="m-r-5" height="50" width="50"></Image>
+                        <Image row="1" col="0" [src]="order.images[0].imagesource" placeholder="res://offline_product" class="m-r-5" height="50" width="50"></Image>
                         <Label row="1" col="1" [text]="order.issue" class="list-group-item-text m-l-15" textWrap="true" textAlignment="left"></Label>
                         <Label row="1" col="3" [text]="order.acceptedDateTime.substring(0,10)" class="list-group-item-text" textAlignment="right"></Label>
                     </GridLayout>

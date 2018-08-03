@@ -13,6 +13,9 @@ import { Page } from "tns-core-modules/ui/page/page";
 import { View } from "tns-core-modules/ui/core/view/view";
 import * as ImageSource from "tns-core-modules/image-source/image-source";
 import * as fs from "tns-core-modules/file-system/file-system";
+import { initializeOnAngular, setCacheLimit } from 'nativescript-image-cache';
+import { BaseURL } from "../shared/baseurl";
+import { Globals } from '../shared/globals';
 
 @Component({
     selector: "app-archive",
@@ -37,10 +40,13 @@ export class ArchiveComponent implements OnInit {
         private modalService: ModalDialogService,
         private vcRef: ViewContainerRef,
         private orderService: OrderService,
-        private routerExtensions: RouterExtensions
+        private routerExtensions: RouterExtensions,
+        private globals: Globals
     ) {
         console.info("Archive Component");
         this.actionBarStyle = "background-color: " + this.couchbaseService.getDocument("colors").colors[0] + ";";
+        initializeOnAngular();
+        setCacheLimit(31);
     }
 
     ngOnInit() {
@@ -57,6 +63,21 @@ export class ArchiveComponent implements OnInit {
             this.loading = false;
             return (res.delivered);
         });
+        for (let i: number = 0; i < this.corders.length; i++) {
+            for (let ii: number = 0; ii < this.corders[i].images.length; ii++) {
+                const path = fs.path.join(this.folder.path, this.corders[i].images[ii].filename);
+                const exists = fs.File.exists(path);
+                if (exists) {
+                    this.corders[i].images[ii].imagesource = this.folder.path + '/' + this.corders[i].images[ii].filename;
+                } else {
+                    if (this.corders[i].images[ii].url && !this.globals.isOffline) {
+                        this.corders[i].images[ii].imagesource = BaseURL + this.corders[i].images[ii].url;
+                    } else {
+                        this.corders[i].images[ii].imagesource = "res://offline_product";
+                    }
+                }
+            }
+        }
     }
 
     goBack() {

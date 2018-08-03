@@ -133,7 +133,8 @@ export class NeworderComponent implements OnInit {
                 "caption": photos[i],
                 "valid": (i === 0) ? true : false,
                 "uploaded": false,
-                "uploading": false
+                "uploading": false,
+                "imagesource": ""
             };
         }
     }
@@ -335,7 +336,8 @@ export class NeworderComponent implements OnInit {
                             caption: "Additional",
                             valid: true,
                             uploaded: false,
-                            uploading: false
+                            uploading: false,
+                            imagesource: ""
                         };
                         this.newOrder.images.push(newPicture);
                     }
