@@ -114,7 +114,7 @@ export class HomeComponent implements OnInit {
     }
 
     userLoggedIn() {
-        if (getString("currentuser") === "") {
+        if (getString("currentAssociateID") === "") {
             //TO DO: ADD LOGIN MODAL (drop down to choose associate, only enter password if one is configured)
             //From App Config: numusers, users, currentusername, currentuserid, usernane_{x}, userid_{x}, userpw_{x}
         } else {

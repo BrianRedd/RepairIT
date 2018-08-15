@@ -1,5 +1,6 @@
 <ActionBar class="action-bar" [style]="actionBarStyle">
-    <Label [text]="('fa-user' | fonticon) + ' New Associate'" class="h2 fa" [style]="actionBarTextStyle"></Label>
+    <NavigationButton android.systemIcon="ic_menu_back" (tap)="goBack()" [visibility]="(currentUser && currentUser !== '') ? 'visible' : 'collapsed'"></NavigationButton>
+    <Label [text]="('fa-user-plus' | fonticon) + ' New Associate'" class="h2 fa" [style]="actionBarTextStyle"></Label>
 </ActionBar>
 
 <StackLayout class="page m-15">
@@ -18,7 +19,7 @@
                 <TextField row="3" col="1" class="input input-border" formControlName="associateid" id="associateid" hint="Associate ID" [text]="" (textChange)="onIdChange($event)" (blur)="onIdChange($event)"></TextField>
                 <Label row="4" col="0" class="h3 m-15" text="Password (optional)"></Label>
                 <TextField row="4" col="1" class="input input-border" formControlName="associatepw" id="associatepw" hint="Password" [text]="" secure="true" (textChange)="onFieldChange('associatepw', $event)"></TextField>
-                <Button row="5" col="1" class="btn btn-primary btn-active m-15" text="Submit" (tap)="newSubmit()" [isEnabled]="newAssociateForm.valid"></Button>
+                <Button row="5" col="1" class="btn btn-primary btn-active m-15" text="Submit" (tap)="newSubmit()" [isEnabled]="newAssociateForm.valid" [style]="newBtnStyle"></Button>
             </GridLayout>
         </StackLayout>
         <StackLayout *tabItem="{title: 'Existing Associate'}">
@@ -28,7 +29,7 @@
                 <TextField row="1" col="1" class="input input-border" formControlName="associateid" id="associateid" hint="Associate ID" [text]="" (blur)="onIdChange($event)"></TextField>
                 <Label row="2" col="0" class="h3 m-15" text="Password (optional)"></Label>
                 <TextField row="2" col="1" class="input input-border" formControlName="associatepw" id="associatepw" hint="Password" [text]="" secure="true" (textChange)="onFieldChange('associatepw', $event)"></TextField>
-                <Button row="3" col="1" class="btn btn-primary btn-active m-15" text="Submit" (tap)="existingSubmit()" [isEnabled]="existingAssociateForm.valid"></Button>
+                <Button row="3" col="1" class="btn btn-primary btn-active m-15" text="Submit" (tap)="existingSubmit()" [isEnabled]="existingAssociateForm.valid" [style]="existBtnStyle"></Button>
             </GridLayout>
         </StackLayout>
     </TabView>

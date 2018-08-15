@@ -18,6 +18,7 @@ import { ArchiveComponent } from "./archive/archive.component";
 import { SettingsComponent } from "./settings/settings.component";
 import { InfoComponent } from "./info/info.component";
 import { SyncComponent } from "~/sync/sync.component";
+import { LoginComponent } from "~/login/login.component";
 import { OrderModalComponent } from "./ordermodal/ordermodal.component";
 import { DisplayOrderModalComponent } from "./displayordermodal/displayordermodal.component";
 
@@ -59,6 +60,7 @@ import { Globals } from './shared/globals';
         SettingsComponent,
         InfoComponent,
         SyncComponent,
+        LoginComponent,
         OrderModalComponent,
         DisplayOrderModalComponent
     ],

@@ -7,18 +7,18 @@
             <Label [text]="message"></Label>
         </StackLayout>
         <GridLayout rows="auto" columns="*, *, *" dock="bottom">
-            <Button row="0" col="0" class="fa m-15 btn-rounded-lg btn-outline" [text]="('fa-cog' | fonticon)" [nsRouterLink]="['/settings']" clearHistory="true"></Button>
-            <Button row="0" col="1" class="fa m-15 btn-rounded-lg btn-outline" [text]="('fa-refresh' | fonticon)" [visibility]="globals.isOffline ? 'hidden' : 'visible'" [nsRouterLink]="['/sync']" clearHistory="true"></Button>
+            <Button row="0" col="0" class="fa m-15 btn-rounded-lg btn-outline" [text]="('fa-cog' | fonticon)" [nsRouterLink]="['/settings']"></Button>
+            <Button row="0" col="1" class="fa m-15 btn-rounded-lg btn-outline" [text]="('fa-refresh' | fonticon)" [visibility]="globals.isOffline ? 'hidden' : 'visible'" [nsRouterLink]="['/sync']"></Button>
             <Label row="0" col="1" class="fa m-15" [text]="('fa-exclamation-triangle' | fonticon) + ' Offline!'" horizontalAlignment="center" verticalAlignment="center" [visibility]="globals.isOffline ? 'visible' : 'hidden'"></Label>
-            <Button row="0" col="2" class="fa m-15 btn-rounded-lg btn-outline" [text]="('fa-info-circle' | fonticon)" [nsRouterLink]="['/info']" clearHistory="true"></Button>
+            <Button row="0" col="2" class="fa m-15 btn-rounded-lg btn-outline" [text]="('fa-info-circle' | fonticon)" [nsRouterLink]="['/info']"></Button>
         </GridLayout>
         <GridLayout *ngIf="company" rows="auto auto auto auto *" columns="*, *, *">
             <Image row="0" col="0" colSpan="3" [src]="company.logo" placeholder="res://RepairIT_rect_logo" class="p-4" horizontalAlignment="center" height="100"></Image>
             <label row="1" col="0" colSpan="3" [text]="company.name" class="h2 m-10 text-center" textWrap="true"></label>
-            <Button row="2" col="0" colspan="3" [text]="('fa-ambulance' | fonticon) + '\nNew Repair Order'" class="m-5 fa" [style]="newBtnStyle" [nsRouterLink]="['/neworder']" clearHistory="true"></Button>
-            <Button row="3" col="0" [text]="('fa-upload' | fonticon) + '\nPending\nOrders'" class="m-5 fa" textWrap="true" [style]="pendBtnStyle" [nsRouterLink]="['/pending']" clearHistory="true" [visibility]="!FirstUse ? 'visible' : 'collapsed'"></Button>
-            <Button row="3" col="1" [text]="('fa-hourglass-half' | fonticon) + '\nActive\nOrders'" class="m-5 fa" textWrap="true" [style]="actvBtnStyle" [nsRouterLink]="['/active']" clearHistory="true" [visibility]="!FirstUse ? 'visible' : 'collapsed'"></Button>
-            <Button row="3" col="2" [text]="('fa-archive' | fonticon) + '\nCompleted\nOrders'" class="m-5 fa" textWrap="true" [style]="archBtnStyle" [nsRouterLink]="['/archive']" clearHistory="true" [visibility]="!FirstUse ? 'visible' : 'collapsed'"></Button>
+            <Button row="2" col="0" colspan="3" [text]="('fa-ambulance' | fonticon) + '\nNew Repair Order'" class="m-5 fa" [style]="newBtnStyle" [nsRouterLink]="['/neworder']"></Button>
+            <Button row="3" col="0" [text]="('fa-upload' | fonticon) + '\nPending\nOrders'" class="m-5 fa" textWrap="true" [style]="pendBtnStyle" [nsRouterLink]="['/pending']" [visibility]="!FirstUse ? 'visible' : 'collapsed'"></Button>
+            <Button row="3" col="1" [text]="('fa-hourglass-half' | fonticon) + '\nActive\nOrders'" class="m-5 fa" textWrap="true" [style]="actvBtnStyle" [nsRouterLink]="['/active']" [visibility]="!FirstUse ? 'visible' : 'collapsed'"></Button>
+            <Button row="3" col="2" [text]="('fa-archive' | fonticon) + '\nCompleted\nOrders'" class="m-5 fa" textWrap="true" [style]="archBtnStyle" [nsRouterLink]="['/archive']" [visibility]="!FirstUse ? 'visible' : 'collapsed'"></Button>
         </GridLayout>
     </DockLayout>
 </StackLayout>

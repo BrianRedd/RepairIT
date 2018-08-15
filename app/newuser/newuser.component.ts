@@ -5,11 +5,12 @@ import { RouterExtensions } from "nativescript-angular/router";
 import { TNSFontIconService } from "nativescript-ngx-fonticon";
 import { Validators, FormBuilder, FormGroup } from "@angular/forms";
 import { TextField } from "tns-core-modules/ui/text-field/text-field";
-import { Switch } from "tns-core-modules/ui/switch/switch";
+//import { Switch } from "tns-core-modules/ui/switch/switch";
 import { Toasty } from "nativescript-toasty";
-import { confirm } from "tns-core-modules/ui/dialogs/dialogs";
+//import { confirm } from "tns-core-modules/ui/dialogs/dialogs";
 import { AssociateService } from "../services/associate.service";
 import { Md5 } from "ts-md5/dist/md5";
+import { AssociateVO } from "~/shared/associateVO";
 
 @Component({
     selector: "app-newuser",
@@ -22,15 +23,19 @@ export class NewuserComponent implements OnInit {
     message: string;
     newAssociateForm: FormGroup;
     existingAssociateForm: FormGroup;
-    users: string = getString('users');
-    numusers: number = getNumber('numusers');
+    associates: any;
+    users: string = "";
+    numusers: number;
     userid_first: string = "";
     userid_last: string = "";
     currentAssociateID: string;
     currentAssociateName: string;
     actionBarStyle: string = "background-color: #006A5C;";
     actionBarTextStyle: string = "color: #FFFFFF";
+    newBtnStyle: string = "";
+    existBtnStyle: string = "";
     tabSelectedIndex: number = 0;
+    currentUser: string;
 
     constructor(
         private formBuilder: FormBuilder,
@@ -40,15 +45,27 @@ export class NewuserComponent implements OnInit {
         private associateService: AssociateService
     ) {
         console.info("NewUser Component");
-        let colors = this.couchbaseService.getDocument("colors").colors;
-        if (colors[0]) {
-            this.actionBarStyle = "background-color: " + colors[0] + ";";
+        this.actionBarStyle = "background-color: " + this.couchbaseService.getDocument("colors").colors[0] + ";";
+        this.newBtnStyle = "background-color: " + this.couchbaseService.getDocument("colors").colors[0] + ";";
+        this.existBtnStyle = "background-color: " + this.couchbaseService.getDocument("colors").colors[1] + ";";
+        this.associates = this.couchbaseService.getDocument("associates").associates;
+        if (!this.associates) {
+            this.numusers = 0;
+        } else {
+            this.numusers = this.associates.length;
         }
         if (this.numusers === 0) {
-            this.message = "No local Associates defined"
+            this.message = "No Associates defined on this Device"
         } else {
-            this.message = "Existing associates: " + this.users;
+            for (let i: number = 0; i < this.numusers; i++) {
+                this.users += this.associates[i].associateID;
+                if (i < this.numusers - 1) {
+                    this.users += ", ";
+                }
+            }
+            this.message = "Associates on Device: " + this.users;
         }
+        this.currentUser = getString("currentAssociateID");
         this.newAssociateForm = this.formBuilder.group({
             firstname: ["", Validators.required],
             lastname: ["", Validators.required],
@@ -65,6 +82,10 @@ export class NewuserComponent implements OnInit {
         if (getString('DeviceID') === null) {
             this.routerExtensions.navigate(["/setup"], { clearHistory: true });
         }
+    }
+
+    goBack() {
+        this.routerExtensions.back();
     }
 
     onFieldChange(field, args) {
@@ -95,6 +116,12 @@ export class NewuserComponent implements OnInit {
 
     newSubmit() {
         this.message = "";
+        if (this.users.indexOf(this.newAssociateForm.get('associateid').value) !== -1) {
+            this.message = this.newAssociateForm.get('associateid').value + " already exists on this device!";
+            let toast = new Toasty(this.message, "short", "center");
+            toast.show();
+            return;
+        }
         this.associateService.getAssociateIDs(getString('CompanyID'))
             .subscribe((ids) => {
                 if (ids.indexOf(this.newAssociateForm.get('associateid').value) !== -1) {
@@ -104,17 +131,11 @@ export class NewuserComponent implements OnInit {
                 } else {
                     this.currentAssociateID = this.newAssociateForm.get('associateid').value;
                     this.currentAssociateName = this.newAssociateForm.get("firstname").value + " " + this.newAssociateForm.get("lastname").value; 
-                    if (this.numusers > 0) {
-                        this.users += "|";
-                    }
-                    this.users += this.currentAssociateID;
-                    this.numusers ++;
-                    setString('users', this.users);
-                    setNumber('numusers', this.numusers);
+                    //setString('users', this.users);
+                    //setNumber('numusers', this.numusers);
                     setString('currentAssociateID', this.currentAssociateID);
                     setString('currentAssociateName', this.currentAssociateName);
                     var password = this.newAssociateForm.get('associatepw').value;
-                    //console.log(password);
                     if (password !== "") {
                         password = Md5.hashStr(this.newAssociateForm.get('associatepw').value).toString();
                     } 
@@ -126,6 +147,8 @@ export class NewuserComponent implements OnInit {
                         'company': getString('CompanyID'),
                         'devices': [getString('DeviceID')]
                     };
+                    this.associates.push(newAssociate);
+                    this.couchbaseService.updateDocument("associates", {"associates": this.associates});
                     this.associateService.newAssociate(newAssociate)
                         .subscribe((associate) => {
                             this.message = this.currentAssociateName + " created and configured!";
@@ -141,6 +164,12 @@ export class NewuserComponent implements OnInit {
         let existingAssociateId = this.existingAssociateForm.get('associateid').value.toUpperCase();
         this.existingAssociateForm.patchValue({associateid: existingAssociateId});
         this.message = "";
+        if (this.users.indexOf(existingAssociateId) !== -1) {
+            this.message = existingAssociateId + " already exists on this device!";
+            let toast = new Toasty(this.message, "short", "center");
+            toast.show();
+            return;
+        }
         this.associateService.getAssociateIDs(getString('CompanyID'))
             .subscribe((ids) => {
                 if (ids.indexOf(existingAssociateId) === -1) {
@@ -158,19 +187,28 @@ export class NewuserComponent implements OnInit {
                             } else {
                                 this.currentAssociateID = existingAssociateId;
                                 this.currentAssociateName = associate.firstname + " " + associate.lastname;
-                                if (this.numusers > 0) {
-                                    this.users += "|";
-                                }
-                                this.users += this.currentAssociateID;
-                                this.numusers ++;
-                                setString('users', this.users);
-                                setNumber('numusers', this.numusers);
+                                //if (this.numusers > 0) {
+                                //    this.users += "|";
+                                //}
+                                //this.users += this.currentAssociateID;
+                                //this.numusers ++;
+                                //setString('users', this.users);
+                                //setNumber('numusers', this.numusers);
                                 setString('currentAssociateID', this.currentAssociateID);
                                 setString('currentAssociateName', this.currentAssociateName);                                
                                 this.associateService.updateAssociate(getString('CompanyID'), this.currentAssociateID, {
                                     "device" : getString('DeviceID')
-                                })
-                                    .subscribe((associate) => {
+                                }).subscribe((associate) => {
+                                        var newAssociate = {
+                                            'associateID': this.currentAssociateID,
+                                            'password': associate.password,
+                                            'firstname': associate.firstname, 
+                                            'lastname': associate.lastname,
+                                            'company': associate.company,
+                                            'devices': associate.devices
+                                        };
+                                        this.associates.push(newAssociate);
+                                        this.couchbaseService.updateDocument("associates", {"associates": this.associates});
                                         this.message = this.currentAssociateName + " added to this device!";
                                         let toast = new Toasty(this.message, "short", "center");
                                         toast.show();

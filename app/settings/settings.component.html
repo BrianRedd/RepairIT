@@ -4,8 +4,8 @@
 </ActionBar>
 <StackLayout class="page m-5">
     <GridLayout rows="auto, *, auto" columns="*,*">
-        <Button row="0" col="0" text="Change User" class="btn btn-primary" (tap)="changeUser()" [style]="priBtnStyle"></Button>
-        <Button row="0" col="1" text="New User" class="btn btn-primary" [nsRouterLink]="['/newuser']" [style]="secBtnStyle"></Button>
+        <Button row="0" col="0" [text]="('fa-users' | fonticon) + ' Change Associate'" class="fa btn btn-primary" [nsRouterLink]="['/login']" [style]="priBtnStyle"></Button>
+        <Button row="0" col="1" [text]="('fa-user-plus' | fonticon) + ' New Associate'" class="fa btn btn-primary" [nsRouterLink]="['/newuser']" [style]="secBtnStyle"></Button>
         <Button row="2" col="0" colSpan="2" text="Reset Data" (tap)="reset()"></Button>
     </GridLayout>
 </StackLayout>

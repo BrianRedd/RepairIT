@@ -22,8 +22,8 @@ export class SettingsComponent implements OnInit {
     ){
         console.info("Settings Component");
         this.actionBarStyle = "background-color: " + this.couchbaseService.getDocument("colors").colors[1] + ";";
-        this.priBtnStyle = "background-color: " + this.couchbaseService.getDocument("colors").colors[0] + ";";
-        this.secBtnStyle = "background-color: " + this.couchbaseService.getDocument("colors").colors[1] + ";";
+        this.priBtnStyle = "background-color: " + this.couchbaseService.getDocument("colors").colors[1] + ";";
+        this.secBtnStyle = "background-color: " + this.couchbaseService.getDocument("colors").colors[0] + ";";
     }
 
     ngOnInit() {}
@@ -42,6 +42,7 @@ export class SettingsComponent implements OnInit {
         this.couchbaseService.deleteDocument("issues");
         this.couchbaseService.deleteDocument("locations");
         this.couchbaseService.deleteDocument("requiredPhotos");
+        this.couchbaseService.deleteDocument("associates");
         this.couchbaseService.deleteDocument("orders");
         this.routerExtensions.navigate(["/setup"], { clearHistory: true });
     }

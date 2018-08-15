@@ -1,0 +1,26 @@
+<ActionBar class="action-bar" [style]="actionBarStyle">
+    <NavigationButton android.systemIcon="ic_menu_back" (tap)="goBack()" [visibility]="(currentUser && currentUser !== '') ? 'visible' : 'collapsed'"></NavigationButton>
+    <Label [text]="('fa-users' | fonticon) + ' ' + ((currentUser && currentUser !== '') ? 'Choose Associate' : 'Login')" class="h2 fa" [style]="actionBarTextStyle"></Label>
+</ActionBar>
+
+<StackLayout class="page m-15">
+    <StackLayout orientation="horizontal" horizontalAlignment="center" *ngIf="message">
+        <Label [text]="message"></Label>
+    </StackLayout>
+    <StackLayout orientation="horizontal" *ngIf="currentUser">
+        <Label [text]="'Current Associate: ' + currentUserName + ' [' + currentUser + ']'" class="h2 m-4"></Label>
+    </StackLayout>
+    <StackLayout orientation="vertical">
+        <ListView [items]="associates" class="list-group">
+            <ng-template let-associate="item">
+                <StackLayout orientation="horizontal" class="list-group-item">
+                    <GridLayout class="list-group-item" rows="auto" columns="auto, *, auto">
+                        <Label row="0" col="0" [text]="'[' + associate.associateID + ']'" class="h3 m-4" textAlignment="left"></Label>
+                        <Label row="0" col="1" [text]="associate.firstname + ' ' + associate.lastname" class="h3 m-4" textAlignment="left"></Label>
+                        <Button row="0" col="2" class="btn btn-primary btn-active" text="Choose" (tap)="chooseAssociate(associate)" [isEnabled]="(associate.associateID !== currentUser)" [style]="loginBtnStyle"></Button>
+                    </GridLayout>
+                </StackLayout>
+            </ng-template>
+        </ListView>
+    </StackLayout>
+</StackLayout>

@@ -1,4 +1,4 @@
-import { Component, Inject } from "@angular/core";
+import { Component } from "@angular/core";
 import { CompanyVO } from "../shared/companyVO";
 import { CompanyService } from "../services/company.service";
 import { getString, getNumber, setString, setNumber, setBoolean, getBoolean } from "tns-core-modules/application-settings/application-settings";
@@ -56,10 +56,14 @@ export class SetupComponent {
         if (this.couchbaseService.getDocument("requiredPhotos")) { //create empty locations CBdoc
             this.couchbaseService.deleteDocument("requiredPhotos");
         }
+        if (this.couchbaseService.getDocument("associates")) { //create empty associates CBdoc
+            this.couchbaseService.deleteDocument("associates");
+        }
         this.couchbaseService.createDocument({"colors": []}, "colors");
         this.couchbaseService.createDocument({"issues": []}, "issues");
         this.couchbaseService.createDocument({"locations": []}, "locations");
         this.couchbaseService.createDocument({"requiredPhotos": []}, "requiredPhotos");
+        this.couchbaseService.createDocument({"associates": []}, "associates");
     }
 
     ngOnInit() {
@@ -169,8 +173,8 @@ export class SetupComponent {
         setString("defaultLoc", this.company.locations[0]);//default store location, starting with first in company list, updated when form is submitted
         setString("defaultState", "AL");//default customer state (address), updates when form is submitted
         setBoolean("Initialized", true);
-        setNumber("numusers", 0); //number of users (0 to start)
-        setString("users", "");//string of user ID (empty to start), delimited with "|"
+        //setNumber("numusers", 0); //number of users (0 to start)
+        //setString("users", "");//string of user ID (empty to start), delimited with "|"
         setString("currentAssociateID", ""); //current associate ID (empty to start)
         setString("currentAssociateName", ""); //current associate Name (empty to start)
 
@@ -180,7 +184,7 @@ export class SetupComponent {
 
         this.orderService.initializeOrders();//initialize empty "orders" document
         
-        this.routerExtensions.navigate(["/newuser"]);   
+        this.routerExtensions.navigate(["/newuser"], { clearHistory: true });   
     }
 
     contact() {

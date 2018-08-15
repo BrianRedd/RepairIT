@@ -19,9 +19,6 @@ export class AssociateService {
 
     getAssociateIDs(companyID: string): Observable<AssociateVO[]> {
         return this.http.get(BaseURL + "associates/verify/" + companyID)
-            /*.map((res) => {
-                return this.processHTTPMsgService.extractData(res);
-            })*/
             .catch((error) => {
                 return this.processHTTPMsgService.handleError(error);
             });
@@ -29,9 +26,6 @@ export class AssociateService {
 
     getAssociate(companyID: string, associate: string): Observable<AssociateVO> {
         return this.http.get(BaseURL + "associates/" + companyID + "/" + associate)
-            /*.map(res => {
-                return this.processHTTPMsgService.extractData(res);
-            })*/
             .catch((error) => {
                 return this.processHTTPMsgService.handleError(error);
             });
